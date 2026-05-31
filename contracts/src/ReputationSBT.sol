@@ -46,6 +46,13 @@ contract ReputationSBT is ERC721, IReputationSBT {
         emit CircleAuthorized(circle, authorized);
     }
 
+    event AdminTransferred(address indexed from, address indexed to);
+
+    function transferAdmin(address newAdmin) external onlyAdmin {
+        emit AdminTransferred(admin, newAdmin);
+        admin = newAdmin;
+    }
+
     /// @notice ERC-5192: all tokens are permanently locked.
     function locked(uint256 tokenId) external view returns (bool) {
         _requireOwned(tokenId);
