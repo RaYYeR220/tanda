@@ -41,4 +41,16 @@ contract CircleFactoryTest is Test {
         factory.createCircle(50_000_000, 5);
         assertEq(factory.allCirclesLength(), 1);
     }
+
+    function test_createCircle_rejectsZeroContribution() public {
+        vm.prank(organizer);
+        vm.expectRevert(CircleFactory.InvalidParams.selector);
+        factory.createCircle(0, 3);
+    }
+
+    function test_createCircle_rejectsTooFewMembers() public {
+        vm.prank(organizer);
+        vm.expectRevert(CircleFactory.InvalidParams.selector);
+        factory.createCircle(100_000_000, 1);
+    }
 }

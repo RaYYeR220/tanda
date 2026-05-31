@@ -13,6 +13,8 @@ contract CircleFactory {
     address[] public allCircles;
     mapping(address => bool) public isCircle;
 
+    error InvalidParams();
+
     event CircleCreated(
         address indexed circle, address indexed organizer, uint256 contributionAmount, uint8 maxMembers
     );
@@ -27,6 +29,7 @@ contract CircleFactory {
     }
 
     function createCircle(uint256 contributionAmount, uint8 maxMembers) external returns (address) {
+        if (contributionAmount == 0 || maxMembers < 2) revert InvalidParams();
         TandaCircle circle = new TandaCircle(msg.sender, mxnb, address(reputation), contributionAmount, maxMembers);
         address addr = address(circle);
         allCircles.push(addr);
