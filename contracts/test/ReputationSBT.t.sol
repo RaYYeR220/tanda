@@ -60,4 +60,37 @@ contract ReputationSBTTest is Test {
         assertEq(defaults, 1);
         assertEq(completed, 1);
     }
+
+    function test_mintsSbtOnFirstRecord() public {
+        sbt.setCircleAuthorized(circle, true);
+        assertEq(sbt.balanceOf(member), 0);
+
+        vm.prank(circle);
+        sbt.recordOnTime(member);
+
+        assertEq(sbt.balanceOf(member), 1);
+        uint256 tokenId = uint256(uint160(member));
+        assertEq(sbt.ownerOf(tokenId), member);
+        assertTrue(sbt.locked(tokenId));
+    }
+
+    function test_secondRecordDoesNotMintAgain() public {
+        sbt.setCircleAuthorized(circle, true);
+        vm.startPrank(circle);
+        sbt.recordOnTime(member);
+        sbt.recordOnTime(member);
+        vm.stopPrank();
+        assertEq(sbt.balanceOf(member), 1);
+    }
+
+    function test_transferReverts() public {
+        sbt.setCircleAuthorized(circle, true);
+        vm.prank(circle);
+        sbt.recordOnTime(member);
+
+        uint256 tokenId = uint256(uint160(member));
+        vm.prank(member);
+        vm.expectRevert(ReputationSBT.Soulbound.selector);
+        sbt.transferFrom(member, address(0xDEAD), tokenId);
+    }
 }
