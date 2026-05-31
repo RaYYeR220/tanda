@@ -1,0 +1,9 @@
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+node_modules/
+.env
+.env.*
+!.env.example
+agent/dist/
+web/.next/
