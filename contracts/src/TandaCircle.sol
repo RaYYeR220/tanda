@@ -5,6 +5,7 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {IReputationSBT} from "./interfaces/IReputationSBT.sol";
+import {Underwriter} from "./Underwriter.sol";
 
 /// @notice One rotating savings circle (ROSCA). Phase 1: fixed join-order payout, on-time recording.
 /// @dev Extension points for later phases: `collateral` mapping and `underwriter` address (unused here).
@@ -27,8 +28,8 @@ contract TandaCircle is ReentrancyGuard {
     State public state;
     address[] public members;
     mapping(address => bool) public isMember;
-    mapping(address => uint256) public collateral; // extension point (Phase 2); 0 in Phase 1
-    address public underwriter; // extension point (Phase 2)
+    mapping(address => uint256) public collateral;
+    Underwriter public immutable underwriter;
 
     uint256 public currentRound; // 0-indexed; recipient = members[currentRound]
     mapping(uint256 => mapping(address => bool)) public contributedInRound;
@@ -42,12 +43,14 @@ contract TandaCircle is ReentrancyGuard {
     error NotMember();
     error AlreadyContributed();
     error RoundIncomplete();
+    error NoCollateral();
 
     event Joined(address indexed member, uint256 index);
     event Started(uint256 timestamp);
     event Contributed(address indexed member, uint256 indexed round);
     event PaidOut(address indexed recipient, uint256 indexed round, uint256 amount);
     event Completed();
+    event CollateralWithdrawn(address indexed member, uint256 amount);
 
     modifier inState(State s) {
         if (state != s) revert WrongState();
@@ -58,12 +61,14 @@ contract TandaCircle is ReentrancyGuard {
         address organizer_,
         address token_,
         address reputation_,
+        address underwriter_,
         uint256 contributionAmount_,
         uint8 maxMembers_
     ) {
         organizer = organizer_;
         token = IERC20(token_);
         reputation = IReputationSBT(reputation_);
+        underwriter = Underwriter(underwriter_);
         contributionAmount = contributionAmount_;
         maxMembers = maxMembers_;
         state = State.Forming;
@@ -73,12 +78,26 @@ contract TandaCircle is ReentrancyGuard {
         return members.length;
     }
 
-    function join() external inState(State.Forming) {
+    function join(uint256 adjustedScore, bytes32 rationaleHash, uint256 deadline, bytes calldata signature)
+        external
+        inState(State.Forming)
+        nonReentrant
+    {
         if (isMember[msg.sender]) revert AlreadyMember();
         if (members.length >= maxMembers) revert CircleFull();
+
+        uint256 required = underwriter.verifyAndQuote(
+            address(this), msg.sender, adjustedScore, rationaleHash, deadline, contributionAmount, signature
+        );
+
         isMember[msg.sender] = true;
         members.push(msg.sender);
+        collateral[msg.sender] = required;
         emit Joined(msg.sender, members.length - 1);
+
+        if (required > 0) {
+            token.safeTransferFrom(msg.sender, address(this), required);
+        }
     }
 
     function start() external inState(State.Forming) {
@@ -114,5 +133,13 @@ contract TandaCircle is ReentrancyGuard {
             currentRound += 1;
         }
         token.safeTransfer(recipient, amount);
+    }
+
+    function withdrawCollateral() external inState(State.Completed) nonReentrant {
+        uint256 amount = collateral[msg.sender];
+        if (amount == 0) revert NoCollateral();
+        collateral[msg.sender] = 0;
+        emit CollateralWithdrawn(msg.sender, amount);
+        token.safeTransfer(msg.sender, amount);
     }
 }
