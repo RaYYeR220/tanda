@@ -48,6 +48,7 @@ contract TandaCircle is ReentrancyGuard {
     mapping(address => uint256) public bidFee; // auction bid (0 if not bid)
     uint256 public bidDeadline;
     uint256[] public payoutOrder; // slot -> member index; identity for the no-auction path
+    mapping(uint256 => mapping(address => bool)) public atRisk; // round => member => AI-flagged
 
     uint256 public currentRound;
     uint256 public roundDeadline;
@@ -69,6 +70,7 @@ contract TandaCircle is ReentrancyGuard {
     error ZeroBid();
     error AlreadyBid();
     error BidNotClosed();
+    error ZeroAmount();
 
     event Joined(address indexed member, uint256 index, uint256 collateral, uint256 premium);
     event Started(uint256 timestamp, uint256 roundDeadline);
@@ -83,6 +85,8 @@ contract TandaCircle is ReentrancyGuard {
     event RoundUnderfunded(uint256 indexed round, uint256 shortfall);
     event Completed();
     event CollateralWithdrawn(address indexed member, uint256 amount);
+    event CollateralToppedUp(address indexed member, uint256 amount, uint256 newCollateral);
+    event RiskFlagged(address indexed member, uint256 indexed round, bytes32 rationaleHash);
 
     modifier inState(State s) {
         if (state != s) revert WrongState();
@@ -343,5 +347,28 @@ contract TandaCircle is ReentrancyGuard {
         collateral[msg.sender] = 0;
         emit CollateralWithdrawn(msg.sender, amount);
         token.safeTransfer(msg.sender, amount);
+    }
+
+    /// @notice A member adds collateral mid-circle (e.g. in response to an AI risk flag). This
+    ///         shrinks the insurance draw if they later default, since the slash takes more from
+    ///         their own stake. Conservation-preserving: collateral and contract balance rise together.
+    function topUpCollateral(uint256 amount) external inState(State.Active) nonReentrant {
+        if (!isMember[msg.sender]) revert NotMember();
+        if (amount == 0) revert ZeroAmount();
+        collateral[msg.sender] += amount;
+        emit CollateralToppedUp(msg.sender, amount, collateral[msg.sender]);
+        token.safeTransferFrom(msg.sender, address(this), amount);
+    }
+
+    /// @notice Post an AI-signed early-warning flag for `member` in the current round. Anyone may
+    ///         relay it, but only a valid aiSigner signature is accepted (verifiable AI action).
+    function flagAtRisk(address member, bytes32 rationaleHash, uint256 deadline, bytes calldata signature)
+        external
+        inState(State.Active)
+    {
+        if (!isMember[member]) revert NotMember();
+        underwriter.verifyRiskFlag(address(this), member, currentRound, rationaleHash, deadline, signature);
+        atRisk[currentRound][member] = true;
+        emit RiskFlagged(member, currentRound, rationaleHash);
     }
 }
