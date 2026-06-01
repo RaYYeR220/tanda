@@ -34,4 +34,13 @@ contract CrossLayerTest is Test {
         uint256 collateral = uw.verifyAndQuote(circle, member, 62, rationaleHash, deadline, AMOUNT, sig);
         assertEq(collateral, AMOUNT);
     }
+
+    function test_canonicalRiskFlagAccepted() public view {
+        uint256 deadline = 9999999999;
+        bytes32 rationaleHash = keccak256("risk");
+        bytes memory sig = SignDecision.signRiskFlag(
+            vm, AI_KEY, address(uw), circle, member, 2, rationaleHash, deadline
+        );
+        assertTrue(uw.verifyRiskFlag(circle, member, 2, rationaleHash, deadline, sig));
+    }
 }
