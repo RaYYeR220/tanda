@@ -6,6 +6,7 @@ import {console2} from "forge-std/console2.sol";
 import {MockMXNB} from "../src/MockMXNB.sol";
 import {ReputationSBT} from "../src/ReputationSBT.sol";
 import {Underwriter} from "../src/Underwriter.sol";
+import {InsurancePool} from "../src/InsurancePool.sol";
 import {CircleFactory} from "../src/CircleFactory.sol";
 
 contract Deploy is Script {
@@ -16,13 +17,16 @@ contract Deploy is Script {
         MockMXNB mxnb = new MockMXNB();
         ReputationSBT sbt = new ReputationSBT(msg.sender);
         Underwriter underwriter = new Underwriter(address(sbt), aiSigner);
-        CircleFactory factory = new CircleFactory(address(mxnb), address(sbt), address(underwriter));
+        InsurancePool pool = new InsurancePool(address(mxnb), msg.sender);
+        CircleFactory factory = new CircleFactory(address(mxnb), address(sbt), address(underwriter), address(pool));
         sbt.transferAdmin(address(factory));
+        pool.transferAdmin(address(factory));
         vm.stopBroadcast();
 
         console2.log("MockMXNB:      ", address(mxnb));
         console2.log("ReputationSBT: ", address(sbt));
         console2.log("Underwriter:   ", address(underwriter));
+        console2.log("InsurancePool: ", address(pool));
         console2.log("CircleFactory: ", address(factory));
         console2.log("AI signer:     ", aiSigner);
     }

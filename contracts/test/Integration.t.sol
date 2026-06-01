@@ -5,6 +5,7 @@ import {Test} from "forge-std/Test.sol";
 import {MockMXNB} from "../src/MockMXNB.sol";
 import {ReputationSBT} from "../src/ReputationSBT.sol";
 import {Underwriter} from "../src/Underwriter.sol";
+import {InsurancePool} from "../src/InsurancePool.sol";
 import {CircleFactory} from "../src/CircleFactory.sol";
 import {TandaCircle} from "../src/TandaCircle.sol";
 import {SignDecision} from "./util/SignDecision.sol";
@@ -13,6 +14,7 @@ contract IntegrationTest is Test {
     MockMXNB internal mxnb;
     ReputationSBT internal sbt;
     Underwriter internal uw;
+    InsurancePool internal pool;
     CircleFactory internal factory;
 
     address internal organizer = address(0xABCD);
@@ -21,14 +23,17 @@ contract IntegrationTest is Test {
     address[] internal members;
     uint256 internal constant AMOUNT = 100_000_000;
     uint8 internal constant MAX = 3;
+    uint256 internal constant ROUND = 1 days;
 
     function setUp() public {
         aiSigner = vm.addr(aiKey);
         mxnb = new MockMXNB();
         sbt = new ReputationSBT(address(this));
         uw = new Underwriter(address(sbt), aiSigner);
-        factory = new CircleFactory(address(mxnb), address(sbt), address(uw));
+        pool = new InsurancePool(address(mxnb), address(this));
+        factory = new CircleFactory(address(mxnb), address(sbt), address(uw), address(pool));
         sbt.transferAdmin(address(factory));
+        pool.transferAdmin(address(factory));
 
         members.push(address(0x1));
         members.push(address(0x2));
@@ -37,7 +42,7 @@ contract IntegrationTest is Test {
 
     function test_endToEndLifecycleWithCollateral() public {
         vm.prank(organizer);
-        address circleAddr = factory.createCircle(AMOUNT, MAX);
+        address circleAddr = factory.createCircle(AMOUNT, MAX, ROUND);
         TandaCircle circle = TandaCircle(circleAddr);
 
         for (uint256 i = 0; i < members.length; i++) {
