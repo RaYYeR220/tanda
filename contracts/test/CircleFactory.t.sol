@@ -73,4 +73,10 @@ contract CircleFactoryTest is Test {
         vm.expectRevert(CircleFactory.InvalidParams.selector);
         factory.createCircle(100_000_000, 3, 0, BIDDUR);
     }
+
+    function test_createCircle_rejectsZeroBidDuration() public {
+        vm.prank(organizer);
+        vm.expectRevert(CircleFactory.InvalidParams.selector);
+        factory.createCircle(100_000_000, 3, ROUND, 0);
+    }
 }
