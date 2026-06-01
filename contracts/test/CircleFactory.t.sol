@@ -30,20 +30,23 @@ contract CircleFactoryTest is Test {
         pool.transferAdmin(address(factory));
     }
 
-    function test_createCircle_deploysAuthorizesTracks() public {
+    function test_createCircle_deploysAuthorizesTracksOnBothRegistries() public {
         vm.prank(organizer);
         address circleAddr = factory.createCircle(100_000_000, 3, ROUND);
 
         assertTrue(factory.isCircle(circleAddr));
         assertEq(factory.allCirclesLength(), 1);
         assertTrue(sbt.isAuthorizedCircle(circleAddr));
+        assertTrue(pool.isAuthorizedCircle(circleAddr));
 
         TandaCircle c = TandaCircle(circleAddr);
         assertEq(c.organizer(), organizer);
         assertEq(c.contributionAmount(), 100_000_000);
         assertEq(c.maxMembers(), 3);
+        assertEq(c.roundDuration(), ROUND);
         assertEq(address(c.token()), address(mxnb));
         assertEq(address(c.underwriter()), address(uw));
+        assertEq(address(c.insurancePool()), address(pool));
     }
 
     function test_createCircle_emitsEvent() public {
@@ -62,5 +65,11 @@ contract CircleFactoryTest is Test {
         vm.prank(organizer);
         vm.expectRevert(CircleFactory.InvalidParams.selector);
         factory.createCircle(100_000_000, 1, ROUND);
+    }
+
+    function test_createCircle_rejectsZeroRoundDuration() public {
+        vm.prank(organizer);
+        vm.expectRevert(CircleFactory.InvalidParams.selector);
+        factory.createCircle(100_000_000, 3, 0);
     }
 }

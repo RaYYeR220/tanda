@@ -43,7 +43,7 @@ contract CircleFactory {
         external
         returns (address)
     {
-        if (contributionAmount == 0 || maxMembers < 2) revert InvalidParams();
+        if (contributionAmount == 0 || maxMembers < 2 || roundDuration == 0) revert InvalidParams();
         TandaCircle circle = new TandaCircle(
             msg.sender,
             mxnb,
