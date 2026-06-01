@@ -127,3 +127,31 @@ contract UnderwriterVerifyTest is Test {
         uw.verifyAndQuote(circle, member, 60, keccak256("reason"), deadline, AMOUNT, sig);
     }
 }
+
+contract UnderwriterPremiumTest is Test {
+    ReputationSBT internal sbt;
+    Underwriter internal uw;
+
+    function setUp() public {
+        sbt = new ReputationSBT(address(this));
+        uw = new Underwriter(address(sbt), address(0xA15));
+    }
+
+    function test_premiumLadder() public view {
+        uint256 amount = 100_000_000;
+        assertEq(uw.premium(85, amount), 1_000_000);
+        assertEq(uw.premium(70, amount), 2_000_000);
+        assertEq(uw.premium(50, amount), 4_000_000);
+        assertEq(uw.premium(30, amount), 6_000_000);
+    }
+
+    function test_premiumBoundaries() public view {
+        uint256 amount = 100_000_000;
+        assertEq(uw.premium(80, amount), 1_000_000);
+        assertEq(uw.premium(79, amount), 2_000_000);
+        assertEq(uw.premium(60, amount), 2_000_000);
+        assertEq(uw.premium(59, amount), 4_000_000);
+        assertEq(uw.premium(40, amount), 4_000_000);
+        assertEq(uw.premium(39, amount), 6_000_000);
+    }
+}

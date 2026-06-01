@@ -54,6 +54,17 @@ contract Underwriter is EIP712 {
         return contributionAmount * bps / 10000;
     }
 
+    /// @notice Risk-priced insurance premium for a given score, in token base units.
+    ///         Lower score (riskier) pays a higher premium that funds the insurance buffer.
+    function premium(uint256 score, uint256 contributionAmount) public pure returns (uint256) {
+        uint256 bps;
+        if (score >= 80) bps = 100; // 1%
+        else if (score >= 60) bps = 200; // 2%
+        else if (score >= 40) bps = 400; // 4%
+        else bps = 600; // 6%
+        return contributionAmount * bps / 10000;
+    }
+
     /// @notice Verify the AI's signed decision, enforce the band, and return required collateral.
     /// @dev Reverts if expired, wrong signer, tampered, or the adjusted score is outside
     ///      [baseScore - MAX_DELTA, baseScore + MAX_DELTA].
