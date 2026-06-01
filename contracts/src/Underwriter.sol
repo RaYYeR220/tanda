@@ -65,6 +65,14 @@ contract Underwriter is EIP712 {
         return contributionAmount * bps / 10000;
     }
 
+    /// @notice Earliest 0-indexed payout slot a member of `score` may occupy in a circle of `n`.
+    ///         Riskier members are pushed later so they pay more in before receiving the pot.
+    function earliestSlot(uint256 score, uint256 n) public pure returns (uint256) {
+        if (score >= 50) return 0;
+        if (score >= 30) return n / 4;
+        return n / 2;
+    }
+
     /// @notice Verify the AI's signed decision, enforce the band, and return required collateral.
     /// @dev Reverts if expired, wrong signer, tampered, or the adjusted score is outside
     ///      [baseScore - MAX_DELTA, baseScore + MAX_DELTA].

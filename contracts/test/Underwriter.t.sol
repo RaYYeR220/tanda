@@ -155,3 +155,35 @@ contract UnderwriterPremiumTest is Test {
         assertEq(uw.premium(39, amount), 6_000_000);
     }
 }
+
+contract UnderwriterEarliestSlotTest is Test {
+    ReputationSBT internal sbt;
+    Underwriter internal uw;
+
+    function setUp() public {
+        sbt = new ReputationSBT(address(this));
+        uw = new Underwriter(address(sbt), address(0xA15));
+    }
+
+    function test_highScoreUnrestricted() public view {
+        assertEq(uw.earliestSlot(80, 4), 0);
+        assertEq(uw.earliestSlot(50, 4), 0);
+    }
+
+    function test_midScoreQuarterFloor() public view {
+        assertEq(uw.earliestSlot(40, 4), 1);
+        assertEq(uw.earliestSlot(30, 8), 2);
+    }
+
+    function test_lowScoreHalfFloor() public view {
+        assertEq(uw.earliestSlot(20, 4), 2);
+        assertEq(uw.earliestSlot(0, 6), 3);
+    }
+
+    function test_boundaries() public view {
+        assertEq(uw.earliestSlot(50, 4), 0);
+        assertEq(uw.earliestSlot(49, 4), 1);
+        assertEq(uw.earliestSlot(30, 4), 1);
+        assertEq(uw.earliestSlot(29, 4), 2);
+    }
+}
