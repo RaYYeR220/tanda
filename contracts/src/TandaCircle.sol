@@ -15,6 +15,9 @@ import {InsurancePool} from "./InsurancePool.sol";
 ///         collateral is slashed and the insurance pool tops up any shortfall so the recipient is
 ///         made whole; the defaulter's reputation is downgraded. Underfunded rounds haircut the
 ///         recipient and emit RoundUnderfunded (loss surfaced honestly, no magic).
+/// @dev Assumes a well-behaved ERC20: no transfer fee, no rebasing, no transfer callbacks. The
+///      settlement accounting credits insurance `cover` proceeds at face value, so a fee-on-transfer
+///      token would over-count `liquid`. MXNB and standard stablecoins satisfy this.
 contract TandaCircle is ReentrancyGuard {
     using SafeERC20 for IERC20;
 
