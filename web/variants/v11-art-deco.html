@@ -1,0 +1,1670 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tanda — La tanda de siempre, sin el riesgo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@400;700&family=Mulish:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&display=swap" rel="stylesheet" />
+<style>
+/* ===========================
+   CSS VARIABLES — ART DECO PALETTE
+   =========================== */
+:root {
+  --bg-deep:       #0b1a14;
+  --bg-mid:        #0f2118;
+  --bg-panel:      #122416;
+  --emerald:       #0e3424;
+  --emerald-light: #1a5c3a;
+  --gold:          #c9a84c;
+  --gold-bright:   #e8c96a;
+  --gold-pale:     #f0dfa0;
+  --gold-dim:      #7a6028;
+  --brass:         #a07c2a;
+  --ivory:         #f5efd6;
+  --ivory-dim:     #c8b98a;
+  --ivory-pale:    #8a7a58;
+  --red-warn:      #8b1c1c;
+  --red-warn-light:#c44040;
+  --teal-accent:   #1a6060;
+  --border-gold:   rgba(201,168,76,0.35);
+  --border-gold-bright: rgba(232,201,106,0.7);
+  --shadow-gold:   rgba(201,168,76,0.15);
+  --shadow-deep:   rgba(0,0,0,0.6);
+}
+
+/* ===========================
+   RESET & BASE
+   =========================== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background-color: var(--bg-deep);
+  color: var(--ivory);
+  font-family: 'Mulish', sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+  overflow-x: hidden;
+  min-width: 320px;
+}
+
+/* ===========================
+   GEOMETRIC TEXTURE LAYER
+   =========================== */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 79px,
+      rgba(201,168,76,0.03) 79px,
+      rgba(201,168,76,0.03) 80px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 79px,
+      rgba(201,168,76,0.03) 79px,
+      rgba(201,168,76,0.03) 80px
+    );
+}
+
+/* ===========================
+   ANIMATIONS
+   =========================== */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes sunburstPulse {
+  0%, 100% { opacity: 0.82; }
+  50%       { opacity: 1; }
+}
+@keyframes rayRotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+@keyframes warnPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(196,64,64,0.0), inset 0 0 0 1px var(--red-warn-light); }
+  50%       { box-shadow: 0 0 18px 4px rgba(196,64,64,0.25), inset 0 0 0 1px var(--red-warn-light); }
+}
+@keyframes borderGlow {
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 1; }
+}
+
+.anim-1 { animation: fadeUp 0.7s ease both; animation-delay: 0.1s; }
+.anim-2 { animation: fadeUp 0.7s ease both; animation-delay: 0.25s; }
+.anim-3 { animation: fadeUp 0.7s ease both; animation-delay: 0.4s; }
+.anim-4 { animation: fadeUp 0.7s ease both; animation-delay: 0.55s; }
+.anim-5 { animation: fadeUp 0.7s ease both; animation-delay: 0.7s; }
+.anim-6 { animation: fadeUp 0.7s ease both; animation-delay: 0.85s; }
+
+/* ===========================
+   NAVIGATION
+   =========================== */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 60px;
+  height: 70px;
+  background: linear-gradient(180deg, rgba(11,26,20,0.97) 0%, rgba(11,26,20,0.85) 100%);
+  border-bottom: 1px solid var(--border-gold);
+  animation: fadeIn 0.8s ease both;
+}
+
+.nav-logo {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--gold-bright);
+  text-decoration: none;
+  text-shadow: 0 0 20px rgba(232,201,106,0.4);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.nav-logo-icon {
+  width: 32px; height: 32px;
+  display: inline-block;
+  position: relative;
+}
+.nav-logo-icon svg { width: 32px; height: 32px; }
+
+.nav-links {
+  display: flex;
+  gap: 36px;
+  list-style: none;
+}
+.nav-links a {
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ivory-dim);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--gold-bright); }
+
+.nav-cta {
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--bg-deep);
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 50%, var(--gold) 100%);
+  background-size: 200%;
+  border: none;
+  padding: 10px 24px;
+  cursor: pointer;
+  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  animation: shimmer 3s linear infinite;
+  transition: opacity 0.2s;
+}
+.nav-cta:hover { opacity: 0.9; }
+
+/* ===========================
+   HERO SECTION
+   =========================== */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120px 40px 80px;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* Stepped ziggurat header frame */
+.hero-ziggurat {
+  position: absolute;
+  top: 70px; left: 50%; transform: translateX(-50%);
+  width: min(900px, 96vw);
+  pointer-events: none;
+  z-index: 0;
+}
+.hero-ziggurat svg {
+  width: 100%;
+  height: auto;
+}
+
+/* Sunburst behind the pot */
+.sunburst-container {
+  position: relative;
+  width: 420px;
+  height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 48px;
+  z-index: 2;
+}
+
+.sunburst-rays {
+  position: absolute;
+  inset: 0;
+  animation: sunburstPulse 4s ease-in-out infinite;
+}
+
+.sunburst-rays svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 12px rgba(201,168,76,0.3));
+}
+
+.sunburst-inner {
+  position: absolute;
+  inset: 60px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%,
+    #1d4a30 0%,
+    #0f2a1c 45%,
+    #081510 100%
+  );
+  border: 2px solid var(--gold);
+  box-shadow:
+    0 0 0 6px rgba(201,168,76,0.08),
+    0 0 40px rgba(201,168,76,0.18),
+    inset 0 0 30px rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+}
+
+.pot-icon {
+  font-size: 80px;
+  filter: drop-shadow(0 4px 16px rgba(0,0,0,0.6));
+  line-height: 1;
+}
+
+/* Fluted lines flanking sunburst */
+.fluted-left, .fluted-right {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 5px;
+  align-items: stretch;
+  height: 320px;
+}
+.fluted-left  { left: -80px; }
+.fluted-right { right: -80px; }
+
+.flute {
+  width: 3px;
+  background: linear-gradient(180deg,
+    transparent 0%,
+    var(--gold-dim) 15%,
+    var(--gold) 50%,
+    var(--gold-dim) 85%,
+    transparent 100%
+  );
+  border-radius: 2px;
+  animation: borderGlow 3s ease-in-out infinite;
+}
+.flute:nth-child(2) { animation-delay: 0.3s; height: 85%; margin-top: auto; margin-bottom: auto; }
+.flute:nth-child(3) { animation-delay: 0.6s; height: 70%; margin-top: auto; margin-bottom: auto; }
+.flute:nth-child(4) { animation-delay: 0.9s; height: 55%; margin-top: auto; margin-bottom: auto; }
+
+/* Hero content */
+.hero-content {
+  position: relative;
+  z-index: 4;
+  text-align: center;
+  max-width: 860px;
+  width: 100%;
+}
+
+.hero-eyebrow {
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+.hero-eyebrow::before, .hero-eyebrow::after {
+  content: '';
+  display: block;
+  height: 1px;
+  width: 60px;
+  background: linear-gradient(90deg, transparent, var(--gold));
+}
+.hero-eyebrow::after {
+  background: linear-gradient(90deg, var(--gold), transparent);
+}
+
+.hero-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: clamp(3.5rem, 7vw, 7rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  color: transparent;
+  background: linear-gradient(135deg,
+    var(--gold-dim)  0%,
+    var(--gold)      25%,
+    var(--gold-pale) 50%,
+    var(--gold)      75%,
+    var(--gold-dim)  100%
+  );
+  background-size: 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: shimmer 4s linear infinite;
+  text-shadow: none;
+  margin-bottom: 6px;
+}
+
+.hero-sub-wordmark {
+  font-family: 'Cinzel', serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.5em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+  margin-bottom: 32px;
+}
+
+.hero-tagline {
+  font-family: 'Mulish', sans-serif;
+  font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--ivory);
+  margin-bottom: 14px;
+  line-height: 1.4;
+}
+
+.hero-tagline em {
+  font-style: normal;
+  color: var(--gold-bright);
+  font-weight: 600;
+}
+
+.hero-value-prop {
+  font-family: 'Mulish', sans-serif;
+  font-size: 0.95rem;
+  color: var(--ivory-dim);
+  letter-spacing: 0.02em;
+  margin-bottom: 52px;
+}
+
+/* Feature trio */
+.features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border-gold);
+  border: 1px solid var(--border-gold);
+  margin-bottom: 52px;
+  position: relative;
+}
+.features::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border: 1px solid rgba(201,168,76,0.15);
+  pointer-events: none;
+}
+
+.feature {
+  background: var(--bg-panel);
+  padding: 32px 28px;
+  text-align: center;
+  position: relative;
+  transition: background 0.25s;
+}
+.feature:hover { background: var(--emerald); }
+
+.feature-icon-wrap {
+  width: 48px; height: 48px;
+  margin: 0 auto 16px;
+  border: 1px solid var(--border-gold-bright);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  background: linear-gradient(135deg, rgba(201,168,76,0.12), rgba(201,168,76,0.04));
+}
+.feature-icon { font-size: 1.5rem; }
+
+.feature-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 10px;
+}
+
+.feature-desc {
+  font-size: 0.85rem;
+  color: var(--ivory-dim);
+  line-height: 1.55;
+}
+
+/* CTAs */
+.cta-group {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 52px;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  font-family: 'Cinzel', serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--bg-deep);
+  background: linear-gradient(135deg, var(--brass) 0%, var(--gold-bright) 40%, var(--gold) 70%, var(--brass) 100%);
+  background-size: 200%;
+  border: none;
+  padding: 16px 44px;
+  cursor: pointer;
+  clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+  position: relative;
+  animation: shimmer 3.5s linear infinite;
+  font-weight: 700;
+  transition: transform 0.15s, filter 0.15s;
+  text-decoration: none;
+  display: inline-block;
+}
+.btn-primary:hover { transform: translateY(-2px); filter: brightness(1.1); }
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-pale) 50%, var(--gold) 100%);
+  z-index: -1;
+  opacity: 0.5;
+}
+
+.btn-secondary {
+  font-family: 'Cinzel', serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: transparent;
+  border: 1px solid var(--border-gold-bright);
+  padding: 15px 40px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  transition: background 0.2s, color 0.2s, transform 0.15s;
+}
+.btn-secondary:hover {
+  background: rgba(201,168,76,0.1);
+  color: var(--gold-pale);
+  transform: translateY(-2px);
+}
+
+/* Trust strip */
+.trust-strip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  font-family: 'Cinzel', serif;
+  font-size: 0.63rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ivory-pale);
+}
+.trust-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 24px;
+}
+.trust-item + .trust-item {
+  border-left: 1px solid var(--border-gold);
+}
+.trust-dot {
+  width: 5px; height: 5px;
+  background: var(--gold-dim);
+  transform: rotate(45deg);
+  flex-shrink: 0;
+}
+
+/* ===========================
+   DECORATIVE GOLD DIVIDER
+   =========================== */
+.deco-divider {
+  position: relative;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  z-index: 1;
+}
+.deco-divider svg {
+  width: min(800px, 90vw);
+  height: 50px;
+}
+
+/* ===========================
+   DASHBOARD SECTION
+   =========================== */
+.dashboard-section {
+  position: relative;
+  z-index: 1;
+  padding: 60px 40px 100px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.section-eyebrow {
+  font-family: 'Cinzel', serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+  margin-bottom: 14px;
+}
+
+.section-title {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(1.5rem, 3.5vw, 2.6rem);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--gold-bright);
+  margin-bottom: 10px;
+  text-shadow: 0 2px 20px rgba(201,168,76,0.2);
+}
+
+.section-sub {
+  font-size: 0.9rem;
+  color: var(--ivory-dim);
+  font-style: italic;
+}
+
+/* Dashboard frame */
+.dashboard-frame {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-gold);
+  position: relative;
+  padding: 0;
+}
+
+/* Corner ornaments */
+.dashboard-frame::before,
+.dashboard-frame::after {
+  content: '';
+  position: absolute;
+  width: 28px; height: 28px;
+  border-color: var(--gold);
+  border-style: solid;
+  z-index: 2;
+}
+.dashboard-frame::before {
+  top: -1px; left: -1px;
+  border-width: 2px 0 0 2px;
+}
+.dashboard-frame::after {
+  top: -1px; right: -1px;
+  border-width: 2px 2px 0 0;
+}
+.dashboard-inner-corners {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+.dashboard-inner-corners::before,
+.dashboard-inner-corners::after {
+  content: '';
+  position: absolute;
+  width: 28px; height: 28px;
+  border-color: var(--gold);
+  border-style: solid;
+}
+.dashboard-inner-corners::before {
+  bottom: -1px; left: -1px;
+  border-width: 0 0 2px 2px;
+}
+.dashboard-inner-corners::after {
+  bottom: -1px; right: -1px;
+  border-width: 0 2px 2px 0;
+}
+
+/* Dashboard top bar */
+.dash-topbar {
+  background: linear-gradient(90deg,
+    rgba(11,26,20,1) 0%,
+    rgba(14,52,36,1) 50%,
+    rgba(11,26,20,1) 100%
+  );
+  border-bottom: 1px solid var(--border-gold);
+  padding: 24px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.dash-circle-name {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.dash-circle-badge {
+  width: 40px; height: 40px;
+  border: 1px solid var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  background: linear-gradient(135deg, rgba(201,168,76,0.15), rgba(201,168,76,0.05));
+}
+.dash-name {
+  font-family: 'Cinzel', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--gold-bright);
+}
+.dash-subtitle {
+  font-size: 0.75rem;
+  color: var(--ivory-pale);
+  letter-spacing: 0.06em;
+}
+
+.dash-stats {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.dash-stat {
+  text-align: center;
+}
+.dash-stat-val {
+  font-family: 'Cinzel', serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.04em;
+  line-height: 1;
+  margin-bottom: 3px;
+}
+.dash-stat-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ivory-pale);
+  font-family: 'Cinzel', serif;
+}
+
+/* Warning banner */
+.warn-banner {
+  margin: 28px 40px 0;
+  border: 1px solid var(--red-warn-light);
+  background: linear-gradient(90deg,
+    rgba(139,28,28,0.18) 0%,
+    rgba(139,28,28,0.08) 100%
+  );
+  padding: 18px 24px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  animation: warnPulse 2.5s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+}
+.warn-banner::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--red-warn-light);
+}
+
+.warn-icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.warn-text {
+  flex: 1;
+}
+.warn-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--red-warn-light);
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.warn-badge {
+  font-size: 0.6rem;
+  background: var(--red-warn);
+  color: #fff;
+  padding: 2px 8px;
+  letter-spacing: 0.1em;
+  border-radius: 1px;
+}
+.warn-body {
+  font-size: 0.88rem;
+  color: #e8a0a0;
+  line-height: 1.5;
+}
+.warn-body strong {
+  color: #f0c0c0;
+  font-weight: 600;
+}
+
+.warn-action {
+  font-family: 'Cinzel', serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--red-warn-light);
+  border: 1px solid var(--red-warn);
+  padding: 8px 16px;
+  cursor: pointer;
+  background: transparent;
+  white-space: nowrap;
+  clip-path: polygon(5px 0%, 100% 0%, calc(100% - 5px) 100%, 0% 100%);
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.warn-action:hover { background: rgba(139,28,28,0.3); }
+
+/* Members grid */
+.members-section {
+  padding: 32px 40px 36px;
+}
+
+.members-grid-header {
+  display: grid;
+  grid-template-columns: 1fr 100px 100px 90px 130px;
+  gap: 12px;
+  padding: 0 20px 12px;
+  border-bottom: 1px solid var(--border-gold);
+  margin-bottom: 4px;
+}
+.col-head {
+  font-family: 'Cinzel', serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+}
+
+.members-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Member row */
+.member-row {
+  display: grid;
+  grid-template-columns: 1fr 100px 100px 90px 130px;
+  gap: 12px;
+  align-items: center;
+  padding: 18px 20px;
+  border-bottom: 1px solid rgba(201,168,76,0.08);
+  transition: background 0.2s;
+  position: relative;
+}
+.member-row:hover { background: rgba(201,168,76,0.04); }
+.member-row:last-child { border-bottom: none; }
+
+.member-row.member-flagged {
+  background: rgba(139,28,28,0.06);
+  border-bottom-color: rgba(196,64,64,0.15);
+}
+.member-row.member-flagged:hover { background: rgba(139,28,28,0.1); }
+
+.member-row.member-winner {
+  background: rgba(201,168,76,0.06);
+  border-left: 2px solid var(--gold);
+  margin-left: -2px;
+}
+
+/* Member identity */
+.member-identity {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.member-avatar {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  position: relative;
+}
+.member-avatar.high-trust {
+  background: linear-gradient(135deg, #0d3a24, #1a5c3a);
+  border-color: var(--gold);
+  color: var(--gold);
+  box-shadow: 0 0 10px rgba(201,168,76,0.2);
+}
+.member-avatar.mid-trust {
+  background: linear-gradient(135deg, #1a2e20, #243a28);
+  border-color: var(--border-gold);
+  color: var(--ivory-dim);
+}
+.member-avatar.low-trust {
+  background: linear-gradient(135deg, #2a1a1a, #3a2020);
+  border-color: var(--red-warn);
+  color: #e08080;
+}
+.winner-crown {
+  position: absolute;
+  top: -8px; left: 50%; transform: translateX(-50%);
+  font-size: 0.7rem;
+}
+
+.member-name {
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+  color: var(--ivory);
+  letter-spacing: 0.04em;
+  margin-bottom: 2px;
+}
+.member-handle {
+  font-size: 0.72rem;
+  color: var(--ivory-pale);
+}
+.member-rationale {
+  font-size: 0.68rem;
+  color: var(--ivory-pale);
+  font-style: italic;
+  margin-top: 2px;
+}
+
+/* AI Score medallion */
+.score-medallion {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.score-ring {
+  position: relative;
+  width: 52px; height: 52px;
+}
+.score-ring svg {
+  width: 52px; height: 52px;
+  transform: rotate(-90deg);
+}
+.score-number {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.score-number.score-high  { color: var(--gold-bright); }
+.score-number.score-mid   { color: var(--ivory-dim); }
+.score-number.score-low   { color: #e08080; }
+.score-number.score-vlow  { color: #c44040; }
+.score-label {
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ivory-pale);
+  font-family: 'Cinzel', serif;
+}
+
+/* Collateral */
+.collateral-cell {
+  text-align: center;
+}
+.collateral-val {
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+  margin-bottom: 2px;
+}
+.collateral-val.col-low   { color: var(--gold); }
+.collateral-val.col-mid   { color: var(--ivory-dim); }
+.collateral-val.col-high  { color: #e0a0a0; }
+.collateral-val.col-vhigh { color: #c44040; }
+.collateral-mxnb {
+  font-size: 0.65rem;
+  color: var(--ivory-pale);
+}
+
+/* Payout slot */
+.slot-cell {
+  text-align: center;
+}
+.slot-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px; height: 28px;
+  border: 1px solid var(--border-gold);
+  font-family: 'Cinzel', serif;
+  font-size: 0.8rem;
+  color: var(--gold-dim);
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  background: rgba(201,168,76,0.06);
+}
+.slot-badge.slot-current {
+  border-color: var(--gold);
+  color: var(--gold-bright);
+  background: rgba(201,168,76,0.15);
+  box-shadow: 0 0 8px rgba(201,168,76,0.3);
+}
+
+/* Status */
+.status-cell { text-align: center; }
+.status-badge {
+  display: inline-block;
+  font-family: 'Cinzel', serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  clip-path: polygon(5px 0%, 100% 0%, calc(100% - 5px) 100%, 0% 100%);
+}
+.status-paid    { background: rgba(20,80,50,0.5); color: #80d8a0; border: 1px solid rgba(80,180,100,0.4); }
+.status-active  { background: rgba(201,168,76,0.12); color: var(--gold); border: 1px solid var(--border-gold); }
+.status-pending { background: rgba(80,60,20,0.4); color: var(--ivory-dim); border: 1px solid rgba(201,168,76,0.2); }
+.status-risk    { background: rgba(139,28,28,0.3); color: #e08080; border: 1px solid var(--red-warn); }
+
+/* Dashboard footer */
+.dash-footer {
+  background: linear-gradient(90deg,
+    rgba(11,26,20,1) 0%,
+    rgba(14,52,36,0.6) 50%,
+    rgba(11,26,20,1) 100%
+  );
+  border-top: 1px solid var(--border-gold);
+  padding: 20px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.insurance-pool {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.insurance-icon {
+  font-size: 1.2rem;
+  filter: drop-shadow(0 0 6px rgba(201,168,76,0.5));
+}
+.insurance-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ivory-pale);
+  margin-bottom: 2px;
+}
+.insurance-val {
+  font-family: 'Cinzel', serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.04em;
+}
+
+.pool-bar-wrap {
+  flex: 1;
+  max-width: 260px;
+}
+.pool-bar-label {
+  font-size: 0.62rem;
+  color: var(--ivory-pale);
+  letter-spacing: 0.1em;
+  margin-bottom: 6px;
+  font-family: 'Cinzel', serif;
+  text-transform: uppercase;
+  display: flex;
+  justify-content: space-between;
+}
+.pool-bar-track {
+  height: 4px;
+  background: rgba(201,168,76,0.1);
+  border: 1px solid var(--border-gold);
+  position: relative;
+  overflow: hidden;
+}
+.pool-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--brass), var(--gold-bright));
+  width: 62%;
+  position: relative;
+}
+.pool-bar-fill::after {
+  content: '';
+  position: absolute;
+  right: 0; top: 0; bottom: 0;
+  width: 20px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3));
+}
+
+.dash-round-progress {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.round-pip {
+  width: 10px; height: 10px;
+  transform: rotate(45deg);
+  border: 1px solid var(--border-gold);
+  background: rgba(201,168,76,0.08);
+}
+.round-pip.done { background: var(--gold); border-color: var(--gold); }
+.round-pip.current {
+  background: var(--gold-bright);
+  border-color: var(--gold-bright);
+  box-shadow: 0 0 8px rgba(232,201,106,0.6);
+  animation: sunburstPulse 1.5s ease-in-out infinite;
+}
+.round-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.63rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ivory-pale);
+  margin-left: 8px;
+}
+
+/* ===========================
+   FOOTER
+   =========================== */
+.site-footer {
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid var(--border-gold);
+  padding: 40px 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.footer-brand {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--gold-dim);
+  letter-spacing: 0.12em;
+}
+.footer-legal {
+  font-size: 0.72rem;
+  color: var(--ivory-pale);
+  text-align: center;
+}
+.footer-legal a { color: var(--gold-dim); text-decoration: none; }
+.footer-links {
+  display: flex;
+  gap: 24px;
+  list-style: none;
+}
+.footer-links a {
+  font-family: 'Cinzel', serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ivory-pale);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.footer-links a:hover { color: var(--gold); }
+
+/* ===========================
+   RESPONSIVE
+   =========================== */
+@media (max-width: 900px) {
+  nav { padding: 0 24px; }
+  .nav-links { display: none; }
+
+  .hero { padding: 100px 20px 60px; }
+  .sunburst-container { width: 300px; height: 300px; }
+  .sunburst-inner { inset: 44px; }
+  .pot-icon { font-size: 60px; }
+  .fluted-left { left: -48px; }
+  .fluted-right { right: -48px; }
+
+  .features { grid-template-columns: 1fr; }
+
+  .dashboard-section { padding: 40px 16px 60px; }
+  .dash-topbar { padding: 20px 24px; }
+  .warn-banner { margin: 20px 24px 0; }
+  .members-section { padding: 24px 16px; }
+  .dash-footer { padding: 16px 24px; }
+
+  .members-grid-header,
+  .member-row {
+    grid-template-columns: 1fr 80px 80px 70px 100px;
+    gap: 8px;
+    padding: 14px 12px;
+  }
+
+  .site-footer { padding: 28px 24px; flex-direction: column; text-align: center; }
+}
+
+@media (max-width: 600px) {
+  .members-grid-header { display: none; }
+  .member-row {
+    grid-template-columns: 1fr 60px 60px;
+    gap: 8px;
+  }
+  .slot-cell, .status-cell { display: none; }
+  .collateral-mxnb { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== NAVIGATION ===================== -->
+<nav>
+  <a class="nav-logo" href="#">
+    <div class="nav-logo-icon">
+      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="16,2 30,9 30,23 16,30 2,23 2,9" fill="none" stroke="#c9a84c" stroke-width="1.5"/>
+        <polygon points="16,7 25,11.5 25,20.5 16,25 7,20.5 7,11.5" fill="rgba(201,168,76,0.12)" stroke="#c9a84c" stroke-width="0.8"/>
+        <text x="16" y="20" text-anchor="middle" font-family="Cinzel Decorative" font-size="9" fill="#c9a84c" font-weight="700">T</text>
+      </svg>
+    </div>
+    TANDA
+  </a>
+  <ul class="nav-links">
+    <li><a href="#">Cómo Funciona</a></li>
+    <li><a href="#">Seguridad</a></li>
+    <li><a href="#">Misión</a></li>
+  </ul>
+  <button class="nav-cta">Crear una Tanda</button>
+</nav>
+
+
+<!-- ===================== HERO ===================== -->
+<section class="hero">
+
+  <!-- Stepped ziggurat frame SVG -->
+  <div class="hero-ziggurat" aria-hidden="true">
+    <svg viewBox="0 0 900 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Stepped top border - ziggurat shape -->
+      <path d="M 0 140 L 0 100 L 60 100 L 60 60 L 120 60 L 120 20 L 780 20 L 780 60 L 840 60 L 840 100 L 900 100 L 900 140" stroke="rgba(201,168,76,0.35)" stroke-width="1" fill="none"/>
+      <path d="M 20 140 L 20 110 L 80 110 L 80 72 L 140 72 L 140 38 L 760 38 L 760 72 L 820 72 L 820 110 L 880 110 L 880 140" stroke="rgba(201,168,76,0.15)" stroke-width="0.5" fill="none"/>
+      <!-- Sunburst top center fan -->
+      <g transform="translate(450, 20)">
+        <!-- Fan rays -->
+        <line x1="0" y1="0" x2="-120" y2="-80" stroke="rgba(201,168,76,0.25)" stroke-width="0.8"/>
+        <line x1="0" y1="0" x2="-90"  y2="-90" stroke="rgba(201,168,76,0.3)"  stroke-width="0.8"/>
+        <line x1="0" y1="0" x2="-55"  y2="-95" stroke="rgba(201,168,76,0.35)" stroke-width="0.8"/>
+        <line x1="0" y1="0" x2="-20"  y2="-98" stroke="rgba(201,168,76,0.4)"  stroke-width="0.8"/>
+        <line x1="0" y1="0" x2="0"    y2="-100"stroke="rgba(201,168,76,0.45)" stroke-width="1"/>
+        <line x1="0" y1="0" x2="20"   y2="-98" stroke="rgba(201,168,76,0.4)"  stroke-width="0.8"/>
+        <line x1="0" y1="0" x2="55"   y2="-95" stroke="rgba(201,168,76,0.35)" stroke-width="0.8"/>
+        <line x1="0" y1="0" x2="90"   y2="-90" stroke="rgba(201,168,76,0.3)"  stroke-width="0.8"/>
+        <line x1="0" y1="0" x2="120"  y2="-80" stroke="rgba(201,168,76,0.25)" stroke-width="0.8"/>
+        <!-- Center ornament -->
+        <circle cx="0" cy="0" r="5" fill="none" stroke="rgba(201,168,76,0.6)" stroke-width="1"/>
+        <circle cx="0" cy="0" r="2" fill="rgba(201,168,76,0.5)"/>
+      </g>
+      <!-- Fluted base lines -->
+      <g opacity="0.25">
+        <line x1="0" y1="155" x2="900" y2="155" stroke="rgba(201,168,76,0.8)" stroke-width="0.5"/>
+        <line x1="0" y1="150" x2="900" y2="150" stroke="rgba(201,168,76,0.4)" stroke-width="0.5"/>
+        <line x1="0" y1="145" x2="900" y2="145" stroke="rgba(201,168,76,0.2)" stroke-width="0.5"/>
+      </g>
+    </svg>
+  </div>
+
+  <div class="hero-content">
+
+    <!-- Sunburst + pot -->
+    <div class="sunburst-container anim-1" aria-hidden="true">
+      <!-- Sunburst rays SVG -->
+      <div class="sunburst-rays">
+        <svg viewBox="0 0 420 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g transform="translate(210,210)">
+            <!-- Long alternating rays -->
+            <line x1="0" y1="-80"  x2="0"    y2="-205" stroke="rgba(201,168,76,0.55)" stroke-width="1.5"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-205" stroke="rgba(201,168,76,0.55)" stroke-width="1.5" transform="rotate(15)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-185" stroke="rgba(201,168,76,0.3)"  stroke-width="0.8" transform="rotate(7.5)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-205" stroke="rgba(201,168,76,0.55)" stroke-width="1.5" transform="rotate(30)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-185" stroke="rgba(201,168,76,0.3)"  stroke-width="0.8" transform="rotate(22.5)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-205" stroke="rgba(201,168,76,0.55)" stroke-width="1.5" transform="rotate(45)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-185" stroke="rgba(201,168,76,0.3)"  stroke-width="0.8" transform="rotate(37.5)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-205" stroke="rgba(201,168,76,0.55)" stroke-width="1.5" transform="rotate(60)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-185" stroke="rgba(201,168,76,0.3)"  stroke-width="0.8" transform="rotate(52.5)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-205" stroke="rgba(201,168,76,0.55)" stroke-width="1.5" transform="rotate(75)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-185" stroke="rgba(201,168,76,0.3)"  stroke-width="0.8" transform="rotate(67.5)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-205" stroke="rgba(201,168,76,0.55)" stroke-width="1.5" transform="rotate(90)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-185" stroke="rgba(201,168,76,0.3)"  stroke-width="0.8" transform="rotate(82.5)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-205" stroke="rgba(201,168,76,0.55)" stroke-width="1.5" transform="rotate(105)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-185" stroke="rgba(201,168,76,0.3)"  stroke-width="0.8" transform="rotate(97.5)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-205" stroke="rgba(201,168,76,0.55)" stroke-width="1.5" transform="rotate(120)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-185" stroke="rgba(201,168,76,0.3)"  stroke-width="0.8" transform="rotate(112.5)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-205" stroke="rgba(201,168,76,0.55)" stroke-width="1.5" transform="rotate(135)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-185" stroke="rgba(201,168,76,0.3)"  stroke-width="0.8" transform="rotate(127.5)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-205" stroke="rgba(201,168,76,0.55)" stroke-width="1.5" transform="rotate(150)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-185" stroke="rgba(201,168,76,0.3)"  stroke-width="0.8" transform="rotate(142.5)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-205" stroke="rgba(201,168,76,0.55)" stroke-width="1.5" transform="rotate(165)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-185" stroke="rgba(201,168,76,0.3)"  stroke-width="0.8" transform="rotate(157.5)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-205" stroke="rgba(201,168,76,0.55)" stroke-width="1.5" transform="rotate(180)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-185" stroke="rgba(201,168,76,0.3)"  stroke-width="0.8" transform="rotate(172.5)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-205" stroke="rgba(201,168,76,0.55)" stroke-width="1.5" transform="rotate(195)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-185" stroke="rgba(201,168,76,0.3)"  stroke-width="0.8" transform="rotate(187.5)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-205" stroke="rgba(201,168,76,0.55)" stroke-width="1.5" transform="rotate(210)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-185" stroke="rgba(201,168,76,0.3)"  stroke-width="0.8" transform="rotate(202.5)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-205" stroke="rgba(201,168,76,0.55)" stroke-width="1.5" transform="rotate(225)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-185" stroke="rgba(201,168,76,0.3)"  stroke-width="0.8" transform="rotate(217.5)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-205" stroke="rgba(201,168,76,0.55)" stroke-width="1.5" transform="rotate(240)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-185" stroke="rgba(201,168,76,0.3)"  stroke-width="0.8" transform="rotate(232.5)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-205" stroke="rgba(201,168,76,0.55)" stroke-width="1.5" transform="rotate(255)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-185" stroke="rgba(201,168,76,0.3)"  stroke-width="0.8" transform="rotate(247.5)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-205" stroke="rgba(201,168,76,0.55)" stroke-width="1.5" transform="rotate(270)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-185" stroke="rgba(201,168,76,0.3)"  stroke-width="0.8" transform="rotate(262.5)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-205" stroke="rgba(201,168,76,0.55)" stroke-width="1.5" transform="rotate(285)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-185" stroke="rgba(201,168,76,0.3)"  stroke-width="0.8" transform="rotate(277.5)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-205" stroke="rgba(201,168,76,0.55)" stroke-width="1.5" transform="rotate(300)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-185" stroke="rgba(201,168,76,0.3)"  stroke-width="0.8" transform="rotate(292.5)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-205" stroke="rgba(201,168,76,0.55)" stroke-width="1.5" transform="rotate(315)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-185" stroke="rgba(201,168,76,0.3)"  stroke-width="0.8" transform="rotate(307.5)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-205" stroke="rgba(201,168,76,0.55)" stroke-width="1.5" transform="rotate(330)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-185" stroke="rgba(201,168,76,0.3)"  stroke-width="0.8" transform="rotate(322.5)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-205" stroke="rgba(201,168,76,0.55)" stroke-width="1.5" transform="rotate(345)"/>
+            <line x1="0" y1="-80"  x2="0"    y2="-185" stroke="rgba(201,168,76,0.3)"  stroke-width="0.8" transform="rotate(337.5)"/>
+            <!-- Rings -->
+            <circle cx="0" cy="0" r="80"  fill="none" stroke="rgba(201,168,76,0.5)"  stroke-width="1.5"/>
+            <circle cx="0" cy="0" r="90"  fill="none" stroke="rgba(201,168,76,0.2)"  stroke-width="0.5"/>
+            <circle cx="0" cy="0" r="100" fill="none" stroke="rgba(201,168,76,0.35)" stroke-width="1"/>
+            <circle cx="0" cy="0" r="115" fill="none" stroke="rgba(201,168,76,0.15)" stroke-width="0.5"/>
+            <circle cx="0" cy="0" r="130" fill="none" stroke="rgba(201,168,76,0.25)" stroke-width="0.8"/>
+          </g>
+        </svg>
+      </div>
+
+      <!-- Fluted columns left -->
+      <div class="fluted-left" aria-hidden="true">
+        <div class="flute" style="height:100%"></div>
+        <div class="flute"></div>
+        <div class="flute"></div>
+        <div class="flute"></div>
+      </div>
+
+      <!-- Pot circle -->
+      <div class="sunburst-inner">
+        <div class="pot-icon">🏺</div>
+      </div>
+
+      <!-- Fluted columns right -->
+      <div class="fluted-right" aria-hidden="true">
+        <div class="flute"></div>
+        <div class="flute"></div>
+        <div class="flute"></div>
+        <div class="flute" style="height:100%"></div>
+      </div>
+    </div><!-- /sunburst-container -->
+
+    <p class="hero-eyebrow anim-2">Arbitrum · MXNB · AI Underwriting</p>
+
+    <h1 class="hero-title anim-2">TANDA</h1>
+    <p class="hero-sub-wordmark anim-2">On · Chain</p>
+
+    <p class="hero-tagline anim-3">
+      La tanda de siempre —<br>
+      sin el riesgo de que <em>te dejen colgado</em>.
+    </p>
+
+    <p class="hero-value-prop anim-3">
+      AI-organized savings circles on-chain. Save together, in pesos, without the trust problem.
+    </p>
+
+    <!-- Feature trio -->
+    <div class="features anim-4">
+      <div class="feature">
+        <div class="feature-icon-wrap">
+          <span class="feature-icon">🤖</span>
+        </div>
+        <p class="feature-title">AI Reliability Scoring</p>
+        <p class="feature-desc">An AI underwriter reads your on-chain history and sets collateral — so trust is earned, not assumed.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon-wrap">
+          <span class="feature-icon">🛡️</span>
+        </div>
+        <p class="feature-title">Default-Proof</p>
+        <p class="feature-desc">If someone flakes, their collateral is slashed and an insurance pool covers the gap — recipients always get paid in full.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon-wrap">
+          <span class="feature-icon">🔑</span>
+        </div>
+        <p class="feature-title">Gasless Onboarding</p>
+        <p class="feature-desc">Join with a passkey. No seed phrase. No gas. Built for the next wave of LATAM users.</p>
+      </div>
+    </div>
+
+    <!-- CTAs -->
+    <div class="cta-group anim-5">
+      <a href="#" class="btn-primary">Crear una Tanda &nbsp;/&nbsp; Start a Circle</a>
+      <a href="#" class="btn-secondary">Cómo Funciona &nbsp;/&nbsp; How it Works</a>
+    </div>
+
+    <!-- Trust strip -->
+    <div class="trust-strip anim-6">
+      <div class="trust-item">
+        <div class="trust-dot"></div>
+        Built on Arbitrum
+      </div>
+      <div class="trust-item">
+        <div class="trust-dot"></div>
+        Settles in MXNB
+      </div>
+      <div class="trust-item">
+        <div class="trust-dot"></div>
+        Non-Custodial
+      </div>
+    </div>
+
+  </div><!-- /hero-content -->
+</section>
+
+
+<!-- ===================== DECORATIVE DIVIDER ===================== -->
+<div class="deco-divider" aria-hidden="true">
+  <svg viewBox="0 0 800 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Central diamond -->
+    <polygon points="400,8 418,25 400,42 382,25" fill="none" stroke="rgba(201,168,76,0.7)" stroke-width="1.5"/>
+    <polygon points="400,14 410,25 400,36 390,25" fill="rgba(201,168,76,0.15)" stroke="rgba(201,168,76,0.4)" stroke-width="0.8"/>
+    <!-- Lines with ornaments -->
+    <line x1="0"   y1="25" x2="355" y2="25" stroke="rgba(201,168,76,0.3)" stroke-width="0.8"/>
+    <line x1="445" y1="25" x2="800" y2="25" stroke="rgba(201,168,76,0.3)" stroke-width="0.8"/>
+    <!-- Small diamonds on line -->
+    <polygon points="320,21 328,25 320,29 312,25" fill="rgba(201,168,76,0.3)" stroke="rgba(201,168,76,0.5)" stroke-width="0.8"/>
+    <polygon points="480,21 488,25 480,29 472,25" fill="rgba(201,168,76,0.3)" stroke="rgba(201,168,76,0.5)" stroke-width="0.8"/>
+    <polygon points="240,22 246,25 240,28 234,25" fill="none" stroke="rgba(201,168,76,0.35)" stroke-width="0.7"/>
+    <polygon points="560,22 566,25 560,28 554,25" fill="none" stroke="rgba(201,168,76,0.35)" stroke-width="0.7"/>
+    <!-- Crosshatch ticks -->
+    <line x1="140" y1="20" x2="140" y2="30" stroke="rgba(201,168,76,0.25)" stroke-width="0.8"/>
+    <line x1="660" y1="20" x2="660" y2="30" stroke="rgba(201,168,76,0.25)" stroke-width="0.8"/>
+  </svg>
+</div>
+
+
+<!-- ===================== DASHBOARD SECTION ===================== -->
+<section class="dashboard-section">
+
+  <div class="section-header anim-1">
+    <p class="section-eyebrow">Vista Previa del Panel · Circle Dashboard Preview</p>
+    <h2 class="section-title">Un Círculo Activo</h2>
+    <p class="section-sub">Transparency and intelligence at every round — the AI is always watching.</p>
+  </div>
+
+  <div class="dashboard-frame">
+    <div class="dashboard-inner-corners"></div>
+
+    <!-- Top bar -->
+    <div class="dash-topbar">
+      <div class="dash-circle-name">
+        <div class="dash-circle-badge">🌿</div>
+        <div>
+          <div class="dash-name">Tanda Oaxaca</div>
+          <div class="dash-subtitle">Círculo Activo &nbsp;·&nbsp; 4 Miembros &nbsp;·&nbsp; MXNB</div>
+        </div>
+      </div>
+
+      <div class="dash-stats">
+        <div class="dash-stat">
+          <div class="dash-stat-val">400 MXNB</div>
+          <div class="dash-stat-label">Pote · Pot</div>
+        </div>
+        <div class="dash-stat">
+          <div class="dash-stat-val">100 MXNB</div>
+          <div class="dash-stat-label">Por Ronda · /Round</div>
+        </div>
+        <div class="dash-stat">
+          <div class="dash-stat-val" style="color: var(--gold-bright)">Ronda 2 / 4</div>
+          <div class="dash-stat-label">Ronda Actual · Round</div>
+        </div>
+        <div class="dash-stat">
+          <div class="dash-stat-val" style="color: #80d8a0">Diego</div>
+          <div class="dash-stat-label">Próximo Recipiente</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Warning Banner -->
+    <div class="warn-banner">
+      <div class="warn-icon">⚠</div>
+      <div class="warn-text">
+        <div class="warn-title">
+          Alerta del Agente IA
+          <span class="warn-badge">RIESGO ALTO</span>
+        </div>
+        <p class="warn-body">
+          El agente detectó riesgo de impago de <strong>0xkito</strong> esta ronda — historial irregular en últimas 3 transacciones on-chain. Se solicitó refuerzo de colateral (+50 MXNB adicionales).
+          &nbsp;<em style="color:var(--ivory-pale); font-size:0.8rem;">AI detected default risk from 0xkito this round — collateral top-up requested.</em>
+        </p>
+      </div>
+      <button class="warn-action">Ver Detalles</button>
+    </div>
+
+    <!-- Members -->
+    <div class="members-section">
+
+      <div class="members-grid-header">
+        <div class="col-head">Miembro · Member</div>
+        <div class="col-head" style="text-align:center">Score IA</div>
+        <div class="col-head" style="text-align:center">Colateral</div>
+        <div class="col-head" style="text-align:center">Slot</div>
+        <div class="col-head" style="text-align:center">Estado · Status</div>
+      </div>
+
+      <div class="members-list">
+
+        <!-- María — high trust, already paid out -->
+        <div class="member-row">
+          <div class="member-identity">
+            <div class="member-avatar high-trust">M</div>
+            <div>
+              <div class="member-name">María</div>
+              <div class="member-handle">@maria_oax</div>
+              <div class="member-rationale">6 rondas a tiempo · 1 círculo completo</div>
+            </div>
+          </div>
+          <div class="score-medallion">
+            <div class="score-ring">
+              <svg viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="26" cy="26" r="21" fill="none" stroke="rgba(201,168,76,0.2)" stroke-width="3"/>
+                <circle cx="26" cy="26" r="21" fill="none" stroke="#c9a84c" stroke-width="3"
+                  stroke-dasharray="131.9" stroke-dashoffset="23.7" stroke-linecap="round"/>
+              </svg>
+              <div class="score-number score-high">82</div>
+            </div>
+            <div class="score-label">Excelente</div>
+          </div>
+          <div class="collateral-cell">
+            <div class="collateral-val col-low">0.5×</div>
+            <div class="collateral-mxnb">50 MXNB</div>
+          </div>
+          <div class="slot-cell">
+            <div class="slot-badge">1</div>
+          </div>
+          <div class="status-cell">
+            <span class="status-badge status-paid">✓ Cobrado</span>
+          </div>
+        </div>
+
+        <!-- Diego — good trust, current recipient -->
+        <div class="member-row member-winner">
+          <div class="member-identity">
+            <div class="member-avatar high-trust" style="border-color:var(--gold-bright); box-shadow: 0 0 14px rgba(232,201,106,0.35)">
+              <span class="winner-crown">👑</span>
+              D
+            </div>
+            <div>
+              <div class="member-name" style="color:var(--gold-bright)">Diego</div>
+              <div class="member-handle">@diegoml</div>
+              <div class="member-rationale">3 círculos, puntual, billetera activa 14 meses</div>
+            </div>
+          </div>
+          <div class="score-medallion">
+            <div class="score-ring">
+              <svg viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="26" cy="26" r="21" fill="none" stroke="rgba(232,201,106,0.2)" stroke-width="3"/>
+                <circle cx="26" cy="26" r="21" fill="none" stroke="#e8c96a" stroke-width="3"
+                  stroke-dasharray="131.9" stroke-dashoffset="35.6" stroke-linecap="round"/>
+              </svg>
+              <div class="score-number score-high">73</div>
+            </div>
+            <div class="score-label">Bueno</div>
+          </div>
+          <div class="collateral-cell">
+            <div class="collateral-val col-low">1×</div>
+            <div class="collateral-mxnb">100 MXNB</div>
+          </div>
+          <div class="slot-cell">
+            <div class="slot-badge slot-current">2</div>
+          </div>
+          <div class="status-cell">
+            <span class="status-badge status-active">⏳ Esta Ronda</span>
+          </div>
+        </div>
+
+        <!-- Lupe — medium trust -->
+        <div class="member-row">
+          <div class="member-identity">
+            <div class="member-avatar mid-trust">L</div>
+            <div>
+              <div class="member-name">Lupe</div>
+              <div class="member-handle">@lupe.saves</div>
+              <div class="member-rationale">1 círculo parcial · 2 retrasos leves</div>
+            </div>
+          </div>
+          <div class="score-medallion">
+            <div class="score-ring">
+              <svg viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="26" cy="26" r="21" fill="none" stroke="rgba(140,130,80,0.2)" stroke-width="3"/>
+                <circle cx="26" cy="26" r="21" fill="none" stroke="#a07c2a" stroke-width="3"
+                  stroke-dasharray="131.9" stroke-dashoffset="66.0" stroke-linecap="round"/>
+              </svg>
+              <div class="score-number score-mid">50</div>
+            </div>
+            <div class="score-label">Regular</div>
+          </div>
+          <div class="collateral-cell">
+            <div class="collateral-val col-mid">2×</div>
+            <div class="collateral-mxnb">200 MXNB</div>
+          </div>
+          <div class="slot-cell">
+            <div class="slot-badge">3</div>
+          </div>
+          <div class="status-cell">
+            <span class="status-badge status-pending">◷ Pendiente</span>
+          </div>
+        </div>
+
+        <!-- 0xkito — at-risk, flagged -->
+        <div class="member-row member-flagged">
+          <div class="member-identity">
+            <div class="member-avatar low-trust">K</div>
+            <div>
+              <div class="member-name" style="color:#e08080">0xkito</div>
+              <div class="member-handle" style="color:#c07070">@0xkito</div>
+              <div class="member-rationale" style="color:#c07070">Billetera nueva · cold-start · 3 txns irregulares</div>
+            </div>
+          </div>
+          <div class="score-medallion">
+            <div class="score-ring">
+              <svg viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="26" cy="26" r="21" fill="none" stroke="rgba(196,64,64,0.2)" stroke-width="3"/>
+                <circle cx="26" cy="26" r="21" fill="none" stroke="#c44040" stroke-width="3"
+                  stroke-dasharray="131.9" stroke-dashoffset="95.0" stroke-linecap="round"/>
+              </svg>
+              <div class="score-number score-vlow">28</div>
+            </div>
+            <div class="score-label" style="color:#c07070">Alto Riesgo</div>
+          </div>
+          <div class="collateral-cell">
+            <div class="collateral-val col-vhigh">3×</div>
+            <div class="collateral-mxnb" style="color:#c07070">300 MXNB</div>
+          </div>
+          <div class="slot-cell">
+            <div class="slot-badge" style="border-color:var(--red-warn); color:#e08080">4</div>
+          </div>
+          <div class="status-cell">
+            <span class="status-badge status-risk">⚠ En Riesgo</span>
+          </div>
+        </div>
+
+      </div><!-- /members-list -->
+    </div><!-- /members-section -->
+
+    <!-- Dashboard footer -->
+    <div class="dash-footer">
+      <div class="insurance-pool">
+        <div class="insurance-icon">🏦</div>
+        <div>
+          <div class="insurance-label">Fondo de Protección · Insurance Pool</div>
+          <div class="insurance-val">1,240 MXNB</div>
+        </div>
+      </div>
+
+      <div class="pool-bar-wrap">
+        <div class="pool-bar-label">
+          <span>Capacidad del fondo</span>
+          <span style="color:var(--gold)">62%</span>
+        </div>
+        <div class="pool-bar-track">
+          <div class="pool-bar-fill"></div>
+        </div>
+      </div>
+
+      <div class="dash-round-progress">
+        <div class="round-pip done"   title="Ronda 1 — completada"></div>
+        <div class="round-pip current" title="Ronda 2 — en curso"></div>
+        <div class="round-pip"        title="Ronda 3 — pendiente"></div>
+        <div class="round-pip"        title="Ronda 4 — pendiente"></div>
+        <span class="round-label">Ronda 2 de 4</span>
+      </div>
+    </div>
+
+  </div><!-- /dashboard-frame -->
+
+</section>
+
+
+<!-- ===================== FOOTER ===================== -->
+<footer class="site-footer">
+  <div class="footer-brand">TANDA ON-CHAIN</div>
+  <p class="footer-legal">
+    &copy; 2026 Tanda Protocol &nbsp;·&nbsp;
+    <a href="#">Términos</a> &nbsp;·&nbsp;
+    <a href="#">Privacidad</a> &nbsp;·&nbsp;
+    No-custodial. Smart contract audited.
+  </p>
+  <ul class="footer-links">
+    <li><a href="#">Arbitrum</a></li>
+    <li><a href="#">MXNB</a></li>
+    <li><a href="#">Docs</a></li>
+    <li><a href="#">GitHub</a></li>
+  </ul>
+</footer>
+
+</body>
+</html>

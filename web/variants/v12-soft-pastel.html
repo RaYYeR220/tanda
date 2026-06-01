@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tanda — La tanda que cuida tu dinero</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Mulish:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --peach:       #FFCBA4;
+      --peach-mid:   #FFB07C;
+      --coral:       #FF8C69;
+      --coral-soft:  #FFAD98;
+      --butter:      #FFE8A3;
+      --butter-mid:  #FFD966;
+      --sage:        #B5D5C5;
+      --sage-mid:    #8FBFAC;
+      --sage-dark:   #5F9E8A;
+      --lavender:    #D4C5F0;
+      --sky:         #B8DFF0;
+      --warm-white:  #FFF8F2;
+      --cream:       #FFF3E6;
+      --card-bg:     #FFFFFF;
+      --text-dark:   #3D2B1A;
+      --text-mid:    #6B4D35;
+      --text-soft:   #9E7A60;
+      --text-muted:  #C4A98A;
+      --shadow-sm:   0 2px 12px rgba(180,110,60,0.10);
+      --shadow-md:   0 6px 28px rgba(180,110,60,0.13);
+      --shadow-lg:   0 16px 56px rgba(180,110,60,0.16);
+      --radius-pill: 999px;
+      --radius-card: 28px;
+      --radius-lg:   20px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Mulish', sans-serif;
+      background: var(--warm-white);
+      color: var(--text-dark);
+      overflow-x: hidden;
+    }
+
+    /* ─── HERO BG ─── */
+    .hero-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(72px);
+      opacity: 0.55;
+    }
+    .blob-1 { width: 600px; height: 600px; background: var(--peach);   top: -120px; left: -100px; }
+    .blob-2 { width: 500px; height: 500px; background: var(--butter);  top: 200px;  right: -80px; }
+    .blob-3 { width: 400px; height: 400px; background: var(--sage);    bottom: 100px; left: 30%; }
+
+    /* ─── NAV ─── */
+    nav {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 64px;
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+    .wordmark {
+      font-family: 'Baloo 2', sans-serif;
+      font-weight: 800;
+      font-size: 28px;
+      color: var(--text-dark);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .wordmark-ring {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--coral) 0%, var(--peach-mid) 50%, var(--butter-mid) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(255,140,105,0.35);
+    }
+    .wordmark-ring svg { width: 20px; height: 20px; }
+    .nav-links { display: flex; align-items: center; gap: 32px; }
+    .nav-links a {
+      font-family: 'Mulish', sans-serif;
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--text-mid);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--coral); }
+    .btn-nav {
+      background: var(--cream);
+      border: 2px solid var(--peach-mid);
+      color: var(--text-dark);
+      padding: 10px 22px;
+      border-radius: var(--radius-pill);
+      font-family: 'Baloo 2', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .btn-nav:hover { background: var(--peach); border-color: var(--coral-soft); }
+
+    /* ─── HERO ─── */
+    .hero {
+      position: relative;
+      z-index: 5;
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 60px 64px 80px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+    }
+
+    /* stagger animations */
+    .animate-in {
+      opacity: 0;
+      transform: translateY(24px);
+      animation: fadeUp 0.7s ease forwards;
+    }
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .delay-1 { animation-delay: 0.08s; }
+    .delay-2 { animation-delay: 0.18s; }
+    .delay-3 { animation-delay: 0.28s; }
+    .delay-4 { animation-delay: 0.38s; }
+    .delay-5 { animation-delay: 0.48s; }
+    .delay-6 { animation-delay: 0.58s; }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--cream);
+      border: 1.5px solid var(--peach-mid);
+      padding: 8px 18px;
+      border-radius: var(--radius-pill);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-mid);
+      margin-bottom: 24px;
+    }
+    .eyebrow-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--coral);
+      display: inline-block;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.4); opacity: 0.7; }
+    }
+
+    .hero-title {
+      font-family: 'Baloo 2', sans-serif;
+      font-weight: 800;
+      font-size: clamp(38px, 4.5vw, 66px);
+      line-height: 1.12;
+      color: var(--text-dark);
+      margin-bottom: 18px;
+    }
+    .hero-title .highlight {
+      position: relative;
+      display: inline-block;
+      color: var(--coral);
+    }
+    .hero-title .highlight::after {
+      content: '';
+      position: absolute;
+      bottom: 4px;
+      left: 0;
+      width: 100%;
+      height: 10px;
+      background: var(--butter);
+      border-radius: 4px;
+      z-index: -1;
+      opacity: 0.8;
+    }
+
+    .hero-sub {
+      font-size: 17px;
+      line-height: 1.65;
+      color: var(--text-mid);
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+    .hero-sub-en {
+      font-size: 15px;
+      color: var(--text-soft);
+      margin-bottom: 36px;
+      font-style: italic;
+    }
+
+    .hero-ctas {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 44px;
+      flex-wrap: wrap;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--coral) 0%, var(--peach-mid) 100%);
+      color: #fff;
+      border: none;
+      padding: 16px 34px;
+      border-radius: var(--radius-pill);
+      font-family: 'Baloo 2', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 6px 24px rgba(255,112,80,0.30);
+      transition: transform 0.18s, box-shadow 0.18s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(255,112,80,0.38); }
+    .btn-secondary {
+      background: var(--card-bg);
+      border: 2px solid var(--sage-mid);
+      color: var(--sage-dark);
+      padding: 14px 28px;
+      border-radius: var(--radius-pill);
+      font-family: 'Baloo 2', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.18s, border-color 0.18s;
+    }
+    .btn-secondary:hover { background: var(--sage); border-color: var(--sage-dark); color: #2e5e4d; }
+
+    /* trust strip */
+    .trust-strip {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      flex-wrap: wrap;
+    }
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-soft);
+    }
+    .trust-icon {
+      width: 22px; height: 22px;
+      background: var(--cream);
+      border-radius: 50%;
+      border: 1.5px solid var(--peach-mid);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+    }
+    .trust-sep { color: var(--text-muted); font-size: 18px; line-height: 1; }
+
+    /* feature pills */
+    .feature-pills {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 20px;
+    }
+    .feature-pill {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 18px 22px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: var(--shadow-sm);
+      border: 1.5px solid rgba(255,180,130,0.25);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .feature-pill:hover { transform: translateX(4px); box-shadow: var(--shadow-md); }
+    .pill-icon {
+      width: 46px; height: 46px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .pill-icon.coral  { background: linear-gradient(135deg, #FFD6C8, #FFAD98); }
+    .pill-icon.butter { background: linear-gradient(135deg, #FFF0C0, #FFE080); }
+    .pill-icon.sage   { background: linear-gradient(135deg, #C8EBE0, #A0D4C0); }
+    .pill-title {
+      font-family: 'Baloo 2', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--text-dark);
+      margin-bottom: 2px;
+    }
+    .pill-desc {
+      font-size: 13px;
+      color: var(--text-soft);
+      line-height: 1.45;
+    }
+
+    /* ─── CIRCLE RING ─── */
+    .hero-visual {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 480px;
+    }
+
+    .ring-wrap {
+      position: relative;
+      width: 380px;
+      height: 380px;
+    }
+    .ring-bg {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: conic-gradient(
+        var(--peach) 0deg,
+        var(--coral-soft) 90deg,
+        var(--butter) 180deg,
+        var(--sage) 270deg,
+        var(--peach) 360deg
+      );
+      opacity: 0.18;
+    }
+    .ring-track {
+      position: absolute;
+      inset: 28px;
+      border-radius: 50%;
+      border: 3px dashed var(--peach-mid);
+      opacity: 0.5;
+      animation: spin 30s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .ring-center {
+      position: absolute;
+      inset: 80px;
+      border-radius: 50%;
+      background: var(--card-bg);
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+    }
+    .ring-center-label {
+      font-family: 'Baloo 2', sans-serif;
+      font-weight: 800;
+      font-size: 28px;
+      color: var(--text-dark);
+      line-height: 1;
+    }
+    .ring-center-sub {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-soft);
+      text-align: center;
+      line-height: 1.3;
+    }
+    .ring-center-badge {
+      margin-top: 6px;
+      background: var(--butter);
+      border: 1.5px solid var(--butter-mid);
+      padding: 4px 12px;
+      border-radius: var(--radius-pill);
+      font-size: 11px;
+      font-weight: 700;
+      color: #8B6A00;
+    }
+
+    /* member bubbles around the ring */
+    .member-bubble {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      animation: floatBubble 4s ease-in-out infinite;
+    }
+    @keyframes floatBubble {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-5px); }
+    }
+    .member-bubble:nth-child(2) { animation-delay: 0.5s; }
+    .member-bubble:nth-child(3) { animation-delay: 1.0s; }
+    .member-bubble:nth-child(4) { animation-delay: 1.5s; }
+    .member-bubble:nth-child(5) { animation-delay: 2.0s; }
+
+    /* positions: top, right, bottom, left */
+    .mb-top    { top: -10px;  left: 50%; transform: translateX(-50%); }
+    .mb-right  { right: -10px; top: 50%; transform: translateY(-50%); }
+    .mb-bottom { bottom: -10px; left: 50%; transform: translateX(-50%); }
+    .mb-left   { left: -10px;  top: 50%; transform: translateY(-50%); }
+
+    .avatar {
+      width: 62px; height: 62px;
+      border-radius: 50%;
+      border: 3px solid #fff;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Baloo 2', sans-serif;
+      font-weight: 800;
+      font-size: 22px;
+      color: #fff;
+      position: relative;
+    }
+    .avatar.coral  { background: linear-gradient(135deg, var(--coral), var(--peach-mid)); }
+    .avatar.butter { background: linear-gradient(135deg, #F0C060, var(--butter-mid)); color: #6B4D00; }
+    .avatar.sage   { background: linear-gradient(135deg, var(--sage-mid), var(--sage-dark)); }
+    .avatar.lav    { background: linear-gradient(135deg, #B8A0D8, #9070B8); }
+
+    .score-badge {
+      position: absolute;
+      bottom: -4px; right: -4px;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: 800;
+      color: #fff;
+    }
+    .score-hi   { background: var(--sage-dark); }
+    .score-mid  { background: var(--butter-mid); color: #6B4D00; }
+    .score-lo   { background: #E07060; }
+
+    .bubble-name {
+      font-family: 'Baloo 2', sans-serif;
+      font-weight: 700;
+      font-size: 12px;
+      color: var(--text-dark);
+      background: var(--card-bg);
+      padding: 3px 10px;
+      border-radius: var(--radius-pill);
+      box-shadow: var(--shadow-sm);
+      white-space: nowrap;
+    }
+
+    /* floating mini-cards */
+    .float-card {
+      position: absolute;
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 12px 16px;
+      box-shadow: var(--shadow-md);
+      border: 1.5px solid rgba(255,180,130,0.2);
+      animation: floatCard 5s ease-in-out infinite;
+    }
+    @keyframes floatCard {
+      0%, 100% { transform: translateY(0) rotate(-1deg); }
+      50%       { transform: translateY(-6px) rotate(1deg); }
+    }
+    .float-card-1 { top: 20px; right: -30px; animation-delay: 0.3s; }
+    .float-card-2 { bottom: 40px; left: -40px; animation-delay: 1.5s; }
+    .fc-label { font-size: 11px; font-weight: 700; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.04em; }
+    .fc-value { font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 20px; color: var(--text-dark); }
+    .fc-sub { font-size: 11px; color: var(--text-muted); }
+
+    /* ─── DASHBOARD SECTION ─── */
+    .dashboard-section {
+      position: relative;
+      z-index: 5;
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 0 64px 100px;
+    }
+
+    .section-intro {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .section-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--sage);
+      color: #2e5e4d;
+      padding: 8px 20px;
+      border-radius: var(--radius-pill);
+      font-weight: 700;
+      font-size: 13px;
+      margin-bottom: 18px;
+    }
+    .section-title {
+      font-family: 'Baloo 2', sans-serif;
+      font-weight: 800;
+      font-size: clamp(28px, 3vw, 44px);
+      color: var(--text-dark);
+      margin-bottom: 10px;
+    }
+    .section-sub {
+      font-size: 16px;
+      color: var(--text-soft);
+      font-weight: 500;
+    }
+
+    /* dashboard card */
+    .dashboard-card {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-lg);
+      border: 1.5px solid rgba(255,180,130,0.18);
+      overflow: hidden;
+    }
+
+    /* dash header */
+    .dash-header {
+      background: linear-gradient(135deg, #FFF0E4 0%, #FFECD6 50%, #FFF8E8 100%);
+      padding: 28px 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+      border-bottom: 1.5px solid rgba(255,180,130,0.2);
+    }
+    .dash-circle-name {
+      font-family: 'Baloo 2', sans-serif;
+      font-weight: 800;
+      font-size: 26px;
+      color: var(--text-dark);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .name-emoji { font-size: 28px; }
+    .dash-circle-sub {
+      font-size: 13px;
+      color: var(--text-soft);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+    .dash-stats {
+      display: flex;
+      gap: 28px;
+      flex-wrap: wrap;
+    }
+    .dash-stat {
+      text-align: center;
+    }
+    .dash-stat-value {
+      font-family: 'Baloo 2', sans-serif;
+      font-weight: 800;
+      font-size: 22px;
+      color: var(--text-dark);
+      line-height: 1;
+    }
+    .dash-stat-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 3px;
+    }
+    .stat-divider {
+      width: 1.5px;
+      background: rgba(180,110,60,0.15);
+      align-self: stretch;
+    }
+
+    /* round progress */
+    .round-progress-wrap {
+      padding: 20px 36px;
+      border-bottom: 1.5px solid rgba(255,180,130,0.12);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .round-label {
+      font-family: 'Baloo 2', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--text-mid);
+      white-space: nowrap;
+    }
+    .round-track {
+      flex: 1;
+      height: 12px;
+      background: #F0E4D8;
+      border-radius: var(--radius-pill);
+      overflow: hidden;
+    }
+    .round-fill {
+      height: 100%;
+      width: 50%;
+      background: linear-gradient(90deg, var(--coral) 0%, var(--peach-mid) 100%);
+      border-radius: var(--radius-pill);
+    }
+    .round-chip {
+      background: var(--butter);
+      border: 1.5px solid var(--butter-mid);
+      padding: 6px 14px;
+      border-radius: var(--radius-pill);
+      font-family: 'Baloo 2', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      color: #8B6A00;
+      white-space: nowrap;
+    }
+
+    /* warning banner */
+    .warning-banner {
+      margin: 20px 28px 0;
+      background: linear-gradient(135deg, #FFF0E8, #FFE4D6);
+      border: 2px solid var(--coral-soft);
+      border-radius: 18px;
+      padding: 16px 22px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .warning-icon-wrap {
+      width: 38px; height: 38px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--coral-soft), var(--coral));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+      box-shadow: 0 4px 14px rgba(255,112,80,0.25);
+    }
+    .warning-text strong {
+      font-family: 'Baloo 2', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--text-dark);
+      display: block;
+      margin-bottom: 4px;
+    }
+    .warning-text span {
+      font-size: 13.5px;
+      color: var(--text-mid);
+      line-height: 1.5;
+    }
+    .warning-ai-tag {
+      margin-left: auto;
+      flex-shrink: 0;
+      background: var(--coral);
+      color: #fff;
+      padding: 5px 12px;
+      border-radius: var(--radius-pill);
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* members grid */
+    .members-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      padding: 24px 28px 28px;
+    }
+
+    .member-card {
+      background: var(--warm-white);
+      border-radius: 22px;
+      padding: 22px 18px;
+      border: 2px solid transparent;
+      transition: transform 0.2s, box-shadow 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .member-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      border-radius: 22px 22px 0 0;
+    }
+    .member-card.high   { border-color: rgba(95,158,138,0.25); }
+    .member-card.high::before  { background: linear-gradient(90deg, var(--sage-mid), var(--sage-dark)); }
+    .member-card.mid    { border-color: rgba(255,180,130,0.25); }
+    .member-card.mid::before   { background: linear-gradient(90deg, var(--peach-mid), var(--coral-soft)); }
+    .member-card.low    { border-color: rgba(255,210,180,0.25); }
+    .member-card.low::before   { background: linear-gradient(90deg, var(--butter), var(--butter-mid)); }
+    .member-card.risk   { border-color: rgba(230,120,90,0.35); background: #FFF5F2; }
+    .member-card.risk::before  { background: linear-gradient(90deg, #E07060, #C05040); }
+    .member-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+
+    .mc-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .mc-avatar {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Baloo 2', sans-serif;
+      font-weight: 800;
+      font-size: 20px;
+      color: #fff;
+    }
+    .mc-avatar.coral  { background: linear-gradient(135deg, var(--coral), var(--peach-mid)); }
+    .mc-avatar.sage   { background: linear-gradient(135deg, var(--sage-mid), var(--sage-dark)); }
+    .mc-avatar.butter { background: linear-gradient(135deg, #F0C060, var(--butter-mid)); color: #6B4D00; }
+    .mc-avatar.risk   { background: linear-gradient(135deg, #C09090, #A07070); }
+
+    .mc-slot {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .mc-slot span {
+      font-family: 'Baloo 2', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-mid);
+      letter-spacing: 0;
+      display: block;
+      line-height: 1;
+    }
+
+    .mc-name {
+      font-family: 'Baloo 2', sans-serif;
+      font-weight: 800;
+      font-size: 18px;
+      color: var(--text-dark);
+      margin-bottom: 14px;
+    }
+
+    .mc-score-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .mc-score-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .mc-score-val {
+      font-family: 'Baloo 2', sans-serif;
+      font-weight: 800;
+      font-size: 22px;
+      line-height: 1;
+    }
+    .mc-score-val.high   { color: var(--sage-dark); }
+    .mc-score-val.mid    { color: var(--peach-mid); }
+    .mc-score-val.low    { color: #C89030; }
+    .mc-score-val.risk   { color: #D04030; }
+
+    .mc-score-bar {
+      height: 8px;
+      background: #EEE4D8;
+      border-radius: var(--radius-pill);
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .mc-score-fill {
+      height: 100%;
+      border-radius: var(--radius-pill);
+      transition: width 1s ease;
+    }
+    .mc-score-fill.high   { background: linear-gradient(90deg, var(--sage-mid), var(--sage-dark)); }
+    .mc-score-fill.mid    { background: linear-gradient(90deg, var(--peach-mid), var(--coral)); }
+    .mc-score-fill.low    { background: linear-gradient(90deg, var(--butter-mid), #E0A030); }
+    .mc-score-fill.risk   { background: linear-gradient(90deg, #E08070, #C04030); }
+
+    .mc-collateral {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--card-bg);
+      border-radius: 10px;
+      padding: 8px 12px;
+      margin-bottom: 12px;
+    }
+    .mc-collateral-label { font-size: 11px; font-weight: 600; color: var(--text-muted); }
+    .mc-collateral-val {
+      font-family: 'Baloo 2', sans-serif;
+      font-weight: 800;
+      font-size: 14px;
+      color: var(--text-dark);
+    }
+
+    .mc-rationale {
+      font-size: 11.5px;
+      color: var(--text-soft);
+      line-height: 1.45;
+      font-style: italic;
+      padding-top: 10px;
+      border-top: 1px solid rgba(180,110,60,0.12);
+    }
+    .mc-rationale::before {
+      content: '✦ ';
+      color: var(--coral-soft);
+      font-style: normal;
+    }
+
+    .mc-current-tag {
+      position: absolute;
+      top: 14px; right: 14px;
+      background: var(--butter);
+      border: 1.5px solid var(--butter-mid);
+      padding: 3px 10px;
+      border-radius: var(--radius-pill);
+      font-size: 10px;
+      font-weight: 700;
+      color: #8B6A00;
+    }
+    .mc-risk-tag {
+      position: absolute;
+      top: 14px; right: 14px;
+      background: #FFE8E4;
+      border: 1.5px solid #F0A090;
+      padding: 3px 10px;
+      border-radius: var(--radius-pill);
+      font-size: 10px;
+      font-weight: 700;
+      color: #C04030;
+    }
+
+    /* insurance bar */
+    .insurance-row {
+      margin: 0 28px 28px;
+      background: linear-gradient(135deg, #E8F6F0, #D8F0E4);
+      border: 2px solid var(--sage);
+      border-radius: 18px;
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .insurance-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .insurance-icon {
+      width: 44px; height: 44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--sage), var(--sage-mid));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 4px 14px rgba(95,158,138,0.25);
+    }
+    .insurance-title {
+      font-family: 'Baloo 2', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      color: #2e5e4d;
+      margin-bottom: 2px;
+    }
+    .insurance-sub { font-size: 12px; color: #5F9E8A; font-weight: 600; }
+    .insurance-value {
+      font-family: 'Baloo 2', sans-serif;
+      font-weight: 800;
+      font-size: 24px;
+      color: #2e5e4d;
+    }
+    .insurance-value span { font-size: 14px; color: var(--sage-dark); font-weight: 600; }
+
+    /* ai footer */
+    .ai-footer {
+      background: linear-gradient(135deg, #F8F4FF, #EDE6FF);
+      border-top: 1.5px solid rgba(180,160,230,0.3);
+      padding: 20px 36px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .ai-icon-wrap {
+      width: 42px; height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--lavender), #B0A0E0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .ai-footer-text strong {
+      font-family: 'Baloo 2', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--text-dark);
+      display: block;
+    }
+    .ai-footer-text span {
+      font-size: 13px;
+      color: var(--text-soft);
+    }
+    .ai-powered-badge {
+      margin-left: auto;
+      background: var(--lavender);
+      color: #5040A0;
+      padding: 7px 16px;
+      border-radius: var(--radius-pill);
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border: 1.5px solid rgba(160,130,220,0.4);
+    }
+    .ai-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #7060D0;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    /* ─── FOOTER STRIP ─── */
+    .footer-strip {
+      position: relative;
+      z-index: 5;
+      text-align: center;
+      padding: 32px 64px;
+      border-top: 1.5px solid rgba(180,110,60,0.12);
+    }
+    .footer-text {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .footer-text a { color: var(--coral); text-decoration: none; }
+
+    /* responsive */
+    @media (max-width: 1100px) {
+      nav { padding: 18px 32px; }
+      .hero { padding: 40px 32px 60px; gap: 32px; }
+      .dashboard-section { padding: 0 32px 80px; }
+      .members-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .hero { grid-template-columns: 1fr; padding: 30px 24px 50px; }
+      .hero-visual { height: 340px; }
+      .ring-wrap { width: 300px; height: 300px; }
+      .dashboard-section { padding: 0 20px 60px; }
+      .dash-header { padding: 22px 22px; }
+      .members-grid { grid-template-columns: 1fr 1fr; gap: 14px; padding: 18px 18px 20px; }
+      nav { padding: 16px 24px; }
+      .nav-links { display: none; }
+      .float-card { display: none; }
+    }
+    @media (max-width: 480px) {
+      .members-grid { grid-template-columns: 1fr; }
+      .dash-stats { gap: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- bg blobs -->
+  <div class="hero-bg">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+
+  <!-- ─── NAV ─── -->
+  <nav>
+    <a class="wordmark" href="#">
+      <div class="wordmark-ring">
+        <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="10" cy="10" r="7" stroke="white" stroke-width="2.5" stroke-dasharray="4 3"/>
+          <circle cx="10" cy="10" r="2.5" fill="white"/>
+        </svg>
+      </div>
+      Tanda
+    </a>
+    <div class="nav-links">
+      <a href="#">Cómo funciona</a>
+      <a href="#">Mis tandas</a>
+      <a href="#">Comunidad</a>
+      <button class="btn-nav">Entrar</button>
+    </div>
+  </nav>
+
+  <!-- ─── HERO ─── -->
+  <section class="hero">
+    <!-- LEFT: copy -->
+    <div>
+      <div class="hero-eyebrow animate-in delay-1">
+        <span class="eyebrow-dot"></span>
+        La tanda de siempre, ahora con tecnología
+      </div>
+
+      <h1 class="hero-title animate-in delay-2">
+        La tanda que te<br>
+        <span class="highlight">cuida el dinero</span><br>
+        de verdad.
+      </h1>
+
+      <p class="hero-sub animate-in delay-3">
+        La tanda de siempre — sin el riesgo de que te dejen colgado.
+      </p>
+      <p class="hero-sub-en animate-in delay-3">
+        AI-organized savings circles on-chain. Save together, in pesos, without the trust problem.
+      </p>
+
+      <div class="hero-ctas animate-in delay-4">
+        <button class="btn-primary">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="6.5" stroke="white" stroke-width="2" stroke-dasharray="3 2.5"/><circle cx="9" cy="9" r="2.5" fill="white"/></svg>
+          Crear una tanda
+        </button>
+        <button class="btn-secondary">¿Cómo funciona?</button>
+      </div>
+
+      <div class="trust-strip animate-in delay-5">
+        <div class="trust-item">
+          <div class="trust-icon">⬡</div>
+          Built on Arbitrum
+        </div>
+        <span class="trust-sep">·</span>
+        <div class="trust-item">
+          <div class="trust-icon">$</div>
+          Settles in MXNB
+        </div>
+        <span class="trust-sep">·</span>
+        <div class="trust-item">
+          <div class="trust-icon">🔑</div>
+          Non-custodial
+        </div>
+      </div>
+
+      <!-- feature pills -->
+      <div class="feature-pills" style="margin-top: 40px;">
+        <div class="feature-pill animate-in delay-3">
+          <div class="pill-icon coral">🤖</div>
+          <div>
+            <div class="pill-title">El AI ve por todos</div>
+            <div class="pill-desc">Puntaje de confianza por historial on-chain · colateral justo para cada quien</div>
+          </div>
+        </div>
+        <div class="feature-pill animate-in delay-4">
+          <div class="pill-icon butter">🛡️</div>
+          <div>
+            <div class="pill-title">A prueba de impagos</div>
+            <div class="pill-desc">Colateral bloqueado + fondo de protección · el receptor siempre cobra completo</div>
+          </div>
+        </div>
+        <div class="feature-pill animate-in delay-5">
+          <div class="pill-icon sage">✨</div>
+          <div>
+            <div class="pill-title">Únete con una llave, ya</div>
+            <div class="pill-desc">Solo passkey — sin seed phrase, sin gas, sin complicaciones</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: ring visual -->
+    <div class="hero-visual animate-in delay-2">
+      <div class="ring-wrap">
+        <div class="ring-bg"></div>
+        <div class="ring-track"></div>
+
+        <!-- member bubbles at cardinal positions -->
+        <div class="member-bubble mb-top" style="animation-delay:0s;">
+          <div class="avatar coral" style="top:auto;left:auto;position:relative;transform:none;">
+            M
+            <div class="score-badge score-hi">82</div>
+          </div>
+          <div class="bubble-name">María</div>
+        </div>
+
+        <div class="member-bubble mb-right" style="animation-delay:0.7s;">
+          <div class="avatar sage" style="position:relative;transform:none;">
+            D
+            <div class="score-badge score-mid">66</div>
+          </div>
+          <div class="bubble-name">Diego</div>
+        </div>
+
+        <div class="member-bubble mb-bottom" style="animation-delay:1.4s;">
+          <div class="avatar butter" style="position:relative;transform:none;">
+            L
+            <div class="score-badge score-mid">50</div>
+          </div>
+          <div class="bubble-name">Lupe</div>
+        </div>
+
+        <div class="member-bubble mb-left" style="animation-delay:2.1s;">
+          <div class="avatar lav" style="position:relative;transform:none;">
+            Ξ
+            <div class="score-badge score-lo">28</div>
+          </div>
+          <div class="bubble-name">0xkito</div>
+        </div>
+
+        <!-- center -->
+        <div class="ring-center">
+          <div class="ring-center-label">400</div>
+          <div class="ring-center-sub">MXNB<br>en el pote</div>
+          <div class="ring-center-badge">Ronda 2 de 4</div>
+        </div>
+
+        <!-- floating cards -->
+        <div class="float-card float-card-1">
+          <div class="fc-label">AI Score</div>
+          <div class="fc-value" style="color:var(--sage-dark);">82 ✓</div>
+          <div class="fc-sub">María · alta confianza</div>
+        </div>
+        <div class="float-card float-card-2">
+          <div class="fc-label">Fondo</div>
+          <div class="fc-value">1,240</div>
+          <div class="fc-sub">MXNB protegidos</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── DASHBOARD SECTION ─── -->
+  <section class="dashboard-section">
+    <div class="section-intro animate-in delay-1">
+      <div class="section-chip">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="#2e5e4d" stroke-width="1.8" stroke-dasharray="3 2"/><circle cx="8" cy="8" r="2" fill="#2e5e4d"/></svg>
+        Vista en vivo · Live dashboard
+      </div>
+      <h2 class="section-title">Una tanda activa, así se ve</h2>
+      <p class="section-sub">El AI monitorea cada ronda — transparente, protegido, sin sorpresas.</p>
+    </div>
+
+    <div class="dashboard-card animate-in delay-2">
+
+      <!-- header -->
+      <div class="dash-header">
+        <div>
+          <div class="dash-circle-name">
+            <span class="name-emoji">🌿</span>
+            Tanda Oaxaca
+          </div>
+          <div class="dash-circle-sub">4 integrantes · 100 MXNB / ronda · activa</div>
+        </div>
+        <div class="dash-stats">
+          <div class="dash-stat">
+            <div class="dash-stat-value">400</div>
+            <div class="dash-stat-label">Pote MXNB</div>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="dash-stat">
+            <div class="dash-stat-value" style="color:var(--coral);">Ronda 2</div>
+            <div class="dash-stat-label">de 4</div>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="dash-stat">
+            <div class="dash-stat-value">Diego</div>
+            <div class="dash-stat-label">Próx. receptor</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- round progress -->
+      <div class="round-progress-wrap">
+        <div class="round-label">Progreso de la ronda</div>
+        <div class="round-track"><div class="round-fill"></div></div>
+        <div class="round-chip">50% completado</div>
+      </div>
+
+      <!-- warning banner -->
+      <div class="warning-banner">
+        <div class="warning-icon-wrap">⚠️</div>
+        <div class="warning-text">
+          <strong>El AI detectó riesgo de impago esta ronda</strong>
+          <span>
+            <b>0xkito</b> muestra señales de riesgo en su historial reciente. Se solicitó refuerzo de colateral — el grupo sigue protegido. Si no responde en 24h, el fondo de protección cubre la diferencia.
+          </span>
+        </div>
+        <div class="warning-ai-tag">
+          <span style="font-size:14px;">🤖</span>
+          AI aviso
+        </div>
+      </div>
+
+      <!-- members grid -->
+      <div class="members-grid">
+
+        <!-- María: high trust -->
+        <div class="member-card high">
+          <div class="mc-top">
+            <div class="mc-avatar coral">M</div>
+            <div class="mc-slot">Slot<span>#1 ✓</span></div>
+          </div>
+          <div class="mc-name">María</div>
+          <div class="mc-score-row">
+            <div class="mc-score-label">AI Score</div>
+            <div class="mc-score-val high">82</div>
+          </div>
+          <div class="mc-score-bar"><div class="mc-score-fill high" style="width:82%"></div></div>
+          <div class="mc-collateral">
+            <div class="mc-collateral-label">Colateral</div>
+            <div class="mc-collateral-val">0.5× · 50 MXNB</div>
+          </div>
+          <div class="mc-rationale">6 rondas a tiempo, 1 círculo completo — muy confiable</div>
+        </div>
+
+        <!-- Diego: mid trust, current recipient -->
+        <div class="member-card mid" style="position:relative;">
+          <div class="mc-current-tag">🎉 Próximo receptor</div>
+          <div class="mc-top">
+            <div class="mc-avatar sage">D</div>
+            <div class="mc-slot">Slot<span>#2</span></div>
+          </div>
+          <div class="mc-name">Diego</div>
+          <div class="mc-score-row">
+            <div class="mc-score-label">AI Score</div>
+            <div class="mc-score-val mid">66</div>
+          </div>
+          <div class="mc-score-bar"><div class="mc-score-fill mid" style="width:66%"></div></div>
+          <div class="mc-collateral">
+            <div class="mc-collateral-label">Colateral</div>
+            <div class="mc-collateral-val">1× · 100 MXNB</div>
+          </div>
+          <div class="mc-rationale">3 rondas completadas, historial mixto — score estable</div>
+        </div>
+
+        <!-- Lupe: low-mid -->
+        <div class="member-card low">
+          <div class="mc-top">
+            <div class="mc-avatar butter">L</div>
+            <div class="mc-slot">Slot<span>#3</span></div>
+          </div>
+          <div class="mc-name">Lupe</div>
+          <div class="mc-score-row">
+            <div class="mc-score-label">AI Score</div>
+            <div class="mc-score-val low">50</div>
+          </div>
+          <div class="mc-score-bar"><div class="mc-score-fill low" style="width:50%"></div></div>
+          <div class="mc-collateral">
+            <div class="mc-collateral-label">Colateral</div>
+            <div class="mc-collateral-val">2× · 200 MXNB</div>
+          </div>
+          <div class="mc-rationale">1 ronda completada, actividad reciente baja — en seguimiento</div>
+        </div>
+
+        <!-- 0xkito: at risk -->
+        <div class="member-card risk" style="position:relative;">
+          <div class="mc-risk-tag">⚠ En riesgo</div>
+          <div class="mc-top">
+            <div class="mc-avatar risk">Ξ</div>
+            <div class="mc-slot">Slot<span>#4</span></div>
+          </div>
+          <div class="mc-name">0xkito</div>
+          <div class="mc-score-row">
+            <div class="mc-score-label">AI Score</div>
+            <div class="mc-score-val risk">28</div>
+          </div>
+          <div class="mc-score-bar"><div class="mc-score-fill risk" style="width:28%"></div></div>
+          <div class="mc-collateral">
+            <div class="mc-collateral-label">Colateral</div>
+            <div class="mc-collateral-val">3× · 300 MXNB</div>
+          </div>
+          <div class="mc-rationale">Wallet nueva, cold start — sin historial previo de tandas</div>
+        </div>
+
+      </div>
+
+      <!-- insurance -->
+      <div class="insurance-row">
+        <div class="insurance-left">
+          <div class="insurance-icon">🛡️</div>
+          <div>
+            <div class="insurance-title">Fondo de protección</div>
+            <div class="insurance-sub">Cubre impagos automáticamente · nadie se queda sin cobrar</div>
+          </div>
+        </div>
+        <div class="insurance-value">1,240 <span>MXNB</span></div>
+      </div>
+
+      <!-- AI footer -->
+      <div class="ai-footer">
+        <div class="ai-icon-wrap">🤖</div>
+        <div class="ai-footer-text">
+          <strong>Tu amigo AI vigila el grupo</strong>
+          <span>Monitorea cada movimiento on-chain · avisa antes de que haya problema · protege a todos en la tanda</span>
+        </div>
+        <div class="ai-powered-badge">
+          <div class="ai-dot"></div>
+          AI activo · Arbitrum
+        </div>
+      </div>
+
+    </div><!-- /dashboard-card -->
+  </section>
+
+  <!-- footer strip -->
+  <footer class="footer-strip">
+    <p class="footer-text">
+      Tanda · Hecho con ❤️ para LATAM · <a href="#">Arbitrum</a> · MXNB · Non-custodial · 2025
+    </p>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,1643 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tanda — La tanda de siempre, sin el riesgo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,800;1,9..144,400;1,9..144,700&family=Mulish:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* ─── CSS VARIABLES ─── */
+:root {
+  --crimson:    #C0392B;
+  --crimson-dk: #8B1A11;
+  --marigold:   #E8A020;
+  --gold:       #D4881C;
+  --teal:       #1A7A74;
+  --teal-lt:    #22A99E;
+  --magenta:    #9B2368;
+  --magenta-lt: #C4326A;
+  --cream:      #F5EDD8;
+  --cream-dk:   #E8D9BE;
+  --ivory:      #FBF6EC;
+  --ink:        #1E1209;
+  --ink-mid:    #3D2410;
+  --sand:       #C8A96A;
+  --white:      #FFFDF7;
+
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body:    'Mulish', sans-serif;
+
+  /* Sarape stripe widths for repeating pattern */
+  --stripe-w: 180px;
+}
+
+/* ─── RESET ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--ivory);
+  color: var(--ink);
+  overflow-x: hidden;
+}
+
+/* ─── SARAPE WEAVE UTILITY ─── */
+/* Core repeating sarape: tight horizontal stripes in warm palette */
+.sarape-bg {
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,          transparent 1px,
+      rgba(192,57,43,0.18) 1px,  rgba(192,57,43,0.18) 3px,
+      transparent 3px,           transparent 5px,
+      rgba(232,160,32,0.22) 5px, rgba(232,160,32,0.22) 7px,
+      transparent 7px,           transparent 9px,
+      rgba(26,122,116,0.18) 9px, rgba(26,122,116,0.18) 11px,
+      transparent 11px,          transparent 13px,
+      rgba(155,35,104,0.14) 13px,rgba(155,35,104,0.14) 15px,
+      transparent 15px,          transparent 18px,
+      rgba(212,136,28,0.20) 18px,rgba(212,136,28,0.20) 20px,
+      transparent 20px,          transparent 22px,
+      rgba(192,57,43,0.12) 22px, rgba(192,57,43,0.12) 23px,
+      transparent 23px,          transparent 26px
+    );
+}
+
+/* ─── ZIGZAG DIAMOND MOTIF — used as section divider ─── */
+.sarape-divider {
+  width: 100%;
+  height: 28px;
+  position: relative;
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      var(--crimson)     0px,   var(--crimson)     14px,
+      var(--marigold)   14px,  var(--marigold)   28px,
+      var(--teal)        28px,  var(--teal)        42px,
+      var(--magenta)    42px,  var(--magenta)    56px,
+      var(--gold)        56px,  var(--gold)        70px,
+      var(--teal-lt)    70px,  var(--teal-lt)    84px,
+      var(--crimson-dk) 84px,  var(--crimson-dk) 98px,
+      var(--cream-dk)   98px,  var(--cream-dk)  112px
+    );
+}
+.sarape-divider::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      transparent 0px,         transparent 5px,
+      rgba(0,0,0,0.25) 5px,   rgba(0,0,0,0.25) 7px,
+      transparent 7px,         transparent 12px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      transparent 0px,         transparent 5px,
+      rgba(255,255,255,0.18) 5px, rgba(255,255,255,0.18) 7px,
+      transparent 7px,         transparent 12px
+    );
+}
+
+/* Thick divider variant */
+.sarape-divider-thick {
+  height: 48px;
+}
+
+/* ─── PAGE LOAD ANIMATIONS ─── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes weaveIn {
+  from { opacity: 0; transform: scaleX(0.92); }
+  to   { opacity: 1; transform: scaleX(1); }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* ─── NAV ─── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(30,18,9,0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 3px solid transparent;
+  border-image: repeating-linear-gradient(
+    90deg,
+    var(--crimson)  0, var(--crimson)  20%,
+    var(--marigold) 20%, var(--marigold) 40%,
+    var(--teal)     40%, var(--teal)     60%,
+    var(--magenta)  60%, var(--magenta)  80%,
+    var(--gold)     80%, var(--gold)     100%
+  ) 1;
+  padding: 0 64px;
+  height: 64px;
+  display: flex; align-items: center; justify-content: space-between;
+  animation: fadeIn 0.4s ease both;
+}
+.nav-logo {
+  font-family: var(--font-display);
+  font-size: 1.7rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: linear-gradient(120deg, var(--marigold), var(--crimson), var(--teal-lt), var(--marigold));
+  background-size: 300% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 4s linear infinite;
+  text-decoration: none;
+}
+.nav-links {
+  display: flex; align-items: center; gap: 32px;
+  list-style: none;
+}
+.nav-links a {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--cream);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+.nav-links a:hover { opacity: 1; color: var(--marigold); }
+.nav-cta {
+  background: var(--crimson);
+  color: var(--cream) !important;
+  opacity: 1 !important;
+  padding: 8px 20px;
+  border-radius: 4px;
+  transition: background 0.2s !important;
+}
+.nav-cta:hover { background: var(--crimson-dk) !important; }
+
+/* ─── HERO SECTION ─── */
+.hero {
+  min-height: 100vh;
+  padding-top: 64px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Layered sarape textile background — the signature element */
+.hero-weave {
+  position: absolute;
+  inset: 0;
+  background:
+    /* Zigzag diamond overlay */
+    repeating-linear-gradient(
+      45deg,
+      transparent 0px,            transparent 18px,
+      rgba(255,255,255,0.04) 18px, rgba(255,255,255,0.04) 20px,
+      transparent 20px,            transparent 38px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      transparent 0px,            transparent 18px,
+      rgba(0,0,0,0.06) 18px,      rgba(0,0,0,0.06) 20px,
+      transparent 20px,            transparent 38px
+    ),
+    /* Wide woven bands */
+    repeating-linear-gradient(
+      0deg,
+      var(--ink)         0px,   var(--ink)          40px,
+      var(--crimson-dk)  40px,  var(--crimson-dk)   56px,
+      var(--ink)         56px,  var(--ink)           80px,
+      var(--teal)        80px,  var(--teal)          96px,
+      var(--ink)         96px,  var(--ink)           120px,
+      var(--marigold)    120px, var(--marigold)      134px,
+      var(--ink)         134px, var(--ink)           158px,
+      var(--magenta)     158px, var(--magenta)       170px,
+      var(--ink)         170px, var(--ink)           196px,
+      var(--crimson)     196px, var(--crimson)       208px,
+      var(--ink)         208px, var(--ink)           230px,
+      var(--gold)        230px, var(--gold)          242px,
+      var(--ink)         242px, var(--ink)           270px,
+      var(--teal-lt)     270px, var(--teal-lt)       280px,
+      var(--ink)         280px, var(--ink)           310px
+    );
+}
+
+/* Subtle crosshatch texture on top of the weave */
+.hero-weave::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 2px,
+      transparent 2px, transparent 24px
+    );
+}
+
+/* Dark vignette so text stays readable */
+.hero-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 80% 100% at 50% 40%,
+    rgba(16,8,2,0.65) 0%,
+    rgba(16,8,2,0.85) 60%,
+    rgba(16,8,2,0.95) 100%
+  );
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 100px 64px 80px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+  flex: 1;
+}
+
+/* ─── HERO LEFT ─── */
+.hero-left {
+  animation: fadeUp 0.7s ease 0.1s both;
+}
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(232,160,32,0.15);
+  border: 1px solid rgba(232,160,32,0.35);
+  color: var(--marigold);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 2px;
+  margin-bottom: 24px;
+}
+.hero-eyebrow span { color: var(--marigold); font-size: 1rem; }
+
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 4.5vw, 5rem);
+  font-weight: 800;
+  line-height: 1.0;
+  letter-spacing: -0.03em;
+  color: var(--cream);
+  margin-bottom: 12px;
+}
+.hero-title em {
+  font-style: italic;
+  font-weight: 300;
+  color: var(--marigold);
+}
+
+.hero-tagline {
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 1.8vw, 1.4rem);
+  font-weight: 400;
+  font-style: italic;
+  color: var(--cream-dk);
+  opacity: 0.9;
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+.hero-subtagline {
+  font-size: 0.95rem;
+  color: rgba(245,237,216,0.65);
+  margin-bottom: 40px;
+  line-height: 1.6;
+  max-width: 480px;
+}
+
+/* Feature points */
+.hero-features {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 44px;
+}
+.hero-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+.feature-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  position: relative;
+  overflow: hidden;
+}
+.feature-icon::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0, transparent 3px,
+      rgba(255,255,255,0.12) 3px, rgba(255,255,255,0.12) 4px
+    );
+}
+.fi-ai   { background: var(--teal); }
+.fi-def  { background: var(--crimson); }
+.fi-gas  { background: var(--magenta); }
+.feature-text strong {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--cream);
+  margin-bottom: 2px;
+}
+.feature-text span {
+  font-size: 0.8rem;
+  color: rgba(245,237,216,0.6);
+  line-height: 1.4;
+}
+
+/* CTA buttons */
+.hero-ctas {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 40px;
+}
+.btn-primary {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+  padding: 14px 32px;
+  background: var(--crimson);
+  color: var(--cream);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.15s, background 0.2s;
+  box-shadow: 0 4px 20px rgba(192,57,43,0.5);
+}
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0, transparent 6px,
+      rgba(255,255,255,0.07) 6px, rgba(255,255,255,0.07) 7px
+    );
+}
+.btn-primary:hover { background: var(--crimson-dk); transform: translateY(-2px); }
+
+.btn-secondary {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+  padding: 13px 28px;
+  background: transparent;
+  color: var(--cream);
+  border: 1.5px solid rgba(245,237,216,0.35);
+  border-radius: 4px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: border-color 0.2s, color 0.2s;
+}
+.btn-secondary:hover { border-color: var(--marigold); color: var(--marigold); }
+
+/* Trust strip */
+.trust-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: rgba(245,237,216,0.45);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.trust-strip span { color: rgba(245,237,216,0.2); }
+
+/* ─── HERO RIGHT — decorative woven circle emblem ─── */
+.hero-right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeUp 0.7s ease 0.3s both;
+}
+
+.hero-emblem {
+  position: relative;
+  width: 420px;
+  height: 420px;
+}
+
+/* Outer rings — like threads wrapped round a loom */
+.emblem-ring {
+  position: absolute;
+  border-radius: 50%;
+  border-style: solid;
+}
+.ring-1 {
+  inset: 0;
+  border-width: 20px;
+  border-color: transparent;
+  border-image: conic-gradient(
+    var(--crimson)   0deg  40deg,
+    var(--marigold) 40deg  80deg,
+    var(--teal)      80deg 120deg,
+    var(--magenta)  120deg 160deg,
+    var(--gold)     160deg 200deg,
+    var(--teal-lt)  200deg 240deg,
+    var(--crimson)  240deg 280deg,
+    var(--marigold) 280deg 320deg,
+    var(--magenta)  320deg 360deg
+  ) 20;
+  animation: none;
+}
+.ring-2 {
+  inset: 28px;
+  border-width: 8px;
+  border-color: rgba(245,237,216,0.08);
+}
+.ring-3 {
+  inset: 44px;
+  border-width: 4px;
+  border-color: transparent;
+  border-image: conic-gradient(
+    var(--teal)     0deg  90deg,
+    var(--crimson)  90deg 180deg,
+    var(--marigold) 180deg 270deg,
+    var(--magenta)  270deg 360deg
+  ) 4;
+}
+
+/* Center panel */
+.emblem-center {
+  position: absolute;
+  inset: 56px;
+  border-radius: 50%;
+  background: rgba(16,8,2,0.88);
+  border: 1px solid rgba(245,237,216,0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.emblem-center::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0, transparent 7px,
+      rgba(232,160,32,0.05) 7px, rgba(232,160,32,0.05) 8px
+    );
+  border-radius: 50%;
+}
+.emblem-word {
+  font-family: var(--font-display);
+  font-size: 3.6rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--cream);
+  position: relative;
+  z-index: 1;
+  line-height: 1;
+}
+.emblem-word span {
+  color: var(--marigold);
+}
+.emblem-sub {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(245,237,216,0.4);
+  position: relative;
+  z-index: 1;
+  margin-top: 4px;
+}
+.emblem-tag {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 0.85rem;
+  color: rgba(245,237,216,0.5);
+  position: relative;
+  z-index: 1;
+  margin-top: 10px;
+}
+
+/* Member dots around the emblem */
+.member-dot {
+  position: absolute;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--cream);
+  border: 3px solid var(--ink);
+  z-index: 3;
+}
+.md-maria { top: 20px; left: 50%; transform: translateX(-50%); background: var(--teal); }
+.md-diego { right: 20px; top: 50%; transform: translateY(-50%); background: var(--gold); }
+.md-lupe  { bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--magenta); }
+.md-kito  { left: 20px; top: 50%; transform: translateY(-50%); background: var(--crimson); }
+
+.member-dot .dot-score {
+  position: absolute;
+  bottom: -6px;
+  right: -4px;
+  font-size: 0.55rem;
+  font-family: var(--font-body);
+  font-weight: 700;
+  background: var(--ink);
+  border-radius: 8px;
+  padding: 1px 4px;
+  white-space: nowrap;
+}
+.score-high { color: var(--teal-lt); }
+.score-low  { color: var(--crimson); }
+
+/* Connecting threads */
+.thread-line {
+  position: absolute;
+  background: rgba(245,237,216,0.08);
+  transform-origin: 0 50%;
+}
+
+/* ─── SARAPE BAND DIVIDER ─── */
+.band-divider {
+  position: relative;
+  height: 60px;
+  overflow: hidden;
+}
+.band-divider-inner {
+  width: 100%;
+  height: 100%;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      var(--crimson-dk) 0px,   var(--crimson-dk)  60px,
+      var(--crimson)    60px,  var(--crimson)     72px,
+      var(--marigold)   72px,  var(--marigold)    132px,
+      var(--gold)       132px, var(--gold)        144px,
+      var(--teal)       144px, var(--teal)        204px,
+      var(--teal-lt)    204px, var(--teal-lt)     216px,
+      var(--magenta)    216px, var(--magenta)     276px,
+      var(--magenta-lt) 276px, var(--magenta-lt)  288px,
+      var(--crimson-dk) 288px, var(--crimson-dk)  348px,
+      var(--gold)       348px, var(--gold)        360px,
+      var(--cream-dk)   360px, var(--cream-dk)    420px,
+      var(--sand)       420px, var(--sand)        432px
+    );
+}
+.band-divider-inner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  /* Diamond/zigzag thread overlay */
+  background:
+    repeating-linear-gradient(
+      45deg,
+      rgba(0,0,0,0) 0px, rgba(0,0,0,0) 10px,
+      rgba(0,0,0,0.3) 10px, rgba(0,0,0,0.3) 12px,
+      rgba(0,0,0,0) 12px, rgba(0,0,0,0) 22px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      rgba(0,0,0,0) 0px, rgba(0,0,0,0) 10px,
+      rgba(255,255,255,0.15) 10px, rgba(255,255,255,0.15) 12px,
+      rgba(0,0,0,0) 12px, rgba(0,0,0,0) 22px
+    );
+}
+
+/* ─── DASHBOARD SECTION ─── */
+.dashboard-section {
+  background:
+    repeating-linear-gradient(
+      0deg,
+      var(--ivory) 0px, var(--ivory) 48px,
+      rgba(192,57,43,0.04) 48px, rgba(192,57,43,0.04) 50px,
+      var(--ivory) 50px, var(--ivory) 96px,
+      rgba(26,122,116,0.04) 96px, rgba(26,122,116,0.04) 98px
+    );
+  padding: 80px 0 100px;
+}
+
+.dashboard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 64px;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 52px;
+  animation: fadeUp 0.6s ease 0.1s both;
+}
+.section-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(26,122,116,0.1);
+  border: 1px solid rgba(26,122,116,0.25);
+  color: var(--teal);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 2px;
+  margin-bottom: 16px;
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 3vw, 3rem);
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+.section-title em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--crimson);
+}
+
+/* ─── TANDA CARD ─── */
+.tanda-card {
+  background: var(--white);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(30,18,9,0.1), 0 2px 8px rgba(30,18,9,0.06);
+  animation: fadeUp 0.6s ease 0.2s both;
+  border: 1px solid rgba(200,169,106,0.2);
+}
+
+/* Card header bar — mini sarape stripe */
+.card-sarape-header {
+  height: 8px;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      var(--crimson)    0px, var(--crimson)    60px,
+      var(--marigold)  60px, var(--marigold)  120px,
+      var(--teal)      120px, var(--teal)      180px,
+      var(--magenta)   180px, var(--magenta)   240px,
+      var(--gold)      240px, var(--gold)      300px,
+      var(--teal-lt)   300px, var(--teal-lt)   360px,
+      var(--crimson-dk)360px, var(--crimson-dk)420px
+    );
+}
+
+.card-body {
+  padding: 32px 36px 36px;
+}
+
+/* ─── TANDA ROUND HEADER ─── */
+.tanda-round-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(200,169,106,0.2);
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.tanda-name-block {}
+.tanda-name {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+.tanda-name em {
+  font-style: italic;
+  font-weight: 300;
+  color: var(--teal);
+}
+.tanda-subtitle {
+  font-size: 0.8rem;
+  color: rgba(30,18,9,0.45);
+  margin-top: 4px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.tanda-stats {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.stat-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--ivory);
+  border: 1px solid rgba(200,169,106,0.25);
+  border-radius: 4px;
+  padding: 10px 20px;
+  position: relative;
+  overflow: hidden;
+}
+.stat-pill::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0, transparent 7px,
+      rgba(192,57,43,0.04) 7px, rgba(192,57,43,0.04) 8px
+    );
+}
+.stat-value {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  position: relative;
+}
+.stat-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: rgba(30,18,9,0.4);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  position: relative;
+}
+
+.next-recipient {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.next-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: rgba(30,18,9,0.4);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.next-name {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--teal);
+}
+
+/* ─── WARNING BANNER ─── */
+.warning-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: rgba(192,57,43,0.06);
+  border: 1.5px solid rgba(192,57,43,0.3);
+  border-left: 4px solid var(--crimson);
+  border-radius: 4px;
+  padding: 14px 18px;
+  margin-bottom: 28px;
+  position: relative;
+  overflow: hidden;
+}
+.warning-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0, transparent 40px,
+      rgba(192,57,43,0.03) 40px, rgba(192,57,43,0.03) 42px
+    );
+}
+.warning-icon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  margin-top: -1px;
+}
+.warning-content {}
+.warning-label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--crimson);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 3px;
+}
+.warning-text {
+  font-size: 0.9rem;
+  color: var(--ink-mid);
+  line-height: 1.4;
+  font-weight: 400;
+}
+.warning-text strong { font-weight: 700; color: var(--crimson); }
+
+/* ─── MEMBERS GRID ─── */
+.members-section-label {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: rgba(30,18,9,0.35);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+.members-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.member-card {
+  background: var(--ivory);
+  border-radius: 5px;
+  border: 1.5px solid rgba(200,169,106,0.2);
+  overflow: hidden;
+  transition: transform 0.15s, box-shadow 0.15s;
+  position: relative;
+}
+.member-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(30,18,9,0.1);
+}
+
+/* Top accent band per member — woven color */
+.member-band {
+  height: 6px;
+}
+.band-teal    { background: linear-gradient(90deg, var(--teal), var(--teal-lt)); }
+.band-gold    { background: linear-gradient(90deg, var(--gold), var(--marigold)); }
+.band-magenta { background: linear-gradient(90deg, var(--magenta), var(--magenta-lt)); }
+.band-crimson { background: linear-gradient(90deg, var(--crimson-dk), var(--crimson)); }
+
+.member-card-body {
+  padding: 16px;
+}
+
+.member-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.member-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--cream);
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+.member-avatar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      transparent 0, transparent 4px,
+      rgba(255,255,255,0.12) 4px, rgba(255,255,255,0.12) 5px
+    );
+  border-radius: 50%;
+}
+.av-teal    { background: var(--teal); }
+.av-gold    { background: var(--gold); }
+.av-magenta { background: var(--magenta); }
+.av-crimson { background: var(--crimson-dk); }
+
+.member-id {}
+.member-name {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+.member-handle {
+  font-size: 0.7rem;
+  color: rgba(30,18,9,0.4);
+  margin-top: 1px;
+}
+
+/* AI Score gauge */
+.ai-score-block {
+  margin-bottom: 12px;
+}
+.score-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+.score-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: rgba(30,18,9,0.4);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.score-number {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.score-high { color: var(--teal); }
+.score-med  { color: var(--gold); }
+.score-low  { color: var(--crimson); }
+
+/* Score bar — woven stripe style */
+.score-bar {
+  height: 8px;
+  background: rgba(30,18,9,0.08);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+.score-fill {
+  height: 100%;
+  border-radius: 2px;
+  position: relative;
+  transition: width 0.5s ease;
+}
+.score-fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0, transparent 6px,
+      rgba(255,255,255,0.25) 6px, rgba(255,255,255,0.25) 7px
+    );
+}
+.fill-high    { background: linear-gradient(90deg, var(--teal), var(--teal-lt)); }
+.fill-med     { background: linear-gradient(90deg, var(--gold), var(--marigold)); }
+.fill-low     { background: linear-gradient(90deg, var(--crimson-dk), var(--crimson)); }
+.fill-flagged { background: linear-gradient(90deg, #6B1A0E, var(--crimson)); }
+
+/* Member meta */
+.member-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.meta-item {}
+.meta-key {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: rgba(30,18,9,0.35);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.meta-val {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ink-mid);
+}
+
+/* AI rationale */
+.ai-rationale {
+  background: rgba(26,122,116,0.07);
+  border-left: 2px solid var(--teal-lt);
+  border-radius: 0 3px 3px 0;
+  padding: 6px 8px;
+  font-size: 0.72rem;
+  color: rgba(30,18,9,0.6);
+  line-height: 1.35;
+  font-style: italic;
+}
+.ai-rationale-flagged {
+  background: rgba(192,57,43,0.07);
+  border-left-color: var(--crimson);
+}
+
+/* Flagged card overall style */
+.member-card-flagged {
+  border-color: rgba(192,57,43,0.3);
+  background: rgba(192,57,43,0.02);
+}
+.flagged-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: var(--crimson);
+  color: var(--cream);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 2px;
+  margin-top: 4px;
+}
+
+/* ─── INSURANCE POOL BAR ─── */
+.insurance-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(26,122,116,0.06);
+  border: 1px solid rgba(26,122,116,0.2);
+  border-radius: 4px;
+  padding: 14px 20px;
+  position: relative;
+  overflow: hidden;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.insurance-row::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0, transparent 10px,
+      rgba(26,122,116,0.04) 10px, rgba(26,122,116,0.04) 11px
+    );
+}
+.insurance-label-block {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+}
+.insurance-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 3px;
+  background: var(--teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  position: relative;
+  overflow: hidden;
+}
+.insurance-icon::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0, transparent 3px,
+      rgba(255,255,255,0.15) 3px, rgba(255,255,255,0.15) 4px
+    );
+}
+.insurance-name {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: rgba(30,18,9,0.4);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.insurance-amount {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--teal);
+  letter-spacing: -0.02em;
+  position: relative;
+}
+
+.insurance-bar-block {
+  flex: 1;
+  min-width: 200px;
+  position: relative;
+}
+.insurance-bar {
+  height: 10px;
+  background: rgba(30,18,9,0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.insurance-bar-fill {
+  height: 100%;
+  width: 62%;
+  background: linear-gradient(90deg, var(--teal), var(--teal-lt), var(--teal));
+  background-size: 200% auto;
+  border-radius: 2px;
+  position: relative;
+}
+.insurance-bar-fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0, transparent 8px,
+      rgba(255,255,255,0.3) 8px, rgba(255,255,255,0.3) 9px
+    );
+}
+.insurance-bar-label {
+  font-size: 0.68rem;
+  color: rgba(30,18,9,0.4);
+  margin-top: 5px;
+  font-weight: 600;
+}
+
+.insurance-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--teal);
+  position: relative;
+}
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--teal-lt);
+  box-shadow: 0 0 0 3px rgba(34,169,158,0.2);
+}
+
+/* ─── FOOTER DIVIDER ─── */
+.footer-band {
+  height: 80px;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      var(--ink)         0px,   var(--ink)         80px,
+      var(--crimson-dk)  80px,  var(--crimson-dk)  100px,
+      var(--ink)         100px, var(--ink)          180px,
+      var(--teal)        180px, var(--teal)         196px,
+      var(--ink)         196px, var(--ink)          276px,
+      var(--marigold)    276px, var(--marigold)     292px,
+      var(--ink)         292px, var(--ink)          360px,
+      var(--magenta)     360px, var(--magenta)      374px,
+      var(--ink)         374px, var(--ink)          440px
+    );
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.footer-band::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      transparent 0, transparent 12px,
+      rgba(255,255,255,0.06) 12px, rgba(255,255,255,0.06) 14px,
+      transparent 14px, transparent 26px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      transparent 0, transparent 12px,
+      rgba(0,0,0,0.1) 12px, rgba(0,0,0,0.1) 14px,
+      transparent 14px, transparent 26px
+    );
+}
+.footer-brand {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--cream);
+  position: relative;
+  z-index: 1;
+  letter-spacing: -0.02em;
+  opacity: 0.9;
+}
+.footer-brand span { color: var(--marigold); }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 900px) {
+  nav { padding: 0 24px; }
+  .hero-content { grid-template-columns: 1fr; padding: 80px 24px 60px; gap: 40px; }
+  .hero-emblem { width: 300px; height: 300px; }
+  .hero-right { justify-content: center; }
+  .dashboard-container { padding: 0 24px; }
+  .members-grid { grid-template-columns: repeat(2, 1fr); }
+  .tanda-round-header { flex-direction: column; align-items: flex-start; }
+  .next-recipient { align-items: flex-start; }
+}
+@media (max-width: 600px) {
+  .members-grid { grid-template-columns: 1fr 1fr; }
+  .hero-emblem { width: 240px; height: 240px; }
+  .emblem-word { font-size: 2.6rem; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ─── NAV ─── -->
+<nav>
+  <a class="nav-logo" href="#">Tanda</a>
+  <ul class="nav-links">
+    <li><a href="#">Cómo funciona</a></li>
+    <li><a href="#">Seguridad</a></li>
+    <li><a href="#dashboard">Demo</a></li>
+    <li><a class="nav-cta" href="#">Crear tanda</a></li>
+  </ul>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section class="hero">
+  <!-- Woven textile background — the signature element -->
+  <div class="hero-weave"></div>
+  <div class="hero-vignette"></div>
+
+  <div class="hero-content">
+    <!-- LEFT: copy -->
+    <div class="hero-left">
+      <div class="hero-eyebrow">
+        <span>✦</span>
+        On Arbitrum · MXNB · Non-custodial
+      </div>
+
+      <h1 class="hero-title">
+        La tanda<br>
+        de <em>siempre</em> —<br>
+        sin el riesgo.
+      </h1>
+
+      <p class="hero-tagline">
+        "La tanda de siempre, sin el riesgo de que te dejen colgado."
+      </p>
+
+      <p class="hero-subtagline">
+        AI-organized savings circles on-chain. Save together, in pesos, without the trust problem. — El círculo de ahorro que ya conoces, ahora protegido por inteligencia artificial y contratos inteligentes.
+      </p>
+
+      <div class="hero-features">
+        <div class="hero-feature">
+          <div class="feature-icon fi-ai">🤖</div>
+          <div class="feature-text">
+            <strong>Puntuación de confianza por IA / AI Reliability Scoring</strong>
+            <span>El agente analiza tu historial on-chain y asigna tu colateral automáticamente. Sin subjetividad, sin favoritismos.</span>
+          </div>
+        </div>
+        <div class="hero-feature">
+          <div class="feature-icon fi-def">🛡</div>
+          <div class="feature-text">
+            <strong>A prueba de impagos / Default-Proof</strong>
+            <span>Si alguien falla, su colateral se ejecuta y el fondo de seguro cubre el resto. El destinatario siempre recibe completo.</span>
+          </div>
+        </div>
+        <div class="hero-feature">
+          <div class="feature-icon fi-gas">⚡</div>
+          <div class="feature-text">
+            <strong>Sin semilla, sin gas / Gasless Onboarding</strong>
+            <span>Únete con una passkey desde tu celular. Sin frase semilla, sin ETH para gas — listo para la próxima ola de usuarios LATAM.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-ctas">
+        <a href="#" class="btn-primary">Crear una tanda →</a>
+        <a href="#dashboard" class="btn-secondary">Cómo funciona</a>
+      </div>
+
+      <div class="trust-strip">
+        <span>Built on Arbitrum</span>
+        <span>·</span>
+        <span>Settles in MXNB</span>
+        <span>·</span>
+        <span>Non-custodial</span>
+      </div>
+    </div>
+
+    <!-- RIGHT: woven circle emblem -->
+    <div class="hero-right">
+      <div class="hero-emblem">
+        <!-- Connecting thread lines (decorative) -->
+        <div class="emblem-ring ring-1"></div>
+        <div class="emblem-ring ring-2"></div>
+        <div class="emblem-ring ring-3"></div>
+
+        <!-- Member dots at cardinal positions -->
+        <div class="member-dot md-maria">M
+          <span class="dot-score score-high">82</span>
+        </div>
+        <div class="member-dot md-diego">D
+          <span class="dot-score score-high">66</span>
+        </div>
+        <div class="member-dot md-lupe">L
+          <span class="dot-score score-med">50</span>
+        </div>
+        <div class="member-dot md-kito">K
+          <span class="dot-score score-low">28</span>
+        </div>
+
+        <!-- Center wordmark -->
+        <div class="emblem-center">
+          <div class="emblem-word">T<span>a</span>nda</div>
+          <div class="emblem-sub">On-Chain · MXNB</div>
+          <div class="emblem-tag">Tejida juntos / Woven together</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── WOVEN BAND DIVIDER ─── -->
+<div class="band-divider">
+  <div class="band-divider-inner"></div>
+</div>
+
+<!-- ─── DASHBOARD SECTION ─── -->
+<section class="dashboard-section" id="dashboard">
+  <div class="dashboard-container">
+
+    <div class="section-header">
+      <div class="section-eyebrow">✦ Vista previa — Circle Dashboard</div>
+      <h2 class="section-title">Tu tanda, <em>en tiempo real</em></h2>
+    </div>
+
+    <!-- Main Tanda Card -->
+    <div class="tanda-card">
+      <div class="card-sarape-header"></div>
+      <div class="card-body">
+
+        <!-- Round header -->
+        <div class="tanda-round-header">
+          <div class="tanda-name-block">
+            <div class="tanda-name">Tanda <em>Oaxaca</em></div>
+            <div class="tanda-subtitle">Círculo activo · 4 miembros · Arbitrum</div>
+          </div>
+
+          <div class="tanda-stats">
+            <div class="stat-pill">
+              <span class="stat-value">400</span>
+              <span class="stat-label">Pote MXNB</span>
+            </div>
+            <div class="stat-pill">
+              <span class="stat-value">2 de 4</span>
+              <span class="stat-label">Ronda</span>
+            </div>
+            <div class="stat-pill">
+              <span class="stat-value">100</span>
+              <span class="stat-label">MXNB / ronda</span>
+            </div>
+          </div>
+
+          <div class="next-recipient">
+            <div class="next-label">Siguiente receptor</div>
+            <div class="next-name">María ✦</div>
+          </div>
+        </div>
+
+        <!-- AI Warning Banner — visually central -->
+        <div class="warning-banner">
+          <div class="warning-icon">⚠️</div>
+          <div class="warning-content">
+            <div class="warning-label">Alerta del Agente IA · AI Agent Warning</div>
+            <div class="warning-text">
+              El agente detectó <strong>riesgo de impago de 0xkito</strong> esta ronda — se solicitó refuerzo de colateral.
+              <br><span style="opacity:0.7;font-size:0.83rem;">The AI agent detected a default risk from 0xkito this round — collateral top-up has been requested.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Members -->
+        <div class="members-section-label">Miembros del círculo / Circle Members</div>
+
+        <div class="members-grid">
+
+          <!-- María — high trust -->
+          <div class="member-card">
+            <div class="member-band band-teal"></div>
+            <div class="member-card-body">
+              <div class="member-header">
+                <div class="member-avatar av-teal">M</div>
+                <div class="member-id">
+                  <div class="member-name">María</div>
+                  <div class="member-handle">@maria.eth</div>
+                </div>
+              </div>
+              <div class="ai-score-block">
+                <div class="score-row">
+                  <span class="score-label">Score IA</span>
+                  <span class="score-number score-high">82</span>
+                </div>
+                <div class="score-bar">
+                  <div class="score-fill fill-high" style="width:82%"></div>
+                </div>
+              </div>
+              <div class="member-meta">
+                <div class="meta-item">
+                  <div class="meta-key">Colateral</div>
+                  <div class="meta-val">0.5× (50 MXNB)</div>
+                </div>
+                <div class="meta-item">
+                  <div class="meta-key">Turno</div>
+                  <div class="meta-val">Slot #2 ✦</div>
+                </div>
+              </div>
+              <div class="ai-rationale">
+                "6 rondas puntuales, 1 círculo completado — historial sólido."
+              </div>
+            </div>
+          </div>
+
+          <!-- Diego — good trust -->
+          <div class="member-card">
+            <div class="member-band band-gold"></div>
+            <div class="member-card-body">
+              <div class="member-header">
+                <div class="member-avatar av-gold">D</div>
+                <div class="member-id">
+                  <div class="member-name">Diego</div>
+                  <div class="member-handle">@diegomx</div>
+                </div>
+              </div>
+              <div class="ai-score-block">
+                <div class="score-row">
+                  <span class="score-label">Score IA</span>
+                  <span class="score-number score-med">66</span>
+                </div>
+                <div class="score-bar">
+                  <div class="score-fill fill-med" style="width:66%"></div>
+                </div>
+              </div>
+              <div class="member-meta">
+                <div class="meta-item">
+                  <div class="meta-key">Colateral</div>
+                  <div class="meta-val">1× (100 MXNB)</div>
+                </div>
+                <div class="meta-item">
+                  <div class="meta-key">Turno</div>
+                  <div class="meta-val">Slot #3</div>
+                </div>
+              </div>
+              <div class="ai-rationale">
+                "3 rondas históricas, 1 pago tardío menor — confiable."
+              </div>
+            </div>
+          </div>
+
+          <!-- Lupe — medium trust -->
+          <div class="member-card">
+            <div class="member-band band-magenta"></div>
+            <div class="member-card-body">
+              <div class="member-header">
+                <div class="member-avatar av-magenta">L</div>
+                <div class="member-id">
+                  <div class="member-name">Lupe</div>
+                  <div class="member-handle">@guadalupe_v</div>
+                </div>
+              </div>
+              <div class="ai-score-block">
+                <div class="score-row">
+                  <span class="score-label">Score IA</span>
+                  <span class="score-number score-med" style="color: var(--magenta);">50</span>
+                </div>
+                <div class="score-bar">
+                  <div class="score-fill" style="width:50%; background: linear-gradient(90deg, var(--magenta), var(--magenta-lt));"></div>
+                </div>
+              </div>
+              <div class="member-meta">
+                <div class="meta-item">
+                  <div class="meta-key">Colateral</div>
+                  <div class="meta-val">2× (200 MXNB)</div>
+                </div>
+                <div class="meta-item">
+                  <div class="meta-key">Turno</div>
+                  <div class="meta-val">Slot #1 ✓</div>
+                </div>
+              </div>
+              <div class="ai-rationale">
+                "Wallet nueva, historial parcial — colateral elevado por precaución."
+              </div>
+            </div>
+          </div>
+
+          <!-- 0xkito — FLAGGED -->
+          <div class="member-card member-card-flagged">
+            <div class="member-band band-crimson"></div>
+            <div class="member-card-body">
+              <div class="member-header">
+                <div class="member-avatar av-crimson">K</div>
+                <div class="member-id">
+                  <div class="member-name">0xkito</div>
+                  <div class="member-handle">@0xkito</div>
+                  <div class="flagged-badge">⚠ En riesgo</div>
+                </div>
+              </div>
+              <div class="ai-score-block">
+                <div class="score-row">
+                  <span class="score-label">Score IA</span>
+                  <span class="score-number score-low">28</span>
+                </div>
+                <div class="score-bar">
+                  <div class="score-fill fill-flagged" style="width:28%"></div>
+                </div>
+              </div>
+              <div class="member-meta">
+                <div class="meta-item">
+                  <div class="meta-key">Colateral</div>
+                  <div class="meta-val">3× (300 MXNB)</div>
+                </div>
+                <div class="meta-item">
+                  <div class="meta-key">Turno</div>
+                  <div class="meta-val">Slot #4</div>
+                </div>
+              </div>
+              <div class="ai-rationale ai-rationale-flagged">
+                "Wallet nueva, arranque en frío — riesgo detectado esta ronda. Refuerzo de colateral solicitado."
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /members-grid -->
+
+        <!-- Insurance Pool -->
+        <div class="insurance-row">
+          <div class="insurance-label-block">
+            <div class="insurance-icon">🏦</div>
+            <div>
+              <div class="insurance-name">Fondo de protección / Insurance Pool</div>
+              <div class="insurance-amount">1,240 MXNB</div>
+            </div>
+          </div>
+          <div class="insurance-bar-block">
+            <div class="insurance-bar">
+              <div class="insurance-bar-fill"></div>
+            </div>
+            <div class="insurance-bar-label">62% del objetivo mínimo · Cubre hasta 2 impagos simultáneos</div>
+          </div>
+          <div class="insurance-status">
+            <div class="status-dot"></div>
+            Activo · Solvente
+          </div>
+        </div>
+
+      </div><!-- /card-body -->
+    </div><!-- /tanda-card -->
+
+  </div>
+</section>
+
+<!-- ─── FOOTER SARAPE BAND ─── -->
+<div class="footer-band">
+  <div class="footer-brand">
+    <span>Tanda</span> On-Chain — Tejidos juntos. Woven together.
+  </div>
+</div>
+
+</body>
+</html>

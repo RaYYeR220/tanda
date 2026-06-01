@@ -1,0 +1,1589 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tanda — La tanda de siempre, sin el riesgo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Hanken+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── CSS VARIABLES ─────────────────────────────────────── */
+    :root {
+      --terracotta:    #C2410C;
+      --terracotta-dk: #9A3412;
+      --terracotta-lt: #EA580C;
+      --marigold:      #D97706;
+      --marigold-lt:   #F59E0B;
+      --marigold-pale: #FEF3C7;
+      --teal:          #0D6E6E;
+      --teal-lt:       #0F9090;
+      --teal-pale:     #CCFBF1;
+      --cream:         #FAF3E0;
+      --cream-dk:      #F5E8C8;
+      --bone:          #EDD9A3;
+      --ink:           #1C1410;
+      --ink-mid:       #3D2B1A;
+      --ink-soft:      #6B4C33;
+      --risk-red:      #DC2626;
+      --risk-amber:    #D97706;
+      --safe-green:    #059669;
+
+      --font-display:  'Yeseva One', serif;
+      --font-body:     'Hanken Grotesk', sans-serif;
+
+      --shadow-warm:   0 4px 24px rgba(194,65,12,0.15), 0 1px 4px rgba(194,65,12,0.10);
+      --shadow-deep:   0 12px 48px rgba(28,20,16,0.18), 0 2px 8px rgba(28,20,16,0.12);
+      --shadow-card:   0 2px 16px rgba(28,20,16,0.10), 0 1px 3px rgba(28,20,16,0.08);
+    }
+
+    /* ─── RESET + BASE ──────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background-color: var(--cream);
+      color: var(--ink);
+      min-width: 320px;
+      overflow-x: hidden;
+      /* Paper grain texture via SVG noise */
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+    }
+
+    /* ─── KEYFRAME ANIMATIONS ───────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes swingFlag {
+      0%, 100% { transform: rotate(-1.5deg); }
+      50%       { transform: rotate(1.5deg); }
+    }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(194,65,12,0.30); }
+      50%       { box-shadow: 0 0 0 8px rgba(194,65,12,0); }
+    }
+    @keyframes shimmer {
+      0%   { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+    @keyframes warningPulse {
+      0%, 100% { border-left-color: var(--risk-red); }
+      50%       { border-left-color: #F87171; }
+    }
+
+    /* ─── UTILITY ───────────────────────────────────────────── */
+    .visually-hidden { position: absolute; width: 1px; height: 1px; clip: rect(0,0,0,0); overflow: hidden; }
+
+    .animate-in {
+      opacity: 0;
+      animation: fadeUp 0.7s cubic-bezier(0.22,1,0.36,1) forwards;
+    }
+    .delay-1 { animation-delay: 0.10s; }
+    .delay-2 { animation-delay: 0.22s; }
+    .delay-3 { animation-delay: 0.34s; }
+    .delay-4 { animation-delay: 0.46s; }
+    .delay-5 { animation-delay: 0.58s; }
+    .delay-6 { animation-delay: 0.70s; }
+    .delay-7 { animation-delay: 0.82s; }
+    .delay-8 { animation-delay: 0.94s; }
+
+    /* ─── PAPEL PICADO BANNER ───────────────────────────────── */
+    /* A decorative banner of triangular cut-paper flags */
+    .papel-picado {
+      position: relative;
+      width: 100%;
+      height: 52px;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-start;
+    }
+    .papel-picado::before {
+      /* The string/rope */
+      content: '';
+      position: absolute;
+      top: 4px;
+      left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--terracotta-dk) 0%, var(--marigold) 33%, var(--teal) 66%, var(--terracotta-dk) 100%);
+      z-index: 2;
+    }
+    .papel-picado .flags {
+      display: flex;
+      width: 100%;
+      justify-content: space-around;
+      padding: 0 16px;
+      position: relative;
+      z-index: 1;
+    }
+    .flag {
+      width: 42px;
+      height: 48px;
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+      position: relative;
+      top: 0px;
+      flex-shrink: 0;
+      animation: swingFlag 3s ease-in-out infinite;
+    }
+    /* Perforated cutout effect: inner polygon cutout via CSS */
+    .flag::after {
+      content: '';
+      position: absolute;
+      inset: 6px 6px 10px 6px;
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+      background: inherit;
+      filter: brightness(1.35);
+      opacity: 0.55;
+    }
+    /* Alternate flag colors — Mexican palette */
+    .flag:nth-child(6n+1)  { background: var(--terracotta);    animation-delay: 0.0s; }
+    .flag:nth-child(6n+2)  { background: var(--marigold);      animation-delay: 0.3s; }
+    .flag:nth-child(6n+3)  { background: var(--teal);          animation-delay: 0.6s; }
+    .flag:nth-child(6n+4)  { background: var(--terracotta-dk); animation-delay: 0.9s; }
+    .flag:nth-child(6n+5)  { background: #7C3AED;              animation-delay: 1.2s; }
+    .flag:nth-child(6n+6)  { background: var(--marigold-lt);   animation-delay: 1.5s; }
+
+    /* Scalloped border as an alternative signature element — top of hero */
+    .scallop-top {
+      width: 100%;
+      height: 28px;
+      background: var(--cream);
+      position: relative;
+      overflow: hidden;
+    }
+    .scallop-top::after {
+      content: '';
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: var(--terracotta);
+      /* Scalloped bottom edge via radial-gradient masking */
+      mask-image: radial-gradient(ellipse 24px 28px at 12px 0, transparent 100%, black 100%),
+                  repeating-linear-gradient(90deg, transparent, transparent 0px, black 0px);
+      -webkit-mask-image:
+        radial-gradient(ellipse 24px 28px at 12px 0px, transparent 98%, black 100%);
+    }
+
+    /* ─── NAVIGATION ─────────────────────────────────────────── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--terracotta-dk);
+      border-bottom: 3px solid var(--marigold);
+      padding: 0 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      animation: fadeIn 0.5s ease forwards;
+    }
+
+    .nav-wordmark {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+    .nav-wordmark-name {
+      font-family: var(--font-display);
+      font-size: 1.75rem;
+      color: var(--cream);
+      letter-spacing: -0.01em;
+      line-height: 1;
+    }
+    .nav-wordmark-tagline {
+      font-family: var(--font-body);
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: var(--bone);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      opacity: 0.75;
+      padding-bottom: 2px;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 36px;
+      align-items: center;
+    }
+    nav ul a {
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--bone);
+      text-decoration: none;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      opacity: 0.85;
+      transition: opacity 0.2s, color 0.2s;
+    }
+    nav ul a:hover { opacity: 1; color: var(--marigold-lt); }
+
+    .nav-cta {
+      background: var(--marigold) !important;
+      color: var(--ink) !important;
+      padding: 8px 20px !important;
+      border-radius: 4px !important;
+      opacity: 1 !important;
+      font-weight: 700 !important;
+      transition: background 0.2s !important;
+      letter-spacing: 0.04em !important;
+    }
+    .nav-cta:hover { background: var(--marigold-lt) !important; }
+
+    /* ─── HERO SECTION ───────────────────────────────────────── */
+    .hero {
+      background: var(--terracotta-dk);
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E"),
+        radial-gradient(ellipse 80% 60% at 30% 40%, rgba(217,119,6,0.25) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 80% at 85% 20%, rgba(13,110,110,0.20) 0%, transparent 60%);
+      position: relative;
+      overflow: hidden;
+      padding: 0;
+    }
+
+    /* Decorative large circle motif */
+    .hero-bg-circle {
+      position: absolute;
+      right: -120px;
+      top: -80px;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      border: 2px solid rgba(245,158,11,0.12);
+      pointer-events: none;
+    }
+    .hero-bg-circle::before {
+      content: '';
+      position: absolute;
+      inset: 32px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(245,158,11,0.09);
+    }
+    .hero-bg-circle::after {
+      content: '';
+      position: absolute;
+      inset: 64px;
+      border-radius: 50%;
+      border: 1px solid rgba(245,158,11,0.07);
+    }
+
+    /* Decorative folk-geometric rosette */
+    .hero-rosette {
+      position: absolute;
+      left: -60px;
+      bottom: -60px;
+      width: 320px;
+      height: 320px;
+      opacity: 0.07;
+      pointer-events: none;
+    }
+
+    .papel-picado-hero {
+      padding: 0;
+      background: var(--terracotta-dk);
+    }
+    .papel-picado-hero .papel-picado {
+      background: var(--terracotta-dk);
+      height: 60px;
+    }
+    .papel-picado-hero .papel-picado::before {
+      background: linear-gradient(90deg, var(--marigold-lt), var(--bone), var(--marigold-lt));
+      opacity: 0.6;
+    }
+
+    .hero-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 80px 48px 100px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-left {}
+
+    /* Decorative eyebrow label */
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(245,158,11,0.15);
+      border: 1px solid rgba(245,158,11,0.35);
+      border-radius: 2px;
+      padding: 5px 14px;
+      font-family: var(--font-body);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--marigold-lt);
+      margin-bottom: 28px;
+    }
+    .hero-eyebrow::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--marigold-lt);
+      animation: pulseGlow 2s ease-in-out infinite;
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 5.5vw, 5rem);
+      line-height: 1.0;
+      color: var(--cream);
+      margin-bottom: 20px;
+      letter-spacing: -0.02em;
+    }
+    .hero-title em {
+      font-style: normal;
+      color: var(--marigold-lt);
+      display: block;
+    }
+
+    .hero-tagline {
+      font-family: var(--font-body);
+      font-size: 1.2rem;
+      font-weight: 400;
+      color: var(--bone);
+      line-height: 1.55;
+      margin-bottom: 14px;
+      font-style: italic;
+      border-left: 3px solid var(--marigold);
+      padding-left: 18px;
+    }
+
+    .hero-valueprop {
+      font-size: 0.95rem;
+      font-weight: 400;
+      color: rgba(250,243,224,0.72);
+      line-height: 1.6;
+      margin-bottom: 44px;
+      padding-left: 21px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 48px;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--marigold);
+      color: var(--ink);
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      font-weight: 700;
+      padding: 14px 32px;
+      border-radius: 4px;
+      text-decoration: none;
+      letter-spacing: 0.02em;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 0 var(--terracotta), 0 8px 24px rgba(217,119,6,0.35);
+      position: relative;
+    }
+    .btn-primary:hover {
+      background: var(--marigold-lt);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 0 var(--terracotta), 0 12px 32px rgba(217,119,6,0.4);
+    }
+    .btn-primary:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 0 var(--terracotta), 0 4px 12px rgba(217,119,6,0.25);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: var(--bone);
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      font-weight: 500;
+      padding: 14px 28px;
+      border-radius: 4px;
+      text-decoration: none;
+      letter-spacing: 0.02em;
+      border: 1.5px solid rgba(237,217,163,0.35);
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+    }
+    .btn-secondary:hover {
+      border-color: rgba(237,217,163,0.65);
+      color: var(--cream);
+      background: rgba(255,255,255,0.06);
+    }
+
+    /* Trust strip */
+    .trust-strip {
+      display: flex;
+      gap: 0;
+      flex-wrap: wrap;
+    }
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(237,217,163,0.55);
+      padding-right: 20px;
+      margin-right: 20px;
+      border-right: 1px solid rgba(237,217,163,0.2);
+    }
+    .trust-item:last-child { border-right: none; }
+    .trust-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--teal-lt);
+      flex-shrink: 0;
+    }
+
+    /* ─── FEATURE CARDS (right side of hero) ───────────────── */
+    .hero-features {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .feature-card {
+      background: rgba(250,243,224,0.06);
+      border: 1px solid rgba(237,217,163,0.15);
+      border-radius: 6px;
+      padding: 24px 28px;
+      display: grid;
+      grid-template-columns: 56px 1fr;
+      gap: 18px;
+      align-items: start;
+      transition: background 0.25s, border-color 0.25s, transform 0.2s;
+      backdrop-filter: blur(4px);
+      position: relative;
+      overflow: hidden;
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 3px; height: 100%;
+    }
+    .feature-card:nth-child(1)::before { background: var(--marigold); }
+    .feature-card:nth-child(2)::before { background: var(--teal-lt); }
+    .feature-card:nth-child(3)::before { background: #A78BFA; }
+
+    .feature-card:hover {
+      background: rgba(250,243,224,0.10);
+      border-color: rgba(237,217,163,0.28);
+      transform: translateX(4px);
+    }
+
+    .feature-icon {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+    .feature-card:nth-child(1) .feature-icon { background: rgba(217,119,6,0.18); }
+    .feature-card:nth-child(2) .feature-icon { background: rgba(13,110,110,0.18); }
+    .feature-card:nth-child(3) .feature-icon { background: rgba(167,139,250,0.18); }
+
+    .feature-title {
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--cream);
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .feature-desc {
+      font-size: 0.88rem;
+      font-weight: 400;
+      color: rgba(237,217,163,0.72);
+      line-height: 1.55;
+    }
+
+    /* ─── PAPEL PICADO DIVIDER ───────────────────────────────── */
+    .divider-wrapper {
+      background: linear-gradient(180deg, var(--terracotta-dk) 0%, var(--cream) 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .divider-wrapper .papel-picado {
+      height: 64px;
+      background: transparent;
+    }
+    .divider-wrapper .flags {
+      padding-top: 6px;
+    }
+
+    /* ─── DASHBOARD SECTION ──────────────────────────────────── */
+    .dashboard-section {
+      background: var(--cream);
+      padding: 80px 48px 100px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Decorative background elements */
+    .dashboard-section::before {
+      content: '';
+      position: absolute;
+      top: -200px; right: -200px;
+      width: 500px; height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(217,119,6,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .dashboard-section::after {
+      content: '';
+      position: absolute;
+      bottom: -150px; left: -150px;
+      width: 400px; height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(13,110,110,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .dashboard-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Section header */
+    .section-header {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+    .section-eyebrow {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--terracotta);
+      margin-bottom: 14px;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 3.5vw, 3rem);
+      color: var(--ink);
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: 14px;
+    }
+    .section-title span { color: var(--terracotta); }
+    .section-subtitle {
+      font-size: 1rem;
+      color: var(--ink-soft);
+      max-width: 520px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* ─── CIRCLE DASHBOARD CARD ──────────────────────────────── */
+    .circle-dashboard {
+      background: var(--ink);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: var(--shadow-deep), 0 0 0 1px rgba(217,119,6,0.15);
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    }
+
+    /* Dashboard top bar */
+    .dashboard-topbar {
+      background: var(--terracotta-dk);
+      padding: 16px 28px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 2px solid var(--marigold);
+    }
+    .topbar-dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+    }
+    .topbar-dot:nth-child(1) { background: #DC2626; }
+    .topbar-dot:nth-child(2) { background: var(--marigold); }
+    .topbar-dot:nth-child(3) { background: var(--safe-green); }
+    .topbar-label {
+      margin-left: 12px;
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--bone);
+      opacity: 0.7;
+    }
+    .topbar-live {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--marigold-lt);
+    }
+    .live-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--marigold-lt);
+      animation: pulseGlow 1.5s ease-in-out infinite;
+    }
+
+    /* Dashboard body */
+    .dashboard-body {
+      padding: 32px 36px 36px;
+    }
+
+    /* Circle header */
+    .circle-header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 24px;
+      align-items: start;
+      margin-bottom: 28px;
+      padding-bottom: 28px;
+      border-bottom: 1px solid rgba(237,217,163,0.10);
+    }
+
+    .circle-name-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 8px;
+    }
+    /* Folk-art decorative frame around circle name */
+    .circle-name-badge {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      color: var(--cream);
+      letter-spacing: -0.01em;
+    }
+    .circle-badge-tag {
+      background: var(--teal);
+      color: var(--cream);
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 2px;
+    }
+
+    .circle-meta {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .meta-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(237,217,163,0.45);
+    }
+    .meta-value {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--cream);
+      font-family: var(--font-body);
+    }
+    .meta-value.highlight { color: var(--marigold-lt); }
+
+    /* Round progress */
+    .round-progress {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+    }
+    .round-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(237,217,163,0.45);
+    }
+    .round-indicator {
+      display: flex;
+      gap: 6px;
+    }
+    .round-pip {
+      width: 28px; height: 8px;
+      border-radius: 2px;
+      background: rgba(237,217,163,0.15);
+    }
+    .round-pip.done { background: var(--safe-green); }
+    .round-pip.active { background: var(--marigold); animation: pulseGlow 2s ease-in-out infinite; }
+
+    .pot-display {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      color: var(--marigold-lt);
+      line-height: 1;
+      white-space: nowrap;
+    }
+    .pot-currency {
+      font-family: var(--font-body);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--teal-lt);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-top: 4px;
+      text-align: right;
+    }
+
+    /* ─── WARNING BANNER ─────────────────────────────────────── */
+    .warning-banner {
+      background: rgba(220,38,38,0.10);
+      border: 1px solid rgba(220,38,38,0.30);
+      border-left: 4px solid var(--risk-red);
+      border-radius: 6px;
+      padding: 16px 20px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      animation: warningPulse 2.5s ease-in-out infinite;
+    }
+    .warning-icon {
+      font-size: 1.3rem;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .warning-content {}
+    .warning-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #F87171;
+      margin-bottom: 5px;
+    }
+    .warning-text {
+      font-size: 0.875rem;
+      font-weight: 400;
+      color: rgba(250,243,224,0.85);
+      line-height: 1.5;
+    }
+    .warning-text strong { color: #FCA5A5; font-weight: 600; }
+    .warning-action {
+      margin-left: auto;
+      flex-shrink: 0;
+      background: rgba(220,38,38,0.20);
+      border: 1px solid rgba(220,38,38,0.40);
+      border-radius: 4px;
+      padding: 8px 16px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #FCA5A5;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+      align-self: center;
+    }
+    .warning-action:hover { background: rgba(220,38,38,0.30); }
+
+    /* ─── MEMBERS GRID ───────────────────────────────────────── */
+    .members-section-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(237,217,163,0.45);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .members-section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(237,217,163,0.10);
+    }
+
+    .members-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .member-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(237,217,163,0.10);
+      border-radius: 8px;
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .member-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(237,217,163,0.22);
+    }
+    /* Trust-level left border accent */
+    .member-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 3px; height: 100%;
+    }
+    .member-card.high-trust::before   { background: var(--safe-green); }
+    .member-card.mid-trust::before    { background: var(--marigold); }
+    .member-card.low-trust::before    { background: var(--risk-amber); }
+    .member-card.flagged::before      { background: var(--risk-red); }
+
+    /* Flagged card background tint */
+    .member-card.flagged {
+      background: rgba(220,38,38,0.07);
+      border-color: rgba(220,38,38,0.22);
+    }
+    .member-card.high-trust {
+      background: rgba(5,150,105,0.05);
+    }
+
+    /* Member avatar */
+    .member-avatar {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      margin-bottom: 2px;
+    }
+    .member-card.high-trust .member-avatar  { background: rgba(5,150,105,0.20); color: #6EE7B7; }
+    .member-card.mid-trust .member-avatar   { background: rgba(217,119,6,0.20);  color: var(--marigold-lt); }
+    .member-card.low-trust .member-avatar   { background: rgba(217,119,6,0.15);  color: #FCD34D; }
+    .member-card.flagged .member-avatar     { background: rgba(220,38,38,0.18);  color: #FCA5A5; }
+
+    .member-name {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--cream);
+      font-family: var(--font-body);
+    }
+    .member-slot {
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      color: rgba(237,217,163,0.45);
+      margin-top: 2px;
+    }
+    .member-slot.current-slot {
+      color: var(--marigold-lt);
+      font-weight: 600;
+    }
+
+    /* AI Score */
+    .ai-score-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .ai-score-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(237,217,163,0.40);
+    }
+    .ai-score-value {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      line-height: 1;
+    }
+    .high-trust  .ai-score-value  { color: #6EE7B7; }
+    .mid-trust   .ai-score-value  { color: var(--marigold-lt); }
+    .low-trust   .ai-score-value  { color: #FCD34D; }
+    .flagged     .ai-score-value  { color: #FCA5A5; }
+
+    /* Score bar */
+    .score-bar-track {
+      height: 5px;
+      border-radius: 3px;
+      background: rgba(237,217,163,0.10);
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .score-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 1s cubic-bezier(0.22,1,0.36,1);
+    }
+    .high-trust  .score-bar-fill  { background: linear-gradient(90deg, #059669, #6EE7B7); }
+    .mid-trust   .score-bar-fill  { background: linear-gradient(90deg, var(--marigold), var(--marigold-lt)); }
+    .low-trust   .score-bar-fill  { background: linear-gradient(90deg, #D97706, #FCD34D); }
+    .flagged     .score-bar-fill  { background: linear-gradient(90deg, #DC2626, #F87171); }
+
+    /* Collateral */
+    .collateral-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .collateral-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(237,217,163,0.40);
+    }
+    .collateral-value {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--cream);
+      font-family: var(--font-body);
+    }
+    .collateral-amount {
+      font-size: 0.75rem;
+      color: rgba(237,217,163,0.55);
+      margin-top: 2px;
+      text-align: right;
+    }
+
+    /* AI rationale tooltip */
+    .ai-rationale {
+      background: rgba(237,217,163,0.06);
+      border: 1px solid rgba(237,217,163,0.10);
+      border-radius: 4px;
+      padding: 8px 10px;
+      font-size: 0.72rem;
+      font-weight: 400;
+      color: rgba(237,217,163,0.55);
+      line-height: 1.45;
+      font-style: italic;
+      display: flex;
+      gap: 6px;
+      align-items: flex-start;
+    }
+    .ai-rationale::before {
+      content: '⬡';
+      font-style: normal;
+      font-size: 0.7rem;
+      opacity: 0.6;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .flagged .ai-rationale {
+      background: rgba(220,38,38,0.08);
+      border-color: rgba(220,38,38,0.18);
+      color: rgba(252,165,165,0.75);
+    }
+
+    /* ─── DASHBOARD FOOTER ROW ───────────────────────────────── */
+    .dashboard-footer {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 20px;
+      align-items: center;
+      padding-top: 20px;
+      border-top: 1px solid rgba(237,217,163,0.10);
+    }
+
+    .insurance-pool {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(13,110,110,0.12);
+      border: 1px solid rgba(13,110,110,0.25);
+      border-radius: 6px;
+      padding: 12px 18px;
+    }
+    .insurance-icon {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: rgba(13,110,110,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .insurance-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--teal-lt);
+      margin-bottom: 3px;
+    }
+    .insurance-amount {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      color: var(--cream);
+      line-height: 1;
+    }
+    .insurance-sub {
+      font-size: 0.68rem;
+      color: rgba(15,144,144,0.65);
+      letter-spacing: 0.06em;
+    }
+
+    .next-recipient {
+      background: rgba(217,119,6,0.10);
+      border: 1px solid rgba(217,119,6,0.25);
+      border-radius: 6px;
+      padding: 12px 20px;
+      text-align: right;
+    }
+    .next-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(217,119,6,0.65);
+      margin-bottom: 4px;
+    }
+    .next-name {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      color: var(--marigold-lt);
+      line-height: 1;
+    }
+    .next-amount {
+      font-size: 0.78rem;
+      color: rgba(245,158,11,0.60);
+      margin-top: 3px;
+    }
+
+    /* ─── FOLK-ART DECORATIVE FOOTER ────────────────────────── */
+    .page-footer {
+      background: var(--ink);
+      padding: 0;
+    }
+    .footer-picado { background: var(--ink); }
+    .footer-picado .papel-picado { background: var(--ink); height: 60px; }
+    .footer-picado .papel-picado::before { opacity: 0.4; }
+
+    .footer-content {
+      background: var(--ink);
+      padding: 48px 48px;
+      text-align: center;
+    }
+    .footer-wordmark {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      color: var(--cream);
+      letter-spacing: -0.02em;
+      margin-bottom: 10px;
+    }
+    .footer-tagline {
+      font-size: 0.85rem;
+      color: var(--ink-soft);
+      font-style: italic;
+    }
+    .footer-divider {
+      width: 48px; height: 3px;
+      background: var(--marigold);
+      margin: 24px auto;
+      border-radius: 2px;
+    }
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 36px;
+      flex-wrap: wrap;
+    }
+    .footer-links a {
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--marigold); }
+
+    /* ─── RESPONSIVE ─────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      nav { padding: 0 24px; }
+      nav ul { gap: 20px; }
+      .hero-content { grid-template-columns: 1fr; gap: 48px; padding: 60px 24px 72px; }
+      .dashboard-section { padding: 60px 24px 80px; }
+      .dashboard-body { padding: 24px 20px 24px; }
+      .members-grid { grid-template-columns: repeat(2, 1fr); }
+      .circle-header { grid-template-columns: 1fr; }
+      .round-progress { align-items: flex-start; }
+      .dashboard-footer { grid-template-columns: 1fr; }
+      .next-recipient { text-align: left; }
+    }
+    @media (max-width: 600px) {
+      nav ul { display: none; }
+      .members-grid { grid-template-columns: 1fr; }
+      .hero-title { font-size: 2.5rem; }
+      .warning-banner { flex-direction: column; }
+      .warning-action { align-self: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       NAVIGATION
+  ══════════════════════════════════════════════════════════════ -->
+  <nav>
+    <div class="nav-wordmark">
+      <span class="nav-wordmark-name">Tanda</span>
+      <span class="nav-wordmark-tagline">On-Chain · MXNB</span>
+    </div>
+    <ul>
+      <li><a href="#como-funciona">Cómo funciona</a></li>
+      <li><a href="#dashboard">Ver demo</a></li>
+      <li><a href="#" class="nav-cta">Crear tanda →</a></li>
+    </ul>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       PAPEL PICADO — TOP HERO BANNER
+  ══════════════════════════════════════════════════════════════ -->
+  <div class="papel-picado-hero">
+    <div class="papel-picado">
+      <div class="flags" aria-hidden="true">
+        <!-- 28 flags for full-width banner -->
+        <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+        <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+        <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+        <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+        <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+        <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+        <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+        <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+        <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+        <div class="flag"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       HERO SECTION
+  ══════════════════════════════════════════════════════════════ -->
+  <section class="hero" aria-label="Hero">
+    <!-- Decorative bg circles -->
+    <div class="hero-bg-circle" aria-hidden="true"></div>
+
+    <!-- Decorative folk rosette SVG -->
+    <svg class="hero-rosette" aria-hidden="true" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="100" cy="100" r="90" stroke="white" stroke-width="1.5"/>
+      <circle cx="100" cy="100" r="70" stroke="white" stroke-width="1"/>
+      <circle cx="100" cy="100" r="50" stroke="white" stroke-width="1"/>
+      <circle cx="100" cy="100" r="30" stroke="white" stroke-width="1.5"/>
+      <line x1="10" y1="100" x2="190" y2="100" stroke="white" stroke-width="0.75"/>
+      <line x1="100" y1="10" x2="100" y2="190" stroke="white" stroke-width="0.75"/>
+      <line x1="27" y1="27" x2="173" y2="173" stroke="white" stroke-width="0.75"/>
+      <line x1="173" y1="27" x2="27" y2="173" stroke="white" stroke-width="0.75"/>
+      <line x1="10" y1="63" x2="190" y2="137" stroke="white" stroke-width="0.5"/>
+      <line x1="10" y1="137" x2="190" y2="63" stroke="white" stroke-width="0.5"/>
+      <line x1="63" y1="10" x2="137" y2="190" stroke="white" stroke-width="0.5"/>
+      <line x1="137" y1="10" x2="63" y2="190" stroke="white" stroke-width="0.5"/>
+    </svg>
+
+    <div class="hero-content">
+      <!-- LEFT: Copy -->
+      <div class="hero-left">
+        <div class="hero-eyebrow animate-in delay-1">
+          Arbitrum · MXNB · Non-custodial
+        </div>
+
+        <h1 class="hero-title animate-in delay-2">
+          La tanda<br/>
+          <em>de siempre.</em>
+          Sin el riesgo.
+        </h1>
+
+        <p class="hero-tagline animate-in delay-3">
+          "La tanda que siempre conociste — sin el riesgo de que te dejen colgado."
+        </p>
+
+        <p class="hero-valueprop animate-in delay-4">
+          AI-organized savings circles on-chain. Save together, in pesos, without the trust problem. Your money is protected by smart contracts and an AI underwriter — not by handshakes.
+        </p>
+
+        <div class="hero-actions animate-in delay-5">
+          <a href="#" class="btn-primary">
+            <span>🌼</span>
+            Crear una tanda
+          </a>
+          <a href="#como-funciona" class="btn-secondary">
+            Cómo funciona →
+          </a>
+        </div>
+
+        <div class="trust-strip animate-in delay-6">
+          <div class="trust-item">
+            <div class="trust-dot"></div>
+            Built on Arbitrum
+          </div>
+          <div class="trust-item">
+            <div class="trust-dot"></div>
+            Settles in MXNB
+          </div>
+          <div class="trust-item">
+            <div class="trust-dot"></div>
+            Non-custodial
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Feature cards -->
+      <div class="hero-features">
+        <div class="feature-card animate-in delay-3">
+          <div class="feature-icon">🤖</div>
+          <div>
+            <div class="feature-title">Puntaje IA de confianza</div>
+            <div class="feature-desc">An AI underwriter reads your on-chain history and sets the collateral you must stake — no bank needed. Low-risk members put up less; high-risk members put up more.</div>
+          </div>
+        </div>
+
+        <div class="feature-card animate-in delay-4">
+          <div class="feature-icon">🔒</div>
+          <div>
+            <div class="feature-title">A prueba de impagos</div>
+            <div class="feature-desc">If someone defaults, their staked collateral is slashed and an insurance pool covers any shortfall. The recipient always gets paid in full. Always.</div>
+          </div>
+        </div>
+
+        <div class="feature-card animate-in delay-5">
+          <div class="feature-icon">📲</div>
+          <div>
+            <div class="feature-title">Onboarding sin fricción</div>
+            <div class="feature-desc">Join with a passkey — no seed phrase, no gas, no exchange account. Built for the next wave of LATAM users, including the unbanked.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       PAPEL PICADO DIVIDER
+  ══════════════════════════════════════════════════════════════ -->
+  <div class="divider-wrapper" aria-hidden="true">
+    <div class="papel-picado">
+      <div class="flags">
+        <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+        <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+        <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+        <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+        <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+        <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+        <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+        <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+        <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+        <div class="flag"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       CIRCLE DASHBOARD SECTION
+  ══════════════════════════════════════════════════════════════ -->
+  <section class="dashboard-section" id="dashboard" aria-label="Circle dashboard preview">
+    <div class="dashboard-inner">
+
+      <div class="section-header animate-in delay-1">
+        <div class="section-eyebrow">Vista previa — Preview</div>
+        <h2 class="section-title">
+          Tu tanda, <span>viva en tiempo real</span>
+        </h2>
+        <p class="section-subtitle">
+          El agente de IA monitorea cada ronda, puntúa a cada miembro y detecta riesgos antes de que ocurran.
+        </p>
+      </div>
+
+      <!-- ─── THE DASHBOARD CARD ─────────────────────────── -->
+      <div class="circle-dashboard animate-in delay-2">
+
+        <!-- Browser chrome top bar -->
+        <div class="dashboard-topbar" aria-hidden="true">
+          <div class="topbar-dot"></div>
+          <div class="topbar-dot"></div>
+          <div class="topbar-dot"></div>
+          <span class="topbar-label">tanda.app / círculos / oaxaca-2025</span>
+          <span class="topbar-live">
+            <span class="live-dot"></span>
+            Ronda activa
+          </span>
+        </div>
+
+        <!-- Dashboard content -->
+        <div class="dashboard-body">
+
+          <!-- Circle header: name, meta, pot, round -->
+          <div class="circle-header">
+            <div>
+              <div class="circle-name-row">
+                <span class="circle-name-badge">Tanda Oaxaca</span>
+                <span class="circle-badge-tag">Activa</span>
+              </div>
+              <div class="circle-meta">
+                <div class="meta-item">
+                  <span class="meta-label">Contribución</span>
+                  <span class="meta-value">100 MXNB / ronda</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-label">Miembros</span>
+                  <span class="meta-value">4</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-label">Próxima receptora</span>
+                  <span class="meta-value highlight">María ✓</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="round-progress">
+              <span class="round-label">Ronda 2 de 4</span>
+              <div class="round-indicator" aria-label="Round 2 of 4">
+                <div class="round-pip done" title="Ronda 1 — completada"></div>
+                <div class="round-pip active" title="Ronda 2 — activa"></div>
+                <div class="round-pip" title="Ronda 3 — pendiente"></div>
+                <div class="round-pip" title="Ronda 4 — pendiente"></div>
+              </div>
+              <div class="pot-display">400 MXNB</div>
+              <div class="pot-currency">Pote total · Esta ronda</div>
+            </div>
+          </div>
+
+          <!-- ⚠ AI EARLY-WARNING BANNER -->
+          <div class="warning-banner" role="alert" aria-live="assertive">
+            <div class="warning-icon">⚠️</div>
+            <div class="warning-content">
+              <div class="warning-label">Agente IA — Alerta de riesgo</div>
+              <div class="warning-text">
+                El agente detectó riesgo de impago de <strong>0xkito</strong> esta ronda — se solicitó refuerzo de colateral.
+                Wallet nueva sin historial confirmado. Acción preventiva activada automáticamente.
+              </div>
+            </div>
+            <button class="warning-action">Ver detalles</button>
+          </div>
+
+          <!-- Members section -->
+          <div class="members-section-label" aria-label="Members">
+            Miembros del círculo — Puntuados por IA
+          </div>
+
+          <div class="members-grid">
+
+            <!-- MEMBER 1: María — high trust -->
+            <div class="member-card high-trust animate-in delay-3">
+              <div>
+                <div class="member-avatar">M</div>
+                <div class="member-name">María</div>
+                <div class="member-slot current-slot">📦 Ronda 2 — Receptora</div>
+              </div>
+              <div>
+                <div class="ai-score-row">
+                  <span class="ai-score-label">Score IA</span>
+                  <span class="ai-score-value">82</span>
+                </div>
+                <div class="score-bar-track" aria-hidden="true">
+                  <div class="score-bar-fill" style="width: 82%"></div>
+                </div>
+                <div class="collateral-row">
+                  <div>
+                    <div class="collateral-label">Colateral</div>
+                    <div class="collateral-value">0.5×</div>
+                    <div class="collateral-amount">= 50 MXNB</div>
+                  </div>
+                </div>
+              </div>
+              <div class="ai-rationale">
+                6 rondas a tiempo, 1 círculo completado. Historial sólido.
+              </div>
+            </div>
+
+            <!-- MEMBER 2: Diego — mid trust -->
+            <div class="member-card mid-trust animate-in delay-4">
+              <div>
+                <div class="member-avatar">D</div>
+                <div class="member-name">Diego</div>
+                <div class="member-slot">Ronda 3</div>
+              </div>
+              <div>
+                <div class="ai-score-row">
+                  <span class="ai-score-label">Score IA</span>
+                  <span class="ai-score-value">66</span>
+                </div>
+                <div class="score-bar-track" aria-hidden="true">
+                  <div class="score-bar-fill" style="width: 66%"></div>
+                </div>
+                <div class="collateral-row">
+                  <div>
+                    <div class="collateral-label">Colateral</div>
+                    <div class="collateral-value">1×</div>
+                    <div class="collateral-amount">= 100 MXNB</div>
+                  </div>
+                </div>
+              </div>
+              <div class="ai-rationale">
+                3 rondas completas, 1 demora menor. Perfil moderado.
+              </div>
+            </div>
+
+            <!-- MEMBER 3: Lupe — low trust -->
+            <div class="member-card low-trust animate-in delay-5">
+              <div>
+                <div class="member-avatar">L</div>
+                <div class="member-name">Lupe</div>
+                <div class="member-slot">Ronda 4</div>
+              </div>
+              <div>
+                <div class="ai-score-row">
+                  <span class="ai-score-label">Score IA</span>
+                  <span class="ai-score-value">50</span>
+                </div>
+                <div class="score-bar-track" aria-hidden="true">
+                  <div class="score-bar-fill" style="width: 50%"></div>
+                </div>
+                <div class="collateral-row">
+                  <div>
+                    <div class="collateral-label">Colateral</div>
+                    <div class="collateral-value">2×</div>
+                    <div class="collateral-amount">= 200 MXNB</div>
+                  </div>
+                </div>
+              </div>
+              <div class="ai-rationale">
+                Historial limitado. Sin incidentes, pero datos insuficientes.
+              </div>
+            </div>
+
+            <!-- MEMBER 4: 0xkito — FLAGGED / at-risk -->
+            <div class="member-card flagged animate-in delay-6">
+              <div>
+                <div class="member-avatar">⚠</div>
+                <div class="member-name">0xkito</div>
+                <div class="member-slot">Ronda 1 (ya cobró)</div>
+              </div>
+              <div>
+                <div class="ai-score-row">
+                  <span class="ai-score-label">Score IA</span>
+                  <span class="ai-score-value">28</span>
+                </div>
+                <div class="score-bar-track" aria-hidden="true">
+                  <div class="score-bar-fill" style="width: 28%"></div>
+                </div>
+                <div class="collateral-row">
+                  <div>
+                    <div class="collateral-label">Colateral</div>
+                    <div class="collateral-value">3×</div>
+                    <div class="collateral-amount">= 300 MXNB</div>
+                  </div>
+                </div>
+              </div>
+              <div class="ai-rationale">
+                Billetera nueva, arranque frío. Sin historial verificado. Colateral máximo exigido.
+              </div>
+            </div>
+
+          </div><!-- /members-grid -->
+
+          <!-- Dashboard footer: insurance pool + next recipient -->
+          <div class="dashboard-footer animate-in delay-7">
+            <div class="insurance-pool">
+              <div class="insurance-icon">🛡</div>
+              <div>
+                <div class="insurance-label">Fondo de protección</div>
+                <div class="insurance-amount">1,240 MXNB</div>
+                <div class="insurance-sub">Disponible para cubrir impagos · Pool compartido</div>
+              </div>
+            </div>
+
+            <div class="next-recipient">
+              <div class="next-label">Receptora esta ronda</div>
+              <div class="next-name">María</div>
+              <div class="next-amount">400 MXNB · En 3 días</div>
+            </div>
+          </div>
+
+        </div><!-- /dashboard-body -->
+      </div><!-- /circle-dashboard -->
+
+    </div><!-- /dashboard-inner -->
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       FOOTER PAPEL PICADO + WORDMARK
+  ══════════════════════════════════════════════════════════════ -->
+  <footer class="page-footer" aria-label="Footer">
+    <div class="footer-picado" aria-hidden="true">
+      <div class="papel-picado">
+        <div class="flags">
+          <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+          <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+          <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+          <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+          <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+          <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+          <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+          <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+          <div class="flag"></div><div class="flag"></div><div class="flag"></div>
+          <div class="flag"></div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-content">
+      <div class="footer-wordmark">Tanda</div>
+      <div class="footer-tagline">La tanda de siempre — sin el riesgo de que te dejen colgado.</div>
+      <div class="footer-divider"></div>
+      <nav class="footer-links" aria-label="Footer navigation">
+        <a href="#">Cómo funciona</a>
+        <a href="#">Arbitrum</a>
+        <a href="#">MXNB</a>
+        <a href="#">Términos</a>
+        <a href="#">Privacidad</a>
+        <a href="#">@tanda_onchain</a>
+      </nav>
+    </div>
+  </footer>
+
+</body>
+</html>

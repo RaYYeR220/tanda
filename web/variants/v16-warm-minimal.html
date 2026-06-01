@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tanda — La tanda de siempre, sin riesgos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&family=Hanken+Grotesk:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --oat:       #F5F0E8;
+      --oat-deep:  #EDE7D9;
+      --charcoal:  #2C2820;
+      --charcoal-soft: #4A4338;
+      --muted:     #8C8070;
+      --accent:    #B05A35;   /* burnt sienna */
+      --accent-pale: #F0DDD3;
+      --olive:     #6B7045;
+      --olive-pale: #E0E4CE;
+      --line:      #D9D0C0;
+      --white:     #FEFCF8;
+      --arc-track: rgba(176,90,53,0.12);
+
+      --font-display: 'Fraunces', Georgia, serif;
+      --font-body:    'Hanken Grotesk', sans-serif;
+
+      --max: 1200px;
+      --pad: clamp(1.5rem, 5vw, 5rem);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      background: var(--oat);
+      color: var(--charcoal);
+      font-family: var(--font-body);
+      font-weight: 300;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(22px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes arcDraw {
+      from { stroke-dashoffset: var(--dash-total); }
+      to   { stroke-dashoffset: var(--dash-offset); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    .reveal {
+      opacity: 0;
+      animation: fadeUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    .d1 { animation-delay: 0.05s; }
+    .d2 { animation-delay: 0.18s; }
+    .d3 { animation-delay: 0.32s; }
+    .d4 { animation-delay: 0.46s; }
+    .d5 { animation-delay: 0.60s; }
+    .d6 { animation-delay: 0.74s; }
+    .d7 { animation-delay: 0.88s; }
+
+    /* ─── NAV ─── */
+    nav {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 2.2rem var(--pad);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .wordmark {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: 1.5rem;
+      letter-spacing: -0.02em;
+      color: var(--charcoal);
+      text-decoration: none;
+    }
+    .wordmark span {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      background: var(--accent);
+      border-radius: 50%;
+      margin-left: 3px;
+      vertical-align: middle;
+      position: relative;
+      top: -2px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 0.875rem;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--charcoal); }
+
+    .nav-cta {
+      font-family: var(--font-body);
+      font-size: 0.875rem;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+      color: var(--white);
+      background: var(--charcoal);
+      border: none;
+      padding: 0.65rem 1.4rem;
+      border-radius: 2px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s, opacity 0.2s;
+    }
+    .nav-cta:hover { background: var(--charcoal-soft); }
+
+    /* ─── HERO ─── */
+    .hero {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 5rem var(--pad) 7rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+
+    .hero-left {}
+
+    .eyebrow {
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.8rem;
+    }
+
+    .display-heading {
+      font-family: var(--font-display);
+      font-weight: 300;
+      font-optical-sizing: auto;
+      font-size: clamp(3.2rem, 6.5vw, 5.6rem);
+      line-height: 1.0;
+      letter-spacing: -0.03em;
+      color: var(--charcoal);
+      margin-bottom: 0.3em;
+    }
+    .display-heading em {
+      font-style: italic;
+      font-weight: 300;
+      color: var(--accent);
+    }
+
+    .tagline {
+      font-family: var(--font-display);
+      font-weight: 300;
+      font-style: italic;
+      font-size: clamp(1rem, 1.5vw, 1.2rem);
+      color: var(--muted);
+      margin-bottom: 1.8rem;
+      line-height: 1.4;
+    }
+
+    .value-prop {
+      font-size: 1rem;
+      color: var(--charcoal-soft);
+      max-width: 38ch;
+      line-height: 1.65;
+      margin-bottom: 2.8rem;
+    }
+
+    .cta-group {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 400;
+      letter-spacing: 0.03em;
+      color: var(--white);
+      background: var(--accent);
+      border: none;
+      padding: 0.85rem 2rem;
+      border-radius: 2px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover { background: #993f22; transform: translateY(-1px); }
+
+    .btn-secondary {
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 400;
+      letter-spacing: 0.03em;
+      color: var(--charcoal-soft);
+      background: transparent;
+      border: 1px solid var(--line);
+      padding: 0.85rem 1.8rem;
+      border-radius: 2px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--muted); color: var(--charcoal); }
+
+    /* ─── FEATURES ─── */
+    .features {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+      margin-top: 3.5rem;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1.1rem;
+      padding: 1.2rem 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .feature-item:first-child { border-top: 1px solid var(--line); }
+
+    .feature-num {
+      font-family: var(--font-display);
+      font-size: 0.7rem;
+      font-weight: 300;
+      color: var(--accent);
+      min-width: 1.2rem;
+      padding-top: 0.15rem;
+      letter-spacing: 0.06em;
+    }
+
+    .feature-text strong {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--charcoal);
+      margin-bottom: 0.25rem;
+    }
+    .feature-text span {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* ─── HERO RIGHT — POT DIAGRAM ─── */
+    .hero-right {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+    }
+
+    .pot-diagram {
+      position: relative;
+      width: 320px;
+      height: 320px;
+    }
+
+    .pot-diagram svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* center label */
+    .pot-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      pointer-events: none;
+    }
+    .pot-center-amount {
+      font-family: var(--font-display);
+      font-size: 1.85rem;
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      color: var(--charcoal);
+      display: block;
+      line-height: 1;
+    }
+    .pot-center-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      display: block;
+      margin-top: 0.3rem;
+    }
+    .pot-center-round {
+      font-size: 0.75rem;
+      color: var(--accent);
+      display: block;
+      margin-top: 0.4rem;
+      font-weight: 400;
+    }
+
+    /* member nodes around diagram */
+    .member-node {
+      position: absolute;
+      text-align: center;
+      transform: translate(-50%, -50%);
+    }
+    .member-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 400;
+      font-style: italic;
+      margin: 0 auto 0.3rem;
+      border: 2px solid var(--oat);
+      box-shadow: 0 2px 12px rgba(44,40,32,0.12);
+    }
+    .member-name {
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: var(--charcoal);
+      letter-spacing: 0.02em;
+    }
+    .member-score {
+      font-size: 0.65rem;
+      color: var(--muted);
+    }
+
+    /* Positions (top, right, bottom, left) */
+    .node-top    { top: 2%;  left: 50%; }
+    .node-right  { top: 50%; left: 96%; }
+    .node-bottom { top: 98%; left: 50%; }
+    .node-left   { top: 50%; left: 4%;  }
+
+    /* trust levels */
+    .trust-high   .member-avatar { background: var(--olive-pale); color: var(--olive); }
+    .trust-mid    .member-avatar { background: var(--oat-deep); color: var(--charcoal-soft); }
+    .trust-low    .member-avatar { background: var(--accent-pale); color: var(--accent); }
+    .trust-at-risk .member-avatar {
+      background: #FDE8DF;
+      color: #993F22;
+      border-color: #E8927A;
+    }
+
+    /* ─── TRUST STRIP ─── */
+    .trust-strip {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 1.5rem var(--pad);
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2.5rem;
+      flex-wrap: wrap;
+    }
+
+    .trust-item {
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .trust-dot {
+      width: 5px;
+      height: 5px;
+      background: var(--accent);
+      border-radius: 50%;
+      opacity: 0.5;
+    }
+
+    /* ─── DIVIDER ─── */
+    .section-divider {
+      max-width: var(--max);
+      margin: 5rem auto 0;
+      padding: 0 var(--pad);
+    }
+    .section-divider hr {
+      border: none;
+      border-top: 1px solid var(--line);
+    }
+
+    /* ─── DASHBOARD SECTION ─── */
+    .dashboard-section {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 6rem var(--pad) 8rem;
+    }
+
+    .section-label {
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.8rem;
+    }
+
+    .section-heading {
+      font-family: var(--font-display);
+      font-weight: 300;
+      font-size: clamp(2rem, 3.5vw, 3rem);
+      letter-spacing: -0.025em;
+      color: var(--charcoal);
+      margin-bottom: 0.3em;
+    }
+    .section-heading em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .section-sub {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 3.5rem;
+      max-width: 48ch;
+    }
+
+    /* ─── TANDA CARD ─── */
+    .tanda-card {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 2rem 2.5rem 1.5rem;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      color: var(--charcoal);
+      margin-bottom: 0.15rem;
+    }
+
+    .card-meta {
+      font-size: 0.8rem;
+      color: var(--muted);
+      display: flex;
+      gap: 1.2rem;
+      flex-wrap: wrap;
+    }
+    .card-meta span { display: flex; align-items: center; gap: 0.35rem; }
+
+    .round-badge {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: var(--accent-pale);
+      padding: 0.3rem 0.8rem;
+      border-radius: 2px;
+    }
+
+    .pot-summary {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .pot-stat {
+      text-align: right;
+    }
+    .pot-stat-value {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      color: var(--charcoal);
+      display: block;
+    }
+    .pot-stat-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      display: block;
+    }
+
+    .pot-stat + .pot-stat {
+      border-left: 1px solid var(--line);
+      padding-left: 2rem;
+    }
+
+    /* ─── WARNING BANNER ─── */
+    .warning-banner {
+      margin: 1.5rem 2.5rem;
+      padding: 1rem 1.4rem;
+      background: #FEF3EC;
+      border: 1px solid #F0C4A8;
+      border-left: 3px solid var(--accent);
+      border-radius: 3px;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.8rem;
+    }
+
+    .warning-icon {
+      font-size: 0.9rem;
+      flex-shrink: 0;
+      margin-top: 0.05rem;
+    }
+
+    .warning-text {
+      font-size: 0.83rem;
+      color: var(--charcoal-soft);
+      line-height: 1.5;
+    }
+    .warning-text strong {
+      font-weight: 500;
+      color: #7A2E0E;
+    }
+
+    .warning-tag {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: var(--accent-pale);
+      padding: 0.15rem 0.5rem;
+      border-radius: 2px;
+      margin-left: 0.5rem;
+      vertical-align: middle;
+    }
+
+    /* ─── MEMBERS GRID ─── */
+    .members-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border-top: 1px solid var(--line);
+    }
+
+    .member-card {
+      padding: 1.8rem 1.5rem 2rem;
+      border-right: 1px solid var(--line);
+      position: relative;
+      transition: background 0.2s;
+    }
+    .member-card:last-child { border-right: none; }
+    .member-card:hover { background: var(--oat); }
+
+    .member-card-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 400;
+      font-style: italic;
+      margin-bottom: 1rem;
+    }
+
+    .mc-high   .member-card-avatar { background: var(--olive-pale);  color: var(--olive); }
+    .mc-mid    .member-card-avatar { background: var(--oat-deep);     color: var(--charcoal-soft); }
+    .mc-low    .member-card-avatar { background: var(--accent-pale);  color: var(--accent); }
+    .mc-risk   .member-card-avatar { background: #FDE8DF; color: #993F22; border: 1.5px solid #E8927A; }
+
+    .mc-risk { background: #FFFAF7; }
+
+    .member-card-name {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--charcoal);
+      margin-bottom: 0.15rem;
+    }
+
+    .member-card-slot {
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1.2rem;
+    }
+    .slot-current {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    /* AI score arc */
+    .score-arc-wrap {
+      position: relative;
+      width: 72px;
+      height: 72px;
+      margin-bottom: 0.9rem;
+    }
+    .score-arc-wrap svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+    .score-arc-bg {
+      fill: none;
+      stroke: var(--arc-track);
+      stroke-width: 3;
+    }
+    .score-arc-fill {
+      fill: none;
+      stroke-width: 3;
+      stroke-linecap: round;
+      animation: arcDraw 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      animation-delay: 0.7s;
+    }
+    .score-arc-fill-high { stroke: var(--olive); }
+    .score-arc-fill-mid  { stroke: var(--charcoal-soft); }
+    .score-arc-fill-low  { stroke: var(--muted); }
+    .score-arc-fill-risk { stroke: var(--accent); }
+
+    .score-num {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+    .score-num-val {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      color: var(--charcoal);
+      display: block;
+      line-height: 1;
+    }
+    .score-num-label {
+      font-size: 0.55rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      display: block;
+    }
+
+    .collateral-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+    .collateral-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .collateral-val {
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      font-weight: 300;
+      color: var(--charcoal);
+    }
+
+    .member-rationale {
+      font-size: 0.72rem;
+      color: var(--muted);
+      line-height: 1.45;
+      font-style: italic;
+      margin-top: 0.8rem;
+      padding-top: 0.8rem;
+      border-top: 1px solid var(--line);
+    }
+
+    .risk-flag {
+      position: absolute;
+      top: 1.2rem;
+      right: 1.2rem;
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+
+    /* ─── CARD FOOTER ─── */
+    .card-footer {
+      padding: 1.4rem 2.5rem;
+      border-top: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .insurance-pool {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+    }
+    .insurance-dot {
+      width: 10px;
+      height: 10px;
+      background: var(--olive);
+      border-radius: 50%;
+      opacity: 0.8;
+    }
+    .insurance-text {
+      font-size: 0.8rem;
+      color: var(--charcoal-soft);
+    }
+    .insurance-text strong {
+      font-family: var(--font-display);
+      font-weight: 300;
+      font-size: 1rem;
+      letter-spacing: -0.01em;
+    }
+
+    .footer-actions {
+      display: flex;
+      gap: 0.8rem;
+    }
+
+    .btn-sm {
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+      padding: 0.5rem 1.1rem;
+      border-radius: 2px;
+      cursor: pointer;
+      text-decoration: none;
+      border: 1px solid var(--line);
+      color: var(--charcoal-soft);
+      background: transparent;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .btn-sm:hover { border-color: var(--muted); background: var(--oat-deep); }
+    .btn-sm-accent {
+      background: var(--accent);
+      color: var(--white);
+      border-color: var(--accent);
+    }
+    .btn-sm-accent:hover { background: #993f22; border-color: #993f22; }
+
+    /* ─── PAGE FOOTER ─── */
+    footer {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 3rem var(--pad);
+      border-top: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    footer .wordmark { font-size: 1.1rem; }
+
+    .footer-copy {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 900px) {
+      .hero {
+        grid-template-columns: 1fr;
+        padding: 3rem var(--pad) 5rem;
+        gap: 3rem;
+      }
+      .hero-right { order: -1; }
+      .pot-diagram { width: 260px; height: 260px; }
+      .members-grid { grid-template-columns: repeat(2, 1fr); }
+      .member-card:nth-child(2) { border-right: none; }
+      .member-card:nth-child(3),
+      .member-card:nth-child(4) { border-top: 1px solid var(--line); }
+      .member-card:nth-child(4) { border-right: none; }
+    }
+
+    @media (max-width: 580px) {
+      .nav-links { display: none; }
+      .members-grid { grid-template-columns: 1fr; }
+      .member-card { border-right: none; border-bottom: 1px solid var(--line); }
+      .member-card:last-child { border-bottom: none; }
+      .card-header { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── NAVIGATION ── -->
+  <nav>
+    <a href="#" class="wordmark reveal d1">Tanda<span></span></a>
+    <ul class="nav-links reveal d1">
+      <li><a href="#">Cómo funciona</a></li>
+      <li><a href="#">Para grupos</a></li>
+      <li><a href="#">Seguridad</a></li>
+    </ul>
+    <a href="#" class="nav-cta reveal d1">Entrar</a>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <section class="hero">
+    <div class="hero-left">
+      <p class="eyebrow reveal d1">Savings circles · On-chain · MXNB</p>
+
+      <h1 class="display-heading reveal d2">
+        La tanda<br/>de <em>siempre.</em>
+      </h1>
+
+      <p class="tagline reveal d3">
+        Sin el riesgo de que te dejen colgado.
+      </p>
+
+      <p class="value-prop reveal d3">
+        AI-organized savings circles on-chain. Save together, in pesos — without the trust problem.
+      </p>
+
+      <div class="cta-group reveal d4">
+        <a href="#" class="btn-primary">Crear una tanda</a>
+        <a href="#" class="btn-secondary">Cómo funciona</a>
+      </div>
+
+      <!-- Features -->
+      <div class="features reveal d5">
+        <div class="feature-item">
+          <span class="feature-num">01</span>
+          <div class="feature-text">
+            <strong>AI reliability scoring</strong>
+            <span>An AI underwriter reads on-chain history and sets each member's collateral automatically — no organizer judgment needed.</span>
+          </div>
+        </div>
+        <div class="feature-item">
+          <span class="feature-num">02</span>
+          <div class="feature-text">
+            <strong>Default-proof by design</strong>
+            <span>Collateral is slashed and the insurance pool covers any gap — the recipient is always paid in full, every round.</span>
+          </div>
+        </div>
+        <div class="feature-item">
+          <span class="feature-num">03</span>
+          <div class="feature-text">
+            <strong>Gasless onboarding</strong>
+            <span>Join with a passkey. No seed phrase, no gas fees — built for the next wave of LATAM users.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero right — rotation diagram -->
+    <div class="hero-right reveal d3">
+      <div class="pot-diagram">
+        <!-- SVG arcs and rotation lines -->
+        <svg viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Outer faint ring -->
+          <circle cx="160" cy="160" r="140" stroke="var(--line)" stroke-width="1" stroke-dasharray="4 8" />
+
+          <!-- Inner ring -->
+          <circle cx="160" cy="160" r="88" fill="var(--white)" stroke="var(--line)" stroke-width="1" />
+
+          <!-- Subtle fill arc — round 2 of 4 = 50% -->
+          <circle cx="160" cy="160" r="110"
+            fill="none"
+            stroke="var(--accent-pale)"
+            stroke-width="18"
+            stroke-dasharray="345.6 345.6"
+            stroke-dashoffset="0"
+            transform="rotate(-90 160 160)"
+          />
+          <circle cx="160" cy="160" r="110"
+            fill="none"
+            stroke="var(--accent)"
+            stroke-width="18"
+            stroke-opacity="0.35"
+            stroke-dasharray="172.8 345.6"
+            stroke-dashoffset="0"
+            transform="rotate(-90 160 160)"
+          />
+
+          <!-- Connector lines from center to members -->
+          <!-- Top -->
+          <line x1="160" y1="72" x2="160" y2="76" stroke="var(--line)" stroke-width="1.5" />
+          <line x1="160" y1="84" x2="160" y2="160" stroke="var(--line)" stroke-width="1" stroke-dasharray="3 6" opacity="0.6" />
+          <!-- Right -->
+          <line x1="247" y1="160" x2="243" y2="160" stroke="var(--line)" stroke-width="1.5" />
+          <line x1="237" y1="160" x2="160" y2="160" stroke="var(--line)" stroke-width="1" stroke-dasharray="3 6" opacity="0.6" />
+          <!-- Bottom -->
+          <line x1="160" y1="248" x2="160" y2="244" stroke="var(--line)" stroke-width="1.5" />
+          <line x1="160" y1="236" x2="160" y2="160" stroke="var(--line)" stroke-width="1" stroke-dasharray="3 6" opacity="0.6" />
+          <!-- Left -->
+          <line x1="73" y1="160" x2="77" y2="160" stroke="var(--line)" stroke-width="1.5" />
+          <line x1="83" y1="160" x2="160" y2="160" stroke="var(--line)" stroke-width="1" stroke-dasharray="3 6" opacity="0.6" />
+
+          <!-- Round tick marks -->
+          <line x1="160" y1="18" x2="160" y2="28" stroke="var(--accent)" stroke-width="2" opacity="0.6" />
+          <line x1="302" y1="160" x2="292" y2="160" stroke="var(--line)" stroke-width="1.5" opacity="0.5" />
+          <line x1="160" y1="302" x2="160" y2="292" stroke="var(--line)" stroke-width="1.5" opacity="0.5" />
+          <line x1="18" y1="160" x2="28" y2="160" stroke="var(--line)" stroke-width="1.5" opacity="0.5" />
+
+          <!-- Round 2 indicator dot on arc -->
+          <circle cx="160" cy="50" r="5" fill="var(--accent)" opacity="0.9" />
+          <circle cx="270" cy="160" r="4" fill="var(--line)" />
+          <circle cx="160" cy="270" r="4" fill="var(--line)" />
+          <circle cx="50" cy="160" r="4" fill="var(--line)" />
+        </svg>
+
+        <!-- Center label -->
+        <div class="pot-center">
+          <span class="pot-center-amount">400</span>
+          <span class="pot-center-label">MXNB · Pote</span>
+          <span class="pot-center-round">Ronda 2 de 4</span>
+        </div>
+
+        <!-- Member nodes -->
+        <div class="member-node node-top trust-high">
+          <div class="member-avatar">M</div>
+          <div class="member-name">María</div>
+          <div class="member-score">AI: 82</div>
+        </div>
+        <div class="member-node node-right trust-mid">
+          <div class="member-avatar">D</div>
+          <div class="member-name">Diego</div>
+          <div class="member-score">AI: 66</div>
+        </div>
+        <div class="member-node node-bottom trust-low">
+          <div class="member-avatar">L</div>
+          <div class="member-name">Lupe</div>
+          <div class="member-score">AI: 50</div>
+        </div>
+        <div class="member-node node-left trust-at-risk">
+          <div class="member-avatar">0x</div>
+          <div class="member-name">0xkito</div>
+          <div class="member-score">AI: 28 ⚠</div>
+        </div>
+      </div>
+
+      <!-- Small caption under diagram -->
+      <p style="font-size:0.72rem;color:var(--muted);text-align:center;letter-spacing:0.06em;text-transform:uppercase;">
+        Tanda Oaxaca · 100 MXNB / ronda
+      </p>
+    </div>
+  </section>
+
+  <!-- ── TRUST STRIP ── -->
+  <div class="trust-strip reveal d6">
+    <span class="trust-item">
+      <span class="trust-dot"></span>
+      Built on Arbitrum
+    </span>
+    <span class="trust-item">
+      <span class="trust-dot"></span>
+      Settles in MXNB
+    </span>
+    <span class="trust-item">
+      <span class="trust-dot"></span>
+      Non-custodial
+    </span>
+    <span class="trust-item">
+      <span class="trust-dot"></span>
+      Smart contract escrow
+    </span>
+  </div>
+
+  <!-- ── DIVIDER ── -->
+  <div class="section-divider">
+    <hr />
+  </div>
+
+  <!-- ── DASHBOARD SECTION ── -->
+  <section class="dashboard-section">
+    <p class="section-label reveal d1">Circle preview · Vista activa</p>
+    <h2 class="section-heading reveal d2">
+      Tu tanda, <em>vigilada</em><br/>por IA en cada ronda.
+    </h2>
+    <p class="section-sub reveal d2">
+      Every member scored. Every round monitored. Defaults caught before they happen.
+    </p>
+
+    <!-- Tanda card -->
+    <div class="tanda-card reveal d3">
+
+      <!-- Card header -->
+      <div class="card-header">
+        <div>
+          <div class="card-title">Tanda Oaxaca</div>
+          <div class="card-meta">
+            <span>
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1"/>
+                <path d="M6 3v3l2 1.5" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+              </svg>
+              Próximo pago: 5 días
+            </span>
+            <span>4 miembros</span>
+            <span>100 MXNB / ronda</span>
+          </div>
+        </div>
+        <div class="pot-summary">
+          <div class="pot-stat">
+            <span class="pot-stat-value">400</span>
+            <span class="pot-stat-label">MXNB · Pote</span>
+          </div>
+          <div class="pot-stat">
+            <span class="pot-stat-value" style="color:var(--accent);">Ronda 2</span>
+            <span class="pot-stat-label">de 4</span>
+          </div>
+          <div class="pot-stat">
+            <span class="pot-stat-value">María</span>
+            <span class="pot-stat-label">Próxima en cobrar</span>
+          </div>
+        </div>
+        <span class="round-badge">Activa</span>
+      </div>
+
+      <!-- AI Warning banner -->
+      <div class="warning-banner">
+        <span class="warning-icon">⚠</span>
+        <div class="warning-text">
+          <strong>Alerta del agente IA:</strong>
+          El agente detectó riesgo de impago de <strong>0xkito</strong> esta ronda — se solicitó refuerzo de colateral.
+          <span class="warning-tag">IA activa</span>
+          <br/>
+          <span style="font-size:0.78rem;color:var(--muted);margin-top:0.3rem;display:inline-block;">
+            AI detected default risk from 0xkito this round. Collateral top-up requested automatically.
+          </span>
+        </div>
+      </div>
+
+      <!-- Members grid -->
+      <div class="members-grid">
+
+        <!-- María — high trust -->
+        <div class="member-card mc-high">
+          <div class="member-card-avatar">M</div>
+          <div class="member-card-name">María</div>
+          <div class="member-card-slot slot-current">Slot 1 · Cobró ronda 1</div>
+
+          <div class="score-arc-wrap">
+            <svg viewBox="0 0 72 72">
+              <circle class="score-arc-bg" cx="36" cy="36" r="28" />
+              <circle class="score-arc-fill score-arc-fill-high" cx="36" cy="36" r="28"
+                style="--dash-total:175.9;--dash-offset:calc(175.9 * (1 - 0.82));"
+                stroke-dasharray="175.9"
+                stroke-dashoffset="31.7"
+              />
+            </svg>
+            <div class="score-num">
+              <span class="score-num-val">82</span>
+              <span class="score-num-label">IA</span>
+            </div>
+          </div>
+
+          <div class="collateral-row">
+            <span class="collateral-label">Colateral</span>
+            <span class="collateral-val">0.5× <span style="font-size:0.72rem;color:var(--muted);">50 MXNB</span></span>
+          </div>
+          <div class="member-rationale">
+            6 rondas a tiempo, 1 círculo completado.
+          </div>
+        </div>
+
+        <!-- Diego — mid trust -->
+        <div class="member-card mc-mid">
+          <div class="member-card-avatar">D</div>
+          <div class="member-card-name">Diego</div>
+          <div class="member-card-slot">Slot 3 · Paga regularmente</div>
+
+          <div class="score-arc-wrap">
+            <svg viewBox="0 0 72 72">
+              <circle class="score-arc-bg" cx="36" cy="36" r="28" />
+              <circle class="score-arc-fill score-arc-fill-mid" cx="36" cy="36" r="28"
+                style="--dash-total:175.9;--dash-offset:calc(175.9 * (1 - 0.66));"
+                stroke-dasharray="175.9"
+                stroke-dashoffset="59.8"
+              />
+            </svg>
+            <div class="score-num">
+              <span class="score-num-val">66</span>
+              <span class="score-num-label">IA</span>
+            </div>
+          </div>
+
+          <div class="collateral-row">
+            <span class="collateral-label">Colateral</span>
+            <span class="collateral-val">1× <span style="font-size:0.72rem;color:var(--muted);">100 MXNB</span></span>
+          </div>
+          <div class="member-rationale">
+            3 rondas en 2 círculos. Historial mixto.
+          </div>
+        </div>
+
+        <!-- Lupe — low trust -->
+        <div class="member-card mc-low">
+          <div class="member-card-avatar">L</div>
+          <div class="member-card-name">Lupe</div>
+          <div class="member-card-slot">Slot 4 · Primera tanda on-chain</div>
+
+          <div class="score-arc-wrap">
+            <svg viewBox="0 0 72 72">
+              <circle class="score-arc-bg" cx="36" cy="36" r="28" />
+              <circle class="score-arc-fill score-arc-fill-low" cx="36" cy="36" r="28"
+                style="--dash-total:175.9;--dash-offset:calc(175.9 * (1 - 0.50));"
+                stroke-dasharray="175.9"
+                stroke-dashoffset="88"
+              />
+            </svg>
+            <div class="score-num">
+              <span class="score-num-val">50</span>
+              <span class="score-num-label">IA</span>
+            </div>
+          </div>
+
+          <div class="collateral-row">
+            <span class="collateral-label">Colateral</span>
+            <span class="collateral-val">2× <span style="font-size:0.72rem;color:var(--muted);">200 MXNB</span></span>
+          </div>
+          <div class="member-rationale">
+            Billetera reciente, datos limitados. Score inicial.
+          </div>
+        </div>
+
+        <!-- 0xkito — at risk -->
+        <div class="member-card mc-risk">
+          <div class="risk-flag"></div>
+          <div class="member-card-avatar">0x</div>
+          <div class="member-card-name">0xkito</div>
+          <div class="member-card-slot" style="color:var(--accent);">Slot 2 · ⚠ Riesgo detectado</div>
+
+          <div class="score-arc-wrap">
+            <svg viewBox="0 0 72 72">
+              <circle class="score-arc-bg" cx="36" cy="36" r="28" />
+              <circle class="score-arc-fill score-arc-fill-risk" cx="36" cy="36" r="28"
+                style="--dash-total:175.9;--dash-offset:calc(175.9 * (1 - 0.28));"
+                stroke-dasharray="175.9"
+                stroke-dashoffset="126.6"
+              />
+            </svg>
+            <div class="score-num">
+              <span class="score-num-val" style="color:var(--accent);">28</span>
+              <span class="score-num-label">IA</span>
+            </div>
+          </div>
+
+          <div class="collateral-row">
+            <span class="collateral-label">Colateral</span>
+            <span class="collateral-val" style="color:var(--accent);">3× <span style="font-size:0.72rem;color:var(--muted);">300 MXNB</span></span>
+          </div>
+          <div class="member-rationale" style="color:var(--accent);border-top-color:var(--accent-pale);">
+            Billetera nueva, cold-start. Actividad de red irregular esta semana.
+          </div>
+        </div>
+
+      </div><!-- /members-grid -->
+
+      <!-- Card footer -->
+      <div class="card-footer">
+        <div class="insurance-pool">
+          <div class="insurance-dot"></div>
+          <div class="insurance-text">
+            Fondo de protección: <strong>1,240 MXNB</strong>
+            <span style="color:var(--muted);margin-left:0.5rem;font-size:0.72rem;">· Pool de seguro activo</span>
+          </div>
+        </div>
+        <div class="footer-actions">
+          <a href="#" class="btn-sm">Ver contrato</a>
+          <a href="#" class="btn-sm btn-sm-accent">Pagar ronda</a>
+        </div>
+      </div>
+
+    </div><!-- /tanda-card -->
+  </section>
+
+  <!-- ── PAGE FOOTER ── -->
+  <footer>
+    <a href="#" class="wordmark">Tanda<span></span></a>
+    <p class="footer-copy">
+      Built on Arbitrum · Settles in MXNB · Non-custodial ·
+      <span style="font-style:italic;font-family:var(--font-display);">Para la próxima ola.</span>
+    </p>
+  </footer>
+
+</body>
+</html>

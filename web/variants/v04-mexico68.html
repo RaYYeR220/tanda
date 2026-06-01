@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tanda — La tanda de siempre, sin el riesgo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;500;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── PALETTE ─────────────────────────────────────────────── */
+    :root {
+      --hot-pink:    #E8005A;
+      --magenta:     #C8006E;
+      --orange:      #F5770A;
+      --marigold:    #F5A800;
+      --turquoise:   #00A89D;
+      --teal-dark:   #007A73;
+      --black:       #0F0D0A;
+      --warm-white:  #FBF7EF;
+      --cream:       #F2EBD8;
+      --stripe-w:    7px;
+    }
+
+    /* ─── RESET ───────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--warm-white);
+      color: var(--black);
+      font-family: 'Hanken Grotesk', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ─── UTILITY ─────────────────────────────────────────────── */
+    .anton { font-family: 'Anton', sans-serif; }
+
+    /* ─── REPEATING STRIPE PATTERNS ──────────────────────────── */
+    /* concentric stripe burst — radiates outward */
+    .stripe-burst {
+      background:
+        repeating-conic-gradient(
+          var(--hot-pink) 0deg 2deg,
+          transparent 2deg 6deg,
+          var(--orange) 6deg 8deg,
+          transparent 8deg 12deg,
+          var(--turquoise) 12deg 14deg,
+          transparent 14deg 18deg,
+          var(--marigold) 18deg 20deg,
+          transparent 20deg 24deg
+        );
+    }
+
+    /* linear stripes diagonal */
+    .stripe-diag {
+      background:
+        repeating-linear-gradient(
+          -45deg,
+          var(--hot-pink) 0px, var(--hot-pink) var(--stripe-w),
+          var(--warm-white) var(--stripe-w), var(--warm-white) calc(var(--stripe-w)*2),
+          var(--orange) calc(var(--stripe-w)*2), var(--orange) calc(var(--stripe-w)*3),
+          var(--warm-white) calc(var(--stripe-w)*3), var(--warm-white) calc(var(--stripe-w)*4)
+        );
+    }
+
+    /* ─── HEADER / NAV ────────────────────────────────────────── */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--black);
+      border-bottom: 4px solid var(--hot-pink);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 48px;
+      height: 64px;
+    }
+
+    .nav-logo {
+      font-family: 'Anton', sans-serif;
+      font-size: 2rem;
+      color: var(--warm-white);
+      letter-spacing: 0.04em;
+      position: relative;
+    }
+    .nav-logo::after {
+      content: '';
+      position: absolute;
+      bottom: -2px; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--hot-pink), var(--orange), var(--marigold), var(--turquoise));
+    }
+
+    nav {
+      display: flex;
+      gap: 32px;
+      align-items: center;
+    }
+    nav a {
+      color: var(--warm-white);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.75;
+      transition: opacity 0.2s;
+    }
+    nav a:hover { opacity: 1; color: var(--marigold); }
+
+    .nav-cta {
+      background: var(--hot-pink);
+      color: var(--warm-white) !important;
+      opacity: 1 !important;
+      padding: 8px 20px;
+      border: 2px solid var(--hot-pink);
+      font-family: 'Anton', sans-serif;
+      font-size: 0.95rem !important;
+      letter-spacing: 0.1em;
+      transition: background 0.2s, color 0.2s !important;
+    }
+    .nav-cta:hover { background: var(--warm-white) !important; color: var(--hot-pink) !important; }
+
+    /* ─── HERO SECTION ────────────────────────────────────────── */
+    .hero {
+      position: relative;
+      min-height: calc(100vh - 64px);
+      background: var(--warm-white);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    /* giant radial burst in the right half */
+    .hero::before {
+      content: '';
+      position: absolute;
+      right: -120px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 800px;
+      height: 800px;
+      border-radius: 50%;
+      background:
+        repeating-conic-gradient(
+          var(--hot-pink) 0deg 2.5deg,
+          var(--warm-white) 2.5deg 5deg,
+          var(--orange) 5deg 7.5deg,
+          var(--warm-white) 7.5deg 10deg,
+          var(--marigold) 10deg 12.5deg,
+          var(--warm-white) 12.5deg 15deg,
+          var(--turquoise) 15deg 17.5deg,
+          var(--warm-white) 17.5deg 20deg
+        );
+      z-index: 0;
+      animation: slowspin 80s linear infinite;
+    }
+
+    @keyframes slowspin {
+      to { transform: translateY(-50%) rotate(360deg); }
+    }
+
+    /* overlay concentric rings on top of the burst */
+    .hero::after {
+      content: '';
+      position: absolute;
+      right: -120px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 800px;
+      height: 800px;
+      border-radius: 50%;
+      background: radial-gradient(
+        circle,
+        var(--warm-white) 0%,
+        transparent 18%,
+        var(--warm-white) 18%,
+        transparent 22%,
+        var(--warm-white) 30%,
+        transparent 30%,
+        transparent 100%
+      );
+      z-index: 1;
+    }
+
+    .hero-left {
+      position: relative;
+      z-index: 10;
+      padding: 80px 60px 80px 80px;
+      animation: fadeSlideUp 0.7s ease both;
+    }
+
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-eyebrow {
+      display: inline-block;
+      background: var(--black);
+      color: var(--marigold);
+      font-family: 'Anton', sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      margin-bottom: 24px;
+      animation: fadeSlideUp 0.5s ease both;
+    }
+
+    .hero-title {
+      font-family: 'Anton', sans-serif;
+      font-size: clamp(4.5rem, 8vw, 7.5rem);
+      line-height: 0.92;
+      letter-spacing: -0.01em;
+      color: var(--black);
+      position: relative;
+      margin-bottom: 8px;
+      animation: fadeSlideUp 0.6s ease 0.1s both;
+    }
+
+    /* Tanda wordmark gets its own radiating underline */
+    .hero-title .wordmark {
+      position: relative;
+      display: inline-block;
+      color: var(--hot-pink);
+    }
+    .hero-title .wordmark::before {
+      content: '';
+      position: absolute;
+      bottom: -6px; left: 0; right: 0;
+      height: 10px;
+      background:
+        repeating-linear-gradient(
+          90deg,
+          var(--hot-pink) 0px, var(--hot-pink) 8px,
+          var(--orange) 8px, var(--orange) 16px,
+          var(--marigold) 16px, var(--marigold) 24px,
+          var(--turquoise) 24px, var(--turquoise) 32px,
+          var(--warm-white) 32px, var(--warm-white) 34px
+        );
+    }
+
+    .hero-tagline {
+      font-family: 'Anton', sans-serif;
+      font-size: clamp(1rem, 2.2vw, 1.55rem);
+      color: var(--black);
+      line-height: 1.25;
+      margin-top: 18px;
+      margin-bottom: 8px;
+      animation: fadeSlideUp 0.6s ease 0.2s both;
+    }
+    .hero-tagline em {
+      font-style: normal;
+      color: var(--orange);
+    }
+
+    .hero-sub {
+      font-size: 1.05rem;
+      color: #4a4035;
+      line-height: 1.6;
+      max-width: 480px;
+      margin-bottom: 40px;
+      animation: fadeSlideUp 0.6s ease 0.3s both;
+    }
+
+    /* ─── FEATURE PILLS ───────────────────────────────────────── */
+    .features {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 44px;
+      animation: fadeSlideUp 0.6s ease 0.4s both;
+    }
+
+    .feat {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .feat-icon {
+      flex-shrink: 0;
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Anton', sans-serif;
+      font-size: 0.85rem;
+      color: var(--warm-white);
+    }
+    .feat-icon.pink    { background: var(--hot-pink); }
+    .feat-icon.orange  { background: var(--orange); }
+    .feat-icon.teal    { background: var(--turquoise); }
+
+    .feat-text strong {
+      display: block;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--black);
+    }
+    .feat-text span {
+      font-size: 0.875rem;
+      color: #5a5045;
+      line-height: 1.4;
+    }
+
+    /* ─── BUTTONS ─────────────────────────────────────────────── */
+    .cta-row {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 36px;
+      animation: fadeSlideUp 0.6s ease 0.5s both;
+    }
+
+    .btn-primary {
+      font-family: 'Anton', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: var(--hot-pink);
+      color: var(--warm-white);
+      border: none;
+      padding: 16px 36px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      text-decoration: none;
+      display: inline-block;
+      transition: transform 0.15s;
+    }
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(
+          90deg,
+          transparent 0px, transparent 20px,
+          rgba(255,255,255,0.08) 20px, rgba(255,255,255,0.08) 28px
+        );
+    }
+    .btn-primary:hover { transform: translate(-3px, -3px); }
+    .btn-primary:hover::after {
+      content: '';
+      position: absolute;
+      bottom: -4px; right: -4px;
+      width: 100%; height: 100%;
+      border: 2px solid var(--black);
+      z-index: -1;
+    }
+
+    .btn-secondary {
+      font-family: 'Anton', sans-serif;
+      font-size: 1.05rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: transparent;
+      color: var(--black);
+      border: 3px solid var(--black);
+      padding: 14px 30px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: background 0.15s, color 0.15s;
+    }
+    .btn-secondary:hover { background: var(--black); color: var(--warm-white); }
+
+    /* ─── TRUST STRIP ─────────────────────────────────────────── */
+    .trust-strip {
+      display: flex;
+      gap: 0;
+      align-items: center;
+      animation: fadeSlideUp 0.6s ease 0.6s both;
+    }
+    .trust-pill {
+      background: var(--cream);
+      border: 2px solid var(--black);
+      padding: 6px 16px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--black);
+    }
+    .trust-pill + .trust-pill { border-left: none; }
+    .trust-pill:first-child { border-right: none; }
+    .trust-pill.accent { background: var(--turquoise); color: var(--warm-white); }
+
+    /* ─── HERO RIGHT ──────────────────────────────────────────── */
+    .hero-right {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    /* The big central circle / pot icon */
+    .pot-ring {
+      position: relative;
+      width: 460px;
+      height: 460px;
+      flex-shrink: 0;
+      animation: fadeSlideUp 0.7s ease 0.3s both;
+    }
+
+    /* concentric stripe rings around the pot */
+    .ring {
+      position: absolute;
+      border-radius: 50%;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .ring-1 { width: 460px; height: 460px;
+      background: repeating-conic-gradient(
+        var(--hot-pink) 0deg 3deg,
+        var(--warm-white) 3deg 6deg,
+        var(--orange) 6deg 9deg,
+        var(--warm-white) 9deg 12deg,
+        var(--turquoise) 12deg 15deg,
+        var(--warm-white) 15deg 18deg,
+        var(--marigold) 18deg 21deg,
+        var(--warm-white) 21deg 24deg
+      );
+      animation: slowspin 60s linear infinite;
+    }
+    .ring-2 { width: 400px; height: 400px; background: var(--warm-white); }
+    .ring-3 { width: 380px; height: 380px;
+      background: repeating-conic-gradient(
+        var(--orange) 0deg 3deg,
+        var(--warm-white) 3deg 7deg,
+        var(--hot-pink) 7deg 10deg,
+        var(--warm-white) 10deg 14deg
+      );
+      animation: slowspin 40s linear infinite reverse;
+    }
+    .ring-4 { width: 320px; height: 320px; background: var(--warm-white); }
+    .ring-5 { width: 300px; height: 300px;
+      background: repeating-conic-gradient(
+        var(--turquoise) 0deg 4deg,
+        var(--warm-white) 4deg 8deg,
+        var(--marigold) 8deg 12deg,
+        var(--warm-white) 12deg 16deg
+      );
+      animation: slowspin 30s linear infinite;
+    }
+    .ring-6 { width: 240px; height: 240px; background: var(--warm-white); }
+
+    /* inner pot face */
+    .pot-face {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 220px; height: 220px;
+      border-radius: 50%;
+      background: var(--black);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+    }
+    .pot-face .pot-label {
+      font-family: 'Anton', sans-serif;
+      color: var(--marigold);
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .pot-face .pot-amount {
+      font-family: 'Anton', sans-serif;
+      color: var(--warm-white);
+      font-size: 2.4rem;
+      line-height: 1;
+    }
+    .pot-face .pot-unit {
+      font-size: 0.8rem;
+      color: var(--turquoise);
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      margin-top: 2px;
+    }
+    .pot-face .pot-round {
+      margin-top: 10px;
+      background: var(--hot-pink);
+      color: var(--warm-white);
+      font-family: 'Anton', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      padding: 4px 12px;
+    }
+
+    /* ─── DIVIDER STRIPE ──────────────────────────────────────── */
+    .stripe-bar {
+      height: 16px;
+      background:
+        repeating-linear-gradient(
+          90deg,
+          var(--hot-pink) 0px, var(--hot-pink) 40px,
+          var(--orange)   40px, var(--orange)   80px,
+          var(--marigold) 80px, var(--marigold) 120px,
+          var(--turquoise) 120px, var(--turquoise) 160px,
+          var(--black)    160px, var(--black)    200px
+        );
+    }
+
+    /* ─── DASHBOARD SECTION ───────────────────────────────────── */
+    .dashboard {
+      background: var(--cream);
+      padding: 80px 80px 100px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* background stripe texture */
+    .dashboard::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 340px; height: 100%;
+      background:
+        repeating-linear-gradient(
+          0deg,
+          var(--cream) 0px, var(--cream) 10px,
+          rgba(232,0,90,0.06) 10px, rgba(232,0,90,0.06) 12px
+        );
+      pointer-events: none;
+    }
+
+    .dash-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .dash-title-block {}
+    .dash-eyebrow {
+      font-family: 'Anton', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.22em;
+      color: var(--turquoise);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .dash-title {
+      font-family: 'Anton', sans-serif;
+      font-size: 3.2rem;
+      line-height: 0.95;
+      color: var(--black);
+      position: relative;
+    }
+    .dash-title span { color: var(--hot-pink); }
+    .dash-title::after {
+      content: '';
+      display: block;
+      margin-top: 8px;
+      height: 6px;
+      width: 100%;
+      background:
+        repeating-linear-gradient(
+          90deg,
+          var(--hot-pink) 0, var(--hot-pink) 12px,
+          var(--orange) 12px, var(--orange) 24px,
+          var(--marigold) 24px, var(--marigold) 36px,
+          var(--turquoise) 36px, var(--turquoise) 48px,
+          var(--black) 48px, var(--black) 52px,
+          var(--cream) 52px, var(--cream) 56px
+        );
+    }
+
+    /* POT STATS ROW */
+    .pot-stats {
+      display: flex;
+      gap: 0;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+    .pot-stat {
+      background: var(--black);
+      color: var(--warm-white);
+      padding: 18px 32px;
+      border-right: 3px solid var(--hot-pink);
+      min-width: 160px;
+    }
+    .pot-stat:last-child { border-right: none; }
+    .pot-stat .ps-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #aaa;
+      margin-bottom: 4px;
+    }
+    .pot-stat .ps-val {
+      font-family: 'Anton', sans-serif;
+      font-size: 1.6rem;
+      line-height: 1;
+      color: var(--marigold);
+    }
+    .pot-stat .ps-sub {
+      font-size: 0.75rem;
+      color: var(--turquoise);
+      margin-top: 3px;
+    }
+    .pot-stat.highlight .ps-val { color: var(--hot-pink); }
+
+    /* AI WARNING BANNER */
+    .warning-banner {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      background: var(--black);
+      border-left: 8px solid var(--marigold);
+      border-right: 4px solid var(--hot-pink);
+      padding: 16px 24px;
+      margin-bottom: 36px;
+      position: relative;
+      overflow: hidden;
+      animation: fadeSlideUp 0.6s ease 0.8s both;
+    }
+    .warning-banner::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 60px; height: 100%;
+      background:
+        repeating-linear-gradient(
+          -45deg,
+          transparent 0, transparent 6px,
+          rgba(245,168,0,0.15) 6px, rgba(245,168,0,0.15) 10px
+        );
+    }
+
+    .warn-icon {
+      font-size: 1.8rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .warn-text {}
+    .warn-text strong {
+      display: block;
+      font-family: 'Anton', sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.2em;
+      color: var(--marigold);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .warn-text p {
+      color: var(--warm-white);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+    .warn-text em { color: var(--hot-pink); font-style: normal; font-weight: 700; }
+    .warn-badge {
+      margin-left: auto;
+      flex-shrink: 0;
+      background: var(--hot-pink);
+      color: var(--warm-white);
+      font-family: 'Anton', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      padding: 6px 14px;
+      text-transform: uppercase;
+      align-self: center;
+    }
+
+    /* MEMBERS GRID */
+    .members-label {
+      font-family: 'Anton', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: #9a8e7e;
+      margin-bottom: 16px;
+    }
+
+    .members-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      border: 3px solid var(--black);
+      margin-bottom: 40px;
+    }
+
+    .member-card {
+      background: var(--warm-white);
+      border-right: 3px solid var(--black);
+      padding: 24px 20px 20px;
+      position: relative;
+      transition: transform 0.2s;
+    }
+    .member-card:last-child { border-right: none; }
+    .member-card:hover { transform: translateY(-4px); z-index: 5; box-shadow: 0 8px 0 var(--black); }
+
+    /* top-strip color per member */
+    .member-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 8px;
+    }
+    .mc-high::before {
+      background:
+        repeating-linear-gradient(
+          90deg,
+          var(--turquoise) 0, var(--turquoise) 8px,
+          var(--marigold) 8px, var(--marigold) 16px
+        );
+    }
+    .mc-mid::before {
+      background:
+        repeating-linear-gradient(
+          90deg,
+          var(--orange) 0, var(--orange) 8px,
+          var(--warm-white) 8px, var(--warm-white) 14px
+        );
+    }
+    .mc-low::before {
+      background:
+        repeating-linear-gradient(
+          90deg,
+          var(--hot-pink) 0, var(--hot-pink) 8px,
+          var(--black) 8px, var(--black) 14px
+        );
+    }
+    .mc-risk::before {
+      background:
+        repeating-linear-gradient(
+          90deg,
+          var(--hot-pink) 0, var(--hot-pink) 5px,
+          var(--marigold) 5px, var(--marigold) 10px,
+          var(--hot-pink) 10px, var(--hot-pink) 15px
+        );
+    }
+
+    .mc-avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      border: 3px solid var(--black);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Anton', sans-serif;
+      font-size: 1.1rem;
+      color: var(--warm-white);
+      margin-bottom: 12px;
+    }
+    .mc-high .mc-avatar { background: var(--turquoise); }
+    .mc-mid  .mc-avatar { background: var(--orange); }
+    .mc-low  .mc-avatar { background: var(--black); }
+    .mc-risk .mc-avatar { background: var(--hot-pink); }
+
+    .mc-name {
+      font-family: 'Anton', sans-serif;
+      font-size: 1.25rem;
+      color: var(--black);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .mc-slot {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #7a6e5e;
+      margin-bottom: 16px;
+    }
+
+    /* AI SCORE BADGE */
+    .ai-score-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .ai-badge {
+      position: relative;
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      border: 3px solid var(--black);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .ai-badge::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+    }
+    .score-high .ai-badge::before {
+      background: repeating-conic-gradient(
+        var(--turquoise) 0deg 3deg,
+        var(--warm-white) 3deg 8deg
+      );
+    }
+    .score-mid .ai-badge::before {
+      background: repeating-conic-gradient(
+        var(--orange) 0deg 3deg,
+        var(--cream) 3deg 8deg
+      );
+    }
+    .score-low .ai-badge::before {
+      background: repeating-conic-gradient(
+        var(--black) 0deg 3deg,
+        var(--cream) 3deg 8deg
+      );
+    }
+    .score-risk .ai-badge::before {
+      background: repeating-conic-gradient(
+        var(--hot-pink) 0deg 3deg,
+        var(--cream) 3deg 8deg
+      );
+    }
+
+    .ai-badge-inner {
+      position: relative;
+      z-index: 2;
+      width: 46px; height: 46px;
+      border-radius: 50%;
+      background: var(--warm-white);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    .ai-num {
+      font-family: 'Anton', sans-serif;
+      font-size: 1.1rem;
+      line-height: 1;
+      color: var(--black);
+    }
+    .ai-lbl {
+      font-size: 0.45rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #888;
+    }
+
+    .ai-score-info {}
+    .ai-score-info .score-tag {
+      font-family: 'Anton', sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      margin-bottom: 4px;
+      display: inline-block;
+    }
+    .score-high .score-tag { background: var(--turquoise); color: var(--warm-white); }
+    .score-mid  .score-tag { background: var(--orange);    color: var(--warm-white); }
+    .score-low  .score-tag { background: var(--black);     color: var(--warm-white); }
+    .score-risk .score-tag { background: var(--hot-pink);  color: var(--warm-white); }
+
+    .ai-score-info .score-val {
+      font-family: 'Anton', sans-serif;
+      font-size: 1.5rem;
+      line-height: 1;
+      color: var(--black);
+    }
+    .score-risk .score-val { color: var(--hot-pink); }
+
+    .mc-collateral {
+      background: var(--black);
+      color: var(--marigold);
+      font-family: 'Anton', sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      padding: 4px 10px;
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+
+    .mc-rationale {
+      font-size: 0.78rem;
+      color: #5a5045;
+      line-height: 1.4;
+      border-top: 2px solid var(--cream);
+      padding-top: 10px;
+      margin-top: 4px;
+      font-style: italic;
+    }
+    .mc-risk .mc-rationale {
+      border-top-color: rgba(232,0,90,0.2);
+      color: var(--hot-pink);
+      font-style: normal;
+      font-weight: 600;
+    }
+
+    /* PAYOUT INDICATOR */
+    .mc-payout {
+      position: absolute;
+      top: 14px; right: 14px;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      border: 2px solid var(--black);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Anton', sans-serif;
+      font-size: 0.75rem;
+      background: var(--warm-white);
+    }
+    .mc-payout.current {
+      background: var(--marigold);
+      border-color: var(--black);
+      color: var(--black);
+    }
+
+    /* BOTTOM STRIP */
+    .dash-bottom {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      border: 3px solid var(--black);
+    }
+
+    .insurance-block {
+      flex: 1;
+      background: var(--black);
+      padding: 24px 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    .insurance-block::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 120px; height: 100%;
+      background:
+        repeating-conic-gradient(
+          var(--turquoise) 0deg 4deg,
+          transparent 4deg 10deg
+        ) center / 80px 80px;
+      opacity: 0.2;
+    }
+    .ins-label {
+      font-family: 'Anton', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--turquoise);
+      margin-bottom: 6px;
+    }
+    .ins-val {
+      font-family: 'Anton', sans-serif;
+      font-size: 2.6rem;
+      color: var(--warm-white);
+      line-height: 1;
+    }
+    .ins-mxnb {
+      font-size: 0.9rem;
+      color: var(--marigold);
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      margin-top: 2px;
+    }
+    .ins-sub {
+      font-size: 0.8rem;
+      color: #888;
+      margin-top: 8px;
+    }
+
+    .progress-block {
+      flex: 2;
+      padding: 24px 32px;
+      background: var(--warm-white);
+      border-left: 3px solid var(--black);
+    }
+    .prog-label {
+      font-family: 'Anton', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #9a8e7e;
+      margin-bottom: 14px;
+    }
+    .prog-rounds {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .prog-round {
+      flex: 1;
+      height: 48px;
+      border: 3px solid var(--black);
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Anton', sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      overflow: hidden;
+    }
+    .prog-round.done {
+      background: var(--black);
+      color: var(--marigold);
+    }
+    .prog-round.done::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(
+          -45deg,
+          transparent 0, transparent 6px,
+          rgba(245,168,0,0.12) 6px, rgba(245,168,0,0.12) 10px
+        );
+    }
+    .prog-round.active {
+      background: var(--hot-pink);
+      color: var(--warm-white);
+    }
+    .prog-round.active::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(
+          -45deg,
+          transparent 0, transparent 6px,
+          rgba(255,255,255,0.12) 6px, rgba(255,255,255,0.12) 10px
+        );
+    }
+    .prog-round.upcoming {
+      background: var(--cream);
+      color: #aaa;
+    }
+    .prog-arrow {
+      color: var(--black);
+      font-weight: 900;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    /* ─── FOOTER STRIPE ───────────────────────────────────────── */
+    .footer-stripe {
+      height: 12px;
+      background:
+        repeating-linear-gradient(
+          90deg,
+          var(--black) 0px, var(--black) 40px,
+          var(--hot-pink) 40px, var(--hot-pink) 80px,
+          var(--orange) 80px, var(--orange) 120px,
+          var(--marigold) 120px, var(--marigold) 160px,
+          var(--turquoise) 160px, var(--turquoise) 200px
+        );
+    }
+
+    footer {
+      background: var(--black);
+      padding: 24px 80px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .footer-logo {
+      font-family: 'Anton', sans-serif;
+      font-size: 1.5rem;
+      color: var(--warm-white);
+      letter-spacing: 0.05em;
+    }
+    .footer-logo span { color: var(--hot-pink); }
+    .footer-copy {
+      font-size: 0.78rem;
+      color: #666;
+      letter-spacing: 0.06em;
+    }
+    .footer-links {
+      display: flex; gap: 24px;
+    }
+    .footer-links a {
+      color: #888;
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--marigold); }
+
+    /* ─── RESPONSIVE ──────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; min-height: auto; }
+      .hero-right { display: none; }
+      .hero-left { padding: 60px 32px; }
+      .members-grid { grid-template-columns: repeat(2, 1fr); }
+      .dashboard { padding: 48px 24px 64px; }
+      footer { padding: 24px 32px; }
+      .pot-stats { flex-direction: column; }
+      .pot-stat { border-right: none; border-bottom: 3px solid var(--hot-pink); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ HEADER ════════════════════════════════════════════════ -->
+  <header>
+    <div class="nav-logo">TANDA</div>
+    <nav>
+      <a href="#">Cómo funciona</a>
+      <a href="#">Seguridad</a>
+      <a href="#">Comunidad</a>
+      <a href="#" class="nav-cta">Crear una tanda</a>
+    </nav>
+  </header>
+
+  <!-- ═══ HERO ══════════════════════════════════════════════════ -->
+  <section class="hero">
+    <div class="hero-left">
+
+      <div class="hero-eyebrow">Arbitrum · MXNB · No-custodial</div>
+
+      <h1 class="hero-title anton">
+        <span class="wordmark">TANDA</span><br/>
+        ON-CHAIN
+      </h1>
+
+      <p class="hero-tagline">
+        La tanda de siempre —<br/>
+        <em>sin el riesgo de que te dejen colgado.</em>
+      </p>
+
+      <p class="hero-sub">
+        AI-organized savings circles on-chain. Save together, in pesos,
+        without the trust problem. An AI underwriter scores every member,
+        sets collateral, and guards each round — so your pot is always safe.
+      </p>
+
+      <div class="features">
+        <div class="feat">
+          <div class="feat-icon pink">IA</div>
+          <div class="feat-text">
+            <strong>AI Reliability Scoring</strong>
+            <span>Collateral set by an AI underwriter reading your on-chain reputation — not your bank balance.</span>
+          </div>
+        </div>
+        <div class="feat">
+          <div class="feat-icon orange">🛡</div>
+          <div class="feat-text">
+            <strong>Default-Proof</strong>
+            <span>Collateral slashed + insurance pool guarantees the recipient gets paid in full. Always.</span>
+          </div>
+        </div>
+        <div class="feat">
+          <div class="feat-icon teal">⚡</div>
+          <div class="feat-text">
+            <strong>Gasless Onboarding</strong>
+            <span>Join with a passkey. No seed phrase, no gas. Built for the next wave of LATAM users.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cta-row">
+        <a href="#" class="btn-primary">Crear una tanda</a>
+        <a href="#" class="btn-secondary">Cómo funciona →</a>
+      </div>
+
+      <div class="trust-strip">
+        <div class="trust-pill">Built on Arbitrum</div>
+        <div class="trust-pill accent">Settles in MXNB</div>
+        <div class="trust-pill">Non-custodial</div>
+      </div>
+
+    </div>
+
+    <div class="hero-right">
+      <div class="pot-ring">
+        <div class="ring ring-1"></div>
+        <div class="ring ring-2"></div>
+        <div class="ring ring-3"></div>
+        <div class="ring ring-4"></div>
+        <div class="ring ring-5"></div>
+        <div class="ring ring-6"></div>
+        <div class="pot-face">
+          <div class="pot-label">El pote</div>
+          <div class="pot-amount">400</div>
+          <div class="pot-unit">MXNB</div>
+          <div class="pot-round">Ronda 2 de 4</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ STRIPE DIVIDER ════════════════════════════════════════ -->
+  <div class="stripe-bar"></div>
+
+  <!-- ═══ DASHBOARD ═════════════════════════════════════════════ -->
+  <section class="dashboard">
+
+    <div class="dash-header">
+      <div class="dash-title-block">
+        <div class="dash-eyebrow">Vista del círculo activo</div>
+        <h2 class="dash-title anton">TANDA <span>OAXACA</span></h2>
+      </div>
+    </div>
+
+    <!-- POT STATS -->
+    <div class="pot-stats">
+      <div class="pot-stat">
+        <div class="ps-label">Pote total</div>
+        <div class="ps-val">400 MXNB</div>
+        <div class="ps-sub">4 × 100 MXNB</div>
+      </div>
+      <div class="pot-stat highlight">
+        <div class="ps-label">Ronda actual</div>
+        <div class="ps-val">2 / 4</div>
+        <div class="ps-sub">En curso</div>
+      </div>
+      <div class="pot-stat">
+        <div class="ps-label">Próxima receptora</div>
+        <div class="ps-val">LUPE</div>
+        <div class="ps-sub">Ranura #2 · 100 MXNB</div>
+      </div>
+      <div class="pot-stat">
+        <div class="ps-label">Contribución / ronda</div>
+        <div class="ps-val">100 MXNB</div>
+        <div class="ps-sub">Por miembro</div>
+      </div>
+    </div>
+
+    <!-- AI WARNING BANNER -->
+    <div class="warning-banner">
+      <div class="warn-icon">⚠️</div>
+      <div class="warn-text">
+        <strong>Agente IA — Alerta de riesgo</strong>
+        <p>
+          El agente detectó riesgo de impago de <em>0xkito</em> esta ronda —
+          se solicitó refuerzo de colateral. El fondo de protección cubre cualquier shortfall.
+          El receptor recibirá su pote íntegro.
+        </p>
+      </div>
+      <div class="warn-badge">Acción requerida</div>
+    </div>
+
+    <!-- MEMBERS -->
+    <div class="members-label">Miembros del círculo — Puntuación IA</div>
+
+    <div class="members-grid">
+
+      <!-- María — HIGH TRUST -->
+      <div class="member-card mc-high score-high">
+        <div class="mc-payout current">1</div>
+        <div class="mc-avatar">M</div>
+        <div class="mc-name">María</div>
+        <div class="mc-slot">Ranura #1 · Pagada ✓</div>
+        <div class="ai-score-wrap">
+          <div class="ai-badge">
+            <div class="ai-badge-inner">
+              <div class="ai-num">82</div>
+              <div class="ai-lbl">IA</div>
+            </div>
+          </div>
+          <div class="ai-score-info">
+            <div class="score-tag">Alta confianza</div>
+            <div class="score-val">82 / 100</div>
+          </div>
+        </div>
+        <div class="mc-collateral">Colateral: 0.5× · 50 MXNB</div>
+        <div class="mc-rationale">6 rondas puntuales, 1 círculo completado. Historial impecable.</div>
+      </div>
+
+      <!-- Lupe — MID TRUST -->
+      <div class="member-card mc-mid score-mid">
+        <div class="mc-payout current">2</div>
+        <div class="mc-avatar">L</div>
+        <div class="mc-name">Lupe</div>
+        <div class="mc-slot">Ranura #2 · Próxima receptora ★</div>
+        <div class="ai-score-wrap">
+          <div class="ai-badge">
+            <div class="ai-badge-inner">
+              <div class="ai-num">66</div>
+              <div class="ai-lbl">IA</div>
+            </div>
+          </div>
+          <div class="ai-score-info">
+            <div class="score-tag">Confianza media</div>
+            <div class="score-val">66 / 100</div>
+          </div>
+        </div>
+        <div class="mc-collateral">Colateral: 1× · 100 MXNB</div>
+        <div class="mc-rationale">3 rondas completadas, una ausencia menor. Buen historial en progreso.</div>
+      </div>
+
+      <!-- Diego — LOW TRUST -->
+      <div class="member-card mc-low score-low">
+        <div class="mc-payout">3</div>
+        <div class="mc-avatar">D</div>
+        <div class="mc-name">Diego</div>
+        <div class="mc-slot">Ranura #3 · Pendiente</div>
+        <div class="ai-score-wrap">
+          <div class="ai-badge">
+            <div class="ai-badge-inner">
+              <div class="ai-num">50</div>
+              <div class="ai-lbl">IA</div>
+            </div>
+          </div>
+          <div class="ai-score-info">
+            <div class="score-tag">Confianza baja</div>
+            <div class="score-val">50 / 100</div>
+          </div>
+        </div>
+        <div class="mc-collateral">Colateral: 2× · 200 MXNB</div>
+        <div class="mc-rationale">Historial mixto, 1 retraso registrado. Colateral elevado como garantía.</div>
+      </div>
+
+      <!-- 0xkito — AT RISK -->
+      <div class="member-card mc-risk score-risk">
+        <div class="mc-payout">4</div>
+        <div class="mc-avatar">K</div>
+        <div class="mc-name">0xkito</div>
+        <div class="mc-slot">Ranura #4 · ⚠ Riesgo detectado</div>
+        <div class="ai-score-wrap">
+          <div class="ai-badge">
+            <div class="ai-badge-inner">
+              <div class="ai-num">28</div>
+              <div class="ai-lbl">IA</div>
+            </div>
+          </div>
+          <div class="ai-score-info">
+            <div class="score-tag">En riesgo</div>
+            <div class="score-val">28 / 100</div>
+          </div>
+        </div>
+        <div class="mc-collateral">Colateral: 3× · 300 MXNB</div>
+        <div class="mc-rationale">Cartera nueva, cold-start. Sin historial de pagos. Refuerzo de colateral solicitado por el agente IA.</div>
+      </div>
+
+    </div>
+
+    <!-- BOTTOM STRIP -->
+    <div class="dash-bottom">
+      <div class="insurance-block">
+        <div class="ins-label">Fondo de protección</div>
+        <div class="ins-val">1,240</div>
+        <div class="ins-mxnb">MXNB</div>
+        <div class="ins-sub">Cubre el 100% ante impago · Gestionado por contrato</div>
+      </div>
+      <div class="progress-block">
+        <div class="prog-label">Progreso del círculo — rondas</div>
+        <div class="prog-rounds">
+          <div class="prog-round done">R1 · MARÍA ✓</div>
+          <div class="prog-arrow">›</div>
+          <div class="prog-round active">R2 · LUPE ★</div>
+          <div class="prog-arrow">›</div>
+          <div class="prog-round upcoming">R3 · DIEGO</div>
+          <div class="prog-arrow">›</div>
+          <div class="prog-round upcoming">R4 · 0XKITO</div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ═══ FOOTER ════════════════════════════════════════════════ -->
+  <div class="footer-stripe"></div>
+  <footer>
+    <div class="footer-logo">TAN<span>DA</span></div>
+    <div class="footer-copy">© 2025 Tanda On-Chain · Arbitrum · MXNB · Non-custodial</div>
+    <div class="footer-links">
+      <a href="#">Docs</a>
+      <a href="#">GitHub</a>
+      <a href="#">Seguridad</a>
+      <a href="#">Twitter</a>
+    </div>
+  </footer>
+
+</body>
+</html>

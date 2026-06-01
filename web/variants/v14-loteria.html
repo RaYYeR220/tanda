@@ -1,0 +1,1670 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tanda — La tanda de siempre, sin el riesgo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Bitter:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Yeseva+One&display=swap" rel="stylesheet">
+
+<style>
+/* ═══════════════════════════════════════════════════════
+   LOTERÍA PALETTE & VARIABLES
+═══════════════════════════════════════════════════════ */
+:root {
+  --cream:      #F5EDD6;
+  --cream-dark: #E8D9B0;
+  --cream-mid:  #EFE2C0;
+  --red:        #C0281A;
+  --red-deep:   #8B1A10;
+  --gold:       #C8921A;
+  --gold-light: #E8B93A;
+  --gold-pale:  #F5D97A;
+  --green:      #1A5C2A;
+  --green-light:#2E8B45;
+  --black:      #1A1008;
+  --ink:        #2A1B0A;
+  --ink-light:  #5A3E22;
+  --white:      #FFFDF5;
+
+  --font-display: 'Yeseva One', serif;
+  --font-alt:     'Abril Fatface', cursive;
+  --font-body:    'Bitter', serif;
+
+  --border-ornate: 3px solid var(--black);
+  --shadow-card: 4px 6px 0px rgba(26,16,8,0.5);
+  --shadow-deep:  6px 10px 0px rgba(26,16,8,0.4);
+}
+
+/* ═══════════════════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background-color: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ═══════════════════════════════════════════════════════
+   BACKGROUND TEXTURE — faint watermark repeating lotería pattern
+═══════════════════════════════════════════════════════ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.045;
+  background-image:
+    url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='5' y='5' width='70' height='70' rx='4' fill='none' stroke='%231A1008' stroke-width='2.5'/%3E%3Crect x='12' y='12' width='56' height='56' rx='2' fill='none' stroke='%231A1008' stroke-width='1'/%3E%3Ccircle cx='40' cy='40' r='14' fill='none' stroke='%231A1008' stroke-width='1.5'/%3E%3Cpath d='M40 10 L40 26 M40 54 L40 70 M10 40 L26 40 M54 40 L70 40' stroke='%231A1008' stroke-width='1'/%3E%3C/svg%3E");
+  background-size: 80px 80px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   PAGE WRAPPER
+═══════════════════════════════════════════════════════ */
+.page { position: relative; z-index: 1; }
+
+/* ═══════════════════════════════════════════════════════
+   NAV
+═══════════════════════════════════════════════════════ */
+nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 64px;
+  border-bottom: 2px solid var(--black);
+  background: var(--cream);
+  position: sticky; top: 0; z-index: 100;
+}
+
+.nav-wordmark {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-card-badge {
+  width: 38px; height: 50px;
+  background: var(--red);
+  border: 2px solid var(--black);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 2px 3px 0 var(--black);
+  flex-shrink: 0;
+}
+
+.nav-card-badge span {
+  font-family: var(--font-alt);
+  color: var(--gold-light);
+  font-size: 20px;
+  line-height: 1;
+}
+
+.nav-title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  color: var(--red-deep);
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+.nav-subtitle {
+  font-family: var(--font-body);
+  font-size: 10px;
+  color: var(--ink-light);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 32px;
+  list-style: none;
+}
+
+.nav-links a {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--ink);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover { color: var(--red); }
+
+.nav-cta {
+  background: var(--red);
+  color: var(--gold-pale) !important;
+  padding: 9px 22px;
+  border: 2px solid var(--black);
+  border-radius: 2px;
+  box-shadow: 3px 3px 0 var(--black);
+  transition: transform 0.15s, box-shadow 0.15s !important;
+}
+
+.nav-cta:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--black) !important;
+  color: var(--white) !important;
+}
+
+/* ═══════════════════════════════════════════════════════
+   HERO — FULL LOTERÍA SPREAD
+═══════════════════════════════════════════════════════ */
+.hero {
+  min-height: 92vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 0;
+  padding: 0;
+  border-bottom: 3px solid var(--black);
+  overflow: hidden;
+}
+
+/* LEFT: text content */
+.hero-content {
+  padding: 72px 64px 72px 72px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* BIG CARD NUMBER badge top-left */
+.hero-numero {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.numero-badge {
+  background: var(--red);
+  border: 2px solid var(--black);
+  border-radius: 3px;
+  padding: 4px 14px;
+  font-family: var(--font-alt);
+  font-size: 13px;
+  color: var(--gold-light);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  box-shadow: 2px 2px 0 var(--black);
+}
+
+.numero-label {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-style: italic;
+  color: var(--ink-light);
+  letter-spacing: 0.08em;
+}
+
+/* HERO HEADLINE */
+.hero-headline {
+  font-family: var(--font-display);
+  font-size: clamp(42px, 4.5vw, 68px);
+  line-height: 1.05;
+  color: var(--red-deep);
+  letter-spacing: -0.01em;
+}
+
+.hero-headline .hl-gold {
+  color: var(--gold);
+  display: block;
+}
+
+.hero-headline .hl-black {
+  color: var(--black);
+  font-family: var(--font-alt);
+  display: block;
+  font-size: 0.6em;
+}
+
+/* TAGLINE */
+.hero-tagline {
+  font-size: 18px;
+  color: var(--ink);
+  font-style: italic;
+  border-left: 4px solid var(--gold);
+  padding-left: 16px;
+  line-height: 1.5;
+  max-width: 420px;
+}
+
+/* VALUE PROP */
+.hero-value {
+  font-size: 15px;
+  color: var(--ink-light);
+  max-width: 420px;
+  line-height: 1.7;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+/* FEATURES */
+.hero-features {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.feature-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 12px 16px;
+  border: 1.5px solid var(--black);
+  background: var(--white);
+  border-radius: 2px;
+  box-shadow: 3px 3px 0 var(--cream-dark);
+  max-width: 440px;
+  opacity: 0;
+  transform: translateX(-20px);
+  animation: slideInLeft 0.5s ease forwards;
+}
+
+.feature-row:nth-child(1) { animation-delay: 0.3s; }
+.feature-row:nth-child(2) { animation-delay: 0.5s; }
+.feature-row:nth-child(3) { animation-delay: 0.7s; }
+
+@keyframes slideInLeft {
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.feature-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.feature-text strong {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  display: block;
+}
+
+.feature-text span {
+  font-size: 13px;
+  color: var(--ink-light);
+}
+
+/* CTAs */
+.hero-ctas {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  background: var(--red);
+  color: var(--gold-pale);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 14px 32px;
+  border: 2.5px solid var(--black);
+  border-radius: 2px;
+  text-decoration: none;
+  box-shadow: 4px 4px 0 var(--black);
+  transition: transform 0.15s, box-shadow 0.15s;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.btn-primary:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--black);
+  background: var(--red-deep);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 13px 24px;
+  border: 2px solid var(--ink);
+  border-radius: 2px;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+  display: inline-block;
+}
+
+.btn-secondary:hover {
+  background: var(--ink);
+  color: var(--cream);
+}
+
+/* TRUST STRIP */
+.trust-strip {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.trust-item {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-light);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.trust-item::before {
+  content: '◆';
+  color: var(--gold);
+  font-size: 8px;
+}
+
+.trust-item:first-child::before { display: none; }
+
+/* ═══════════════════════════════════════════════════════
+   RIGHT SIDE — HERO LOTERÍA CARD (La Tanda)
+═══════════════════════════════════════════════════════ */
+.hero-card-stage {
+  height: 100%;
+  min-height: 92vh;
+  background: var(--green);
+  border-left: 3px solid var(--black);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* green felt texture */
+.hero-card-stage::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.12;
+  background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='1' cy='1' r='1' fill='%23000'/%3E%3C/svg%3E");
+  background-size: 6px 6px;
+}
+
+/* Corner decorations */
+.hero-card-stage::after {
+  content: '✦ ✦ ✦';
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--gold-light);
+  opacity: 0.5;
+  font-size: 14px;
+  letter-spacing: 8px;
+}
+
+/* THE BIG HERO LOTERÍA CARD */
+.loteria-hero-card {
+  width: 300px;
+  background: var(--cream);
+  border: 4px solid var(--black);
+  border-radius: 8px;
+  box-shadow: 8px 12px 0 rgba(0,0,0,0.5), 0 0 0 8px var(--gold), 0 0 0 12px var(--black);
+  position: relative;
+  z-index: 2;
+  opacity: 0;
+  transform: translateY(30px) rotate(-2deg);
+  animation: cardReveal 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s forwards;
+}
+
+@keyframes cardReveal {
+  to { opacity: 1; transform: translateY(0) rotate(-2deg); }
+}
+
+.card-inner {
+  border: 2px solid var(--gold);
+  border-radius: 5px;
+  margin: 6px;
+  overflow: hidden;
+}
+
+.card-number-bar {
+  background: var(--red);
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid var(--black);
+}
+
+.card-number-bar .num {
+  font-family: var(--font-alt);
+  font-size: 18px;
+  color: var(--gold-light);
+  line-height: 1;
+}
+
+.card-number-bar .stars {
+  color: var(--gold-pale);
+  font-size: 10px;
+  letter-spacing: 3px;
+}
+
+.card-art {
+  background: var(--cream-mid);
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 2px solid var(--black);
+  position: relative;
+  overflow: hidden;
+}
+
+.card-art-bg {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  opacity: 0.07;
+}
+
+.card-art-bg span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.card-emblem-wrap {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px;
+}
+
+.card-emblem {
+  font-size: 72px;
+  line-height: 1;
+  filter: drop-shadow(2px 3px 0 rgba(0,0,0,0.3));
+}
+
+.card-coins {
+  display: flex;
+  gap: 8px;
+}
+
+.coin {
+  width: 24px;
+  height: 24px;
+  background: var(--gold);
+  border: 2px solid var(--black);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 900;
+  color: var(--black);
+  box-shadow: 1px 2px 0 rgba(0,0,0,0.4);
+}
+
+.card-name-banner {
+  background: var(--red);
+  padding: 10px 16px;
+  text-align: center;
+  position: relative;
+}
+
+/* banner ribbon shape */
+.card-name-banner::before,
+.card-name-banner::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 10px;
+  background: var(--red-deep);
+}
+
+.card-name-banner::before { left: -1px; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 50%); }
+.card-name-banner::after  { right: -1px; clip-path: polygon(0 0, 100% 50%, 100% 100%, 0 100%); }
+
+.card-name-banner .card-title {
+  font-family: var(--font-display);
+  font-size: 26px;
+  color: var(--gold-pale);
+  letter-spacing: 0.05em;
+  line-height: 1;
+  text-transform: uppercase;
+  position: relative;
+  z-index: 1;
+}
+
+.card-name-banner .card-sub {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--gold-light);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-top: 2px;
+  font-style: italic;
+  position: relative;
+  z-index: 1;
+}
+
+/* SCATTERED MINI CARDS behind the hero card */
+.mini-card {
+  position: absolute;
+  width: 110px;
+  background: var(--cream);
+  border: 3px solid var(--black);
+  border-radius: 5px;
+  box-shadow: 3px 5px 0 rgba(0,0,0,0.4);
+  overflow: hidden;
+  opacity: 0;
+  animation: scatterReveal 0.5s ease forwards;
+}
+
+@keyframes scatterReveal {
+  to { opacity: 0.85; }
+}
+
+.mini-card:nth-child(1) { top: 80px;  left: 30px;  transform: rotate(-12deg); animation-delay: 0.8s; }
+.mini-card:nth-child(2) { top: 100px; right: 25px;  transform: rotate(9deg);  animation-delay: 1.0s; }
+.mini-card:nth-child(3) { bottom: 90px; left: 40px;  transform: rotate(6deg);  animation-delay: 1.2s; }
+.mini-card:nth-child(4) { bottom: 80px; right: 35px;  transform: rotate(-8deg); animation-delay: 1.4s; }
+
+.mini-card-num {
+  background: var(--red);
+  padding: 3px 7px;
+  font-family: var(--font-alt);
+  font-size: 11px;
+  color: var(--gold-light);
+  border-bottom: 1.5px solid var(--black);
+  display: flex; justify-content: space-between; align-items: center;
+}
+
+.mini-card-art {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  padding: 12px 8px;
+  background: var(--cream-mid);
+  border-bottom: 1.5px solid var(--black);
+}
+
+.mini-card-label {
+  background: var(--gold);
+  padding: 4px 6px;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 9px;
+  color: var(--black);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-bottom: 1.5px solid var(--black);
+}
+
+.mini-card-score {
+  background: var(--cream);
+  padding: 3px 6px;
+  font-family: var(--font-body);
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--ink-light);
+  text-align: center;
+}
+
+/* ═══════════════════════════════════════════════════════
+   DIVIDER ORNAMENT
+═══════════════════════════════════════════════════════ */
+.section-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 32px 64px;
+  background: var(--cream-dark);
+  border-bottom: 2px solid var(--black);
+}
+
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.divider-ornament {
+  font-family: var(--font-alt);
+  font-size: 15px;
+  color: var(--red);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+/* ═══════════════════════════════════════════════════════
+   DASHBOARD SECTION
+═══════════════════════════════════════════════════════ */
+.dashboard {
+  background: var(--cream);
+  padding: 72px 72px 96px;
+}
+
+.dashboard-header {
+  text-align: center;
+  margin-bottom: 56px;
+}
+
+.dashboard-overline {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+
+.dashboard-title {
+  font-family: var(--font-display);
+  font-size: 40px;
+  color: var(--red-deep);
+  letter-spacing: -0.01em;
+}
+
+/* ═══════════════════════════════════════════════════════
+   CIRCLE "CARD" — The game board frame
+═══════════════════════════════════════════════════════ */
+.circle-board {
+  max-width: 1100px;
+  margin: 0 auto;
+  border: 4px solid var(--black);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: var(--shadow-deep);
+  background: var(--white);
+  position: relative;
+}
+
+/* Double border effect */
+.circle-board::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border: 1.5px solid var(--gold);
+  border-radius: 3px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* CIRCLE TOP BAR */
+.circle-topbar {
+  background: var(--red);
+  padding: 0;
+  border-bottom: 3px solid var(--black);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: stretch;
+}
+
+.topbar-corner {
+  width: 120px;
+  background: var(--red-deep);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  border-right: 2px solid rgba(0,0,0,0.3);
+}
+
+.topbar-corner .corner-emblem {
+  font-size: 32px;
+  filter: drop-shadow(1px 2px 0 rgba(0,0,0,0.4));
+}
+
+.topbar-main {
+  padding: 20px 32px;
+  text-align: center;
+}
+
+.circle-name {
+  font-family: var(--font-display);
+  font-size: 28px;
+  color: var(--gold-pale);
+  letter-spacing: 0.03em;
+  line-height: 1;
+}
+
+.circle-meta {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.circle-meta-item {
+  font-size: 13px;
+  color: var(--gold-light);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.circle-meta-item .dot {
+  width: 6px; height: 6px;
+  background: var(--gold-light);
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.topbar-corner-right {
+  width: 120px;
+  background: var(--green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  border-left: 2px solid rgba(0,0,0,0.3);
+  flex-direction: column;
+  gap: 2px;
+}
+
+.topbar-corner-right .ins-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  opacity: 0.8;
+}
+
+.topbar-corner-right .ins-value {
+  font-family: var(--font-alt);
+  font-size: 14px;
+  color: var(--gold-pale);
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* WARNING BANNER */
+.warning-banner {
+  background: #FEF3CD;
+  border-bottom: 2.5px solid var(--black);
+  padding: 14px 56px 14px 24px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  position: relative;
+}
+
+.warning-banner::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 6px;
+  background: repeating-linear-gradient(
+    45deg, #C8921A, #C8921A 4px, #FEF3CD 4px, #FEF3CD 8px
+  );
+}
+
+.warning-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.warning-text {
+  font-size: 13.5px;
+  color: #5A3E22;
+  line-height: 1.55;
+}
+
+.warning-text strong {
+  font-weight: 700;
+  color: var(--red-deep);
+}
+
+.warning-tag {
+  margin-left: 10px;
+  background: var(--red);
+  color: var(--cream);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 2px;
+  border: 1.5px solid var(--black);
+  white-space: nowrap;
+}
+
+/* MEMBERS GRID — Lotería tabla layout */
+.members-section {
+  padding: 32px 40px 40px;
+}
+
+.members-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-light);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.members-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--cream-dark);
+}
+
+/* THE LOTERÍA TABLA: 4 member cards in a 2×2 grid */
+.tabla {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+/* ═══════════════════════════════════════════════════════
+   LOTERÍA MEMBER CARDS — the signature element
+═══════════════════════════════════════════════════════ */
+.loteria-card {
+  border: 3px solid var(--black);
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  background: var(--cream);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+  opacity: 0;
+  transform: translateY(24px);
+  animation: cardUp 0.45s ease forwards;
+}
+
+.loteria-card:nth-child(1) { animation-delay: 0.1s; }
+.loteria-card:nth-child(2) { animation-delay: 0.2s; }
+.loteria-card:nth-child(3) { animation-delay: 0.3s; }
+.loteria-card:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes cardUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.loteria-card:hover {
+  transform: translateY(-4px) rotate(-1deg);
+  box-shadow: 7px 10px 0 rgba(26,16,8,0.45);
+}
+
+/* Inner gold border */
+.loteria-card::after {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border: 1px solid var(--gold);
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0.6;
+}
+
+/* CARD STATES */
+.loteria-card.trust-high { background: var(--cream); }
+.loteria-card.trust-mid  { background: #F8F0E0; }
+.loteria-card.trust-low  { background: #FDF0E8; }
+.loteria-card.trust-risk { background: #FDE8E8; }
+
+/* NUMBER BAR */
+.lc-numbar {
+  padding: 5px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid var(--black);
+}
+
+.trust-high .lc-numbar { background: var(--green); }
+.trust-mid  .lc-numbar { background: var(--gold); }
+.trust-low  .lc-numbar { background: #8B6A1A; }
+.trust-risk .lc-numbar { background: var(--red-deep); }
+
+.lc-num {
+  font-family: var(--font-alt);
+  font-size: 15px;
+  color: var(--gold-pale);
+  line-height: 1;
+}
+
+.trust-mid  .lc-num,
+.trust-low  .lc-num { color: var(--black); }
+
+.lc-slot {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.75);
+  background: rgba(0,0,0,0.2);
+  padding: 2px 6px;
+  border-radius: 2px;
+}
+
+.trust-mid .lc-slot { color: rgba(0,0,0,0.55); background: rgba(0,0,0,0.12); }
+
+/* CARD ART */
+.lc-art {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 12px 14px;
+  position: relative;
+  overflow: hidden;
+  min-height: 90px;
+}
+
+/* crosshatch pattern */
+.lc-art::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.06;
+  background-image: repeating-linear-gradient(45deg, var(--black) 0, var(--black) 1px, transparent 1px, transparent 8px),
+                    repeating-linear-gradient(-45deg, var(--black) 0, var(--black) 1px, transparent 1px, transparent 8px);
+}
+
+.lc-emblem {
+  font-size: 46px;
+  line-height: 1;
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(1px 2px 0 rgba(0,0,0,0.25));
+}
+
+/* AI SCORE BADGE */
+.lc-score-badge {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  z-index: 2;
+  border: 2px solid var(--black);
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 1px 2px 0 rgba(0,0,0,0.4);
+}
+
+.trust-high .lc-score-badge { background: var(--green); }
+.trust-mid  .lc-score-badge { background: var(--gold); }
+.trust-low  .lc-score-badge { background: #8B6A1A; }
+.trust-risk .lc-score-badge { background: var(--red-deep); }
+
+.lc-score-num {
+  font-family: var(--font-alt);
+  font-size: 13px;
+  line-height: 1;
+  color: var(--white);
+}
+
+.trust-mid  .lc-score-num,
+.trust-low  .lc-score-num { color: var(--black); }
+
+.lc-score-label {
+  font-size: 6px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.7);
+  letter-spacing: 0.05em;
+}
+
+/* NAME BANNER */
+.lc-name-banner {
+  background: var(--red);
+  padding: 8px 12px;
+  text-align: center;
+  border-top: 2px solid var(--black);
+  border-bottom: 1.5px solid var(--black);
+}
+
+.trust-high .lc-name-banner { background: var(--red); }
+.trust-mid  .lc-name-banner { background: var(--gold); }
+.trust-low  .lc-name-banner { background: #8B6A1A; }
+.trust-risk .lc-name-banner { background: var(--red-deep); }
+
+.lc-name {
+  font-family: var(--font-display);
+  font-size: 17px;
+  color: var(--gold-pale);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.trust-mid  .lc-name { color: var(--black); }
+.trust-low  .lc-name { color: var(--gold-pale); }
+
+/* CARD STATS */
+.lc-stats {
+  padding: 10px 10px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  background: var(--cream);
+  border-top: 0;
+}
+
+.trust-risk .lc-stats { background: #FDE8E8; }
+
+.lc-stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+}
+
+.lc-stat-key {
+  color: var(--ink-light);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.lc-stat-val {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.lc-stat-val.big { color: var(--red-deep); font-size: 13px; }
+.lc-stat-val.ok  { color: var(--green); }
+.lc-stat-val.warn { color: var(--red-deep); }
+
+.lc-divider {
+  height: 1px;
+  background: var(--cream-dark);
+  margin: 3px 0;
+}
+
+/* AI RATIONALE */
+.lc-rationale {
+  font-size: 10px;
+  font-style: italic;
+  color: var(--ink-light);
+  padding: 0 10px 8px;
+  line-height: 1.45;
+  border-top: 1px dashed var(--cream-dark);
+  padding-top: 6px;
+  background: var(--cream);
+}
+
+.trust-risk .lc-rationale {
+  background: #FDE8E8;
+  color: var(--red-deep);
+  font-weight: 600;
+}
+
+.lc-ai-tag {
+  display: inline-block;
+  background: var(--black);
+  color: var(--gold-light);
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 1px 5px;
+  border-radius: 2px;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+/* NEXT RECIPIENT HIGHLIGHT */
+.recipient-highlight {
+  background: var(--green);
+  color: var(--gold-pale);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  text-align: center;
+  border-bottom: 2px solid var(--black);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.recipient-crown { font-size: 13px; }
+
+/* ═══════════════════════════════════════════════════════
+   FOOTER STRIP
+═══════════════════════════════════════════════════════ */
+footer {
+  background: var(--black);
+  padding: 28px 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  border-top: 3px solid var(--gold);
+}
+
+.footer-brand {
+  font-family: var(--font-display);
+  font-size: 24px;
+  color: var(--gold-pale);
+  letter-spacing: 0.04em;
+}
+
+.footer-tagline {
+  font-size: 12px;
+  color: var(--gold-light);
+  font-style: italic;
+  opacity: 0.7;
+}
+
+.footer-built {
+  display: flex;
+  gap: 20px;
+}
+
+.footer-built span {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  opacity: 0.6;
+  font-weight: 600;
+}
+
+/* ═══════════════════════════════════════════════════════
+   LOTERÍA DECORATIVE CORNER MARKS
+═══════════════════════════════════════════════════════ */
+.ornate-corner {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.ornate-corner svg { width: 100%; height: 100%; }
+.ornate-corner.tl { top: 14px; left: 14px; }
+.ornate-corner.tr { top: 14px; right: 14px; transform: scaleX(-1); }
+.ornate-corner.bl { bottom: 14px; left: 14px; transform: scaleY(-1); }
+.ornate-corner.br { bottom: 14px; right: 14px; transform: scale(-1); }
+
+/* ═══════════════════════════════════════════════════════
+   HERO ANIM
+═══════════════════════════════════════════════════════ */
+.hero-content > * {
+  opacity: 0;
+  transform: translateY(16px);
+  animation: fadeUp 0.5s ease forwards;
+}
+
+.hero-content > *:nth-child(1) { animation-delay: 0.05s; }
+.hero-content > *:nth-child(2) { animation-delay: 0.15s; }
+.hero-content > *:nth-child(3) { animation-delay: 0.25s; }
+.hero-content > *:nth-child(4) { animation-delay: 0.35s; }
+.hero-content > *:nth-child(5) { animation-delay: 0.45s; }
+.hero-content > *:nth-child(6) { animation-delay: 0.55s; }
+.hero-content > *:nth-child(7) { animation-delay: 0.65s; }
+
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- ═══════════════════════════════════════════════════
+  NAV
+════════════════════════════════════════════════════ -->
+<nav>
+  <div class="nav-wordmark">
+    <div class="nav-card-badge"><span>T</span></div>
+    <div>
+      <div class="nav-title">Tanda</div>
+      <div class="nav-subtitle">On-Chain · MXNB · Arbitrum</div>
+    </div>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#">Cómo funciona</a></li>
+    <li><a href="#">Seguridad</a></li>
+    <li><a href="#">Comunidad</a></li>
+    <li><a href="#" class="nav-cta">Crear una tanda</a></li>
+  </ul>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════
+  HERO
+════════════════════════════════════════════════════ -->
+<section class="hero">
+
+  <!-- LEFT: CONTENT -->
+  <div class="hero-content">
+
+    <!-- numero badge -->
+    <div class="hero-numero">
+      <span class="numero-badge">No. 1</span>
+      <span class="numero-label">La ahorradora digital de México</span>
+    </div>
+
+    <!-- headline -->
+    <h1 class="hero-headline">
+      <span class="hl-gold">La Tanda</span>
+      de siempre —
+      <span class="hl-black">sin el riesgo de que te dejen colgado</span>
+    </h1>
+
+    <!-- tagline -->
+    <p class="hero-tagline">
+      La institución que conoces, ahora en blockchain.
+      En pesos. Con IA que cuida tu lana.
+    </p>
+
+    <!-- value prop -->
+    <p class="hero-value">
+      AI-organized savings circles on-chain. Save together, in pesos,<br>without the trust problem.
+    </p>
+
+    <!-- features -->
+    <div class="hero-features">
+      <div class="feature-row">
+        <span class="feature-icon">🤖</span>
+        <div class="feature-text">
+          <strong>Scoring IA de confianza</strong>
+          <span>El agente analiza tu historial on-chain y fija el colateral justo — sin papeleo, sin banco.</span>
+        </div>
+      </div>
+      <div class="feature-row">
+        <span class="feature-icon">🛡️</span>
+        <div class="feature-text">
+          <strong>A prueba de colgados</strong>
+          <span>Si alguien falla, su colateral se ejecuta y el fondo de seguro completa el pago. Siempre cobras.</span>
+        </div>
+      </div>
+      <div class="feature-row">
+        <span class="feature-icon">🔑</span>
+        <div class="feature-text">
+          <strong>Onboarding sin gas ni frases semilla</strong>
+          <span>Entra con passkey, como app del banco. Hecho para la siguiente ola de usuarios LATAM.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTAs -->
+    <div class="hero-ctas">
+      <a href="#" class="btn-primary">Crear una tanda</a>
+      <a href="#" class="btn-secondary">Cómo funciona</a>
+    </div>
+
+    <!-- trust strip -->
+    <div class="trust-strip">
+      <span class="trust-item">Built on Arbitrum</span>
+      <span class="trust-item">Settles in MXNB</span>
+      <span class="trust-item">Non-custodial</span>
+    </div>
+
+  </div>
+
+  <!-- RIGHT: LOTERÍA CARD STAGE -->
+  <div class="hero-card-stage">
+
+    <!-- SCATTERED MINI CARDS -->
+    <div class="mini-card">
+      <div class="mini-card-num"><span>82</span><span>⭐</span></div>
+      <div class="mini-card-art">🌹</div>
+      <div class="mini-card-label">María</div>
+      <div class="mini-card-score">0.5× colateral</div>
+    </div>
+    <div class="mini-card">
+      <div class="mini-card-num"><span>66</span><span>🌙</span></div>
+      <div class="mini-card-art">🦅</div>
+      <div class="mini-card-label">Diego</div>
+      <div class="mini-card-score">1× colateral</div>
+    </div>
+    <div class="mini-card">
+      <div class="mini-card-num"><span>50</span><span>🌵</span></div>
+      <div class="mini-card-art">🌺</div>
+      <div class="mini-card-label">Lupe</div>
+      <div class="mini-card-score">2× colateral</div>
+    </div>
+    <div class="mini-card" style="border-color:#8B1A10;">
+      <div class="mini-card-num" style="background:#8B1A10;"><span>28</span><span>⚠️</span></div>
+      <div class="mini-card-art" style="background:#FDE8E8;">💀</div>
+      <div class="mini-card-label" style="background:#8B1A10; color:#F5EDD6;">0xkito</div>
+      <div class="mini-card-score" style="background:#FDE8E8; color:#8B1A10;">3× colateral</div>
+    </div>
+
+    <!-- MAIN HERO CARD: La Tanda -->
+    <div class="loteria-hero-card">
+      <div class="card-inner">
+        <!-- number bar -->
+        <div class="card-number-bar">
+          <span class="num">No. 01</span>
+          <span class="stars">✦ ✦ ✦</span>
+          <span class="num">No. 01</span>
+        </div>
+        <!-- art area -->
+        <div class="card-art">
+          <div class="card-art-bg">
+            <span>💰</span><span>🌵</span><span>🎭</span><span>🌹</span><span>🦅</span><span>⭐</span>
+            <span>🌙</span><span>💰</span><span>🌮</span><span>🎪</span><span>🌺</span><span>💰</span>
+            <span>🎭</span><span>🦅</span><span>💰</span><span>🌵</span><span>🌙</span><span>🎭</span>
+            <span>🌹</span><span>💰</span><span>⭐</span><span>🌮</span><span>💰</span><span>🌺</span>
+            <span>💰</span><span>🌙</span><span>🌹</span><span>💰</span><span>🌵</span><span>⭐</span>
+          </div>
+          <div class="card-emblem-wrap">
+            <div class="card-emblem">💰</div>
+            <div class="card-coins">
+              <div class="coin">M</div>
+              <div class="coin">X</div>
+              <div class="coin">N</div>
+              <div class="coin">B</div>
+            </div>
+          </div>
+        </div>
+        <!-- name banner -->
+        <div class="card-name-banner">
+          <div class="card-title">La Tanda</div>
+          <div class="card-sub">ahorra · confía · cobra</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+  SECTION DIVIDER
+════════════════════════════════════════════════════ -->
+<div class="section-divider">
+  <div class="divider-line"></div>
+  <span class="divider-ornament">✦ &nbsp; Tanda Activa &nbsp; ✦</span>
+  <div class="divider-line"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+  DASHBOARD
+════════════════════════════════════════════════════ -->
+<section class="dashboard">
+
+  <div class="dashboard-header">
+    <div class="dashboard-overline">✦ &nbsp; Vista del círculo activo &nbsp; ✦</div>
+    <h2 class="dashboard-title">Tu Tabla de Jugadores</h2>
+  </div>
+
+  <!-- THE CIRCLE BOARD — styled as a lotería game board -->
+  <div class="circle-board">
+
+    <!-- Ornate corner marks -->
+    <div class="ornate-corner tl">
+      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2 2 L2 30 M2 2 L30 2" stroke="#C8921A" stroke-width="2"/>
+        <path d="M6 6 L6 26 M6 6 L26 6" stroke="#C8921A" stroke-width="1" opacity="0.5"/>
+        <circle cx="4" cy="4" r="2.5" fill="#C8921A"/>
+      </svg>
+    </div>
+    <div class="ornate-corner tr">
+      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2 2 L2 30 M2 2 L30 2" stroke="#C8921A" stroke-width="2"/>
+        <path d="M6 6 L6 26 M6 6 L26 6" stroke="#C8921A" stroke-width="1" opacity="0.5"/>
+        <circle cx="4" cy="4" r="2.5" fill="#C8921A"/>
+      </svg>
+    </div>
+    <div class="ornate-corner bl">
+      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2 2 L2 30 M2 2 L30 2" stroke="#C8921A" stroke-width="2"/>
+        <path d="M6 6 L6 26 M6 6 L26 6" stroke="#C8921A" stroke-width="1" opacity="0.5"/>
+        <circle cx="4" cy="4" r="2.5" fill="#C8921A"/>
+      </svg>
+    </div>
+    <div class="ornate-corner br">
+      <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2 2 L2 30 M2 2 L30 2" stroke="#C8921A" stroke-width="2"/>
+        <path d="M6 6 L6 26 M6 6 L26 6" stroke="#C8921A" stroke-width="1" opacity="0.5"/>
+        <circle cx="4" cy="4" r="2.5" fill="#C8921A"/>
+      </svg>
+    </div>
+
+    <!-- TOP BAR -->
+    <div class="circle-topbar">
+      <div class="topbar-corner">
+        <span class="corner-emblem">🎪</span>
+      </div>
+      <div class="topbar-main">
+        <div class="circle-name">Tanda Oaxaca</div>
+        <div class="circle-meta">
+          <span class="circle-meta-item"><span class="dot"></span> Pote: 400 MXNB</span>
+          <span class="circle-meta-item"><span class="dot"></span> Ronda 2 de 4</span>
+          <span class="circle-meta-item"><span class="dot"></span> 100 MXNB por ronda</span>
+          <span class="circle-meta-item"><span class="dot"></span> Próxima: María</span>
+        </div>
+      </div>
+      <div class="topbar-corner-right">
+        <span class="ins-label">Fondo de<br>protección</span>
+        <span class="ins-value">1,240<br>MXNB</span>
+      </div>
+    </div>
+
+    <!-- AI WARNING BANNER -->
+    <div class="warning-banner">
+      <span class="warning-icon">⚠️</span>
+      <div class="warning-text">
+        <strong>Alerta del agente IA:</strong> Se detectó riesgo de impago de <strong>0xkito</strong> esta ronda — se solicitó refuerzo de colateral. El miembro debe depositar <strong>50 MXNB adicionales</strong> antes del próximo corte para mantener su lugar en la tanda.
+        <span class="warning-tag">IA · Activo</span>
+      </div>
+    </div>
+
+    <!-- MEMBERS SECTION -->
+    <div class="members-section">
+      <div class="members-label">Jugadores de la tabla — 4 miembros</div>
+
+      <!-- THE TABLA: 4 Lotería member cards -->
+      <div class="tabla">
+
+        <!-- CARD 1: María — HIGH TRUST -->
+        <div class="loteria-card trust-high">
+          <!-- next recipient highlight -->
+          <div class="recipient-highlight">
+            <span class="recipient-crown">👑</span>
+            Recibe esta ronda
+          </div>
+          <!-- number bar with AI score -->
+          <div class="lc-numbar">
+            <span class="lc-num">82</span>
+            <span class="lc-slot">Turno 1</span>
+          </div>
+          <!-- art -->
+          <div class="lc-art">
+            <span class="lc-emblem">🌹</span>
+            <div class="lc-score-badge">
+              <span class="lc-score-num">82</span>
+              <span class="lc-score-label">score</span>
+            </div>
+          </div>
+          <!-- name banner -->
+          <div class="lc-name-banner">
+            <div class="lc-name">María</div>
+          </div>
+          <!-- stats -->
+          <div class="lc-stats">
+            <div class="lc-stat-row">
+              <span class="lc-stat-key">Colateral</span>
+              <span class="lc-stat-val ok">0.5× = 50 MXNB</span>
+            </div>
+            <div class="lc-stat-row">
+              <span class="lc-stat-key">Estado</span>
+              <span class="lc-stat-val ok">✓ Al corriente</span>
+            </div>
+            <div class="lc-divider"></div>
+          </div>
+          <div class="lc-rationale">
+            <span class="lc-ai-tag">IA</span>
+            6 rondas a tiempo, 1 tanda completada. Historial sólido.
+          </div>
+        </div>
+
+        <!-- CARD 2: Diego — MID TRUST -->
+        <div class="loteria-card trust-mid">
+          <div class="lc-numbar">
+            <span class="lc-num">66</span>
+            <span class="lc-slot">Turno 2</span>
+          </div>
+          <div class="lc-art">
+            <span class="lc-emblem">🦅</span>
+            <div class="lc-score-badge">
+              <span class="lc-score-num">66</span>
+              <span class="lc-score-label">score</span>
+            </div>
+          </div>
+          <div class="lc-name-banner">
+            <div class="lc-name">Diego</div>
+          </div>
+          <div class="lc-stats">
+            <div class="lc-stat-row">
+              <span class="lc-stat-key">Colateral</span>
+              <span class="lc-stat-val">1× = 100 MXNB</span>
+            </div>
+            <div class="lc-stat-row">
+              <span class="lc-stat-key">Estado</span>
+              <span class="lc-stat-val ok">✓ Al corriente</span>
+            </div>
+            <div class="lc-divider"></div>
+          </div>
+          <div class="lc-rationale">
+            <span class="lc-ai-tag">IA</span>
+            3 rondas completadas, 1 retraso menor. Perfil moderado.
+          </div>
+        </div>
+
+        <!-- CARD 3: Lupe — LOW TRUST -->
+        <div class="loteria-card trust-low">
+          <div class="lc-numbar">
+            <span class="lc-num">50</span>
+            <span class="lc-slot">Turno 3</span>
+          </div>
+          <div class="lc-art">
+            <span class="lc-emblem">🌺</span>
+            <div class="lc-score-badge">
+              <span class="lc-score-num">50</span>
+              <span class="lc-score-label">score</span>
+            </div>
+          </div>
+          <div class="lc-name-banner">
+            <div class="lc-name">Lupe</div>
+          </div>
+          <div class="lc-stats">
+            <div class="lc-stat-row">
+              <span class="lc-stat-key">Colateral</span>
+              <span class="lc-stat-val big">2× = 200 MXNB</span>
+            </div>
+            <div class="lc-stat-row">
+              <span class="lc-stat-key">Estado</span>
+              <span class="lc-stat-val warn">⚡ Bajo vigilancia</span>
+            </div>
+            <div class="lc-divider"></div>
+          </div>
+          <div class="lc-rationale">
+            <span class="lc-ai-tag">IA</span>
+            Wallet con historial limitado. Colateral alto como garantía.
+          </div>
+        </div>
+
+        <!-- CARD 4: 0xkito — AT RISK -->
+        <div class="loteria-card trust-risk">
+          <div class="lc-numbar">
+            <span class="lc-num">28</span>
+            <span class="lc-slot">Turno 4</span>
+          </div>
+          <div class="lc-art" style="background: #fde8e8;">
+            <span class="lc-emblem">💀</span>
+            <div class="lc-score-badge">
+              <span class="lc-score-num">28</span>
+              <span class="lc-score-label">score</span>
+            </div>
+          </div>
+          <div class="lc-name-banner">
+            <div class="lc-name">0xkito</div>
+          </div>
+          <div class="lc-stats">
+            <div class="lc-stat-row">
+              <span class="lc-stat-key">Colateral</span>
+              <span class="lc-stat-val warn">3× = 300 MXNB</span>
+            </div>
+            <div class="lc-stat-row">
+              <span class="lc-stat-key">Estado</span>
+              <span class="lc-stat-val warn">⚠ Refuerzo pendiente</span>
+            </div>
+            <div class="lc-divider"></div>
+          </div>
+          <div class="lc-rationale">
+            <span class="lc-ai-tag">IA</span>
+            Wallet nueva, arranque en frío. Riesgo elevado esta ronda.
+          </div>
+        </div>
+
+      </div><!-- /.tabla -->
+    </div><!-- /.members-section -->
+
+  </div><!-- /.circle-board -->
+
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="footer-brand">Tanda</div>
+    <div class="footer-tagline">La tanda de siempre — ahora sin el riesgo.</div>
+  </div>
+  <div class="footer-built">
+    <span>Arbitrum</span>
+    <span>MXNB</span>
+    <span>Non-custodial</span>
+    <span>© 2026</span>
+  </div>
+</footer>
+
+</div><!-- /.page -->
+</body>
+</html>

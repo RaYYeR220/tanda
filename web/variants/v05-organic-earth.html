@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tanda — La tanda de siempre, sin el riesgo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=Hanken+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── CSS VARIABLES ─── */
+    :root {
+      --clay:        #C4673A;
+      --clay-light:  #D8845B;
+      --clay-pale:   #EDD5C3;
+      --adobe:       #A84E2A;
+      --agave:       #4A7A5E;
+      --agave-light: #6E9F85;
+      --agave-pale:  #C8DDD4;
+      --sand:        #E8D5B0;
+      --sand-deep:   #D4B88A;
+      --ochre:       #C89A3A;
+      --ochre-light: #E8BF65;
+      --cream:       #FAF5ED;
+      --cream-warm:  #F5EDE0;
+      --parchment:   #EDE4D3;
+      --bark:        #5C3D2A;
+      --bark-mid:    #7A5540;
+      --bark-light:  #A67B5B;
+      --soil:        #3D2B1F;
+
+      --font-display: 'Fraunces', Georgia, serif;
+      --font-body:    'Hanken Grotesk', sans-serif;
+
+      --shadow-warm-sm:  0 2px 8px rgba(92,61,42,0.12);
+      --shadow-warm-md:  0 6px 24px rgba(92,61,42,0.14);
+      --shadow-warm-lg:  0 16px 48px rgba(92,61,42,0.18);
+      --shadow-warm-xl:  0 28px 72px rgba(92,61,42,0.22);
+    }
+
+    /* ─── RESET & BASE ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background-color: var(--cream);
+      color: var(--soil);
+      overflow-x: hidden;
+      /* Subtle paper grain via SVG noise */
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes floatUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes blobPulse {
+      0%, 100% { transform: scale(1) rotate(0deg); }
+      50%       { transform: scale(1.04) rotate(3deg); }
+    }
+    @keyframes ringRotate {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    @keyframes ringRotateSlow {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(-360deg); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes shimmer {
+      0%   { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+    @keyframes warnPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(200,90,42,0.35); }
+      50%       { box-shadow: 0 0 0 10px rgba(200,90,42,0); }
+    }
+    @keyframes scoreGrow {
+      from { stroke-dasharray: 0 283; }
+    }
+
+    .anim-up           { animation: floatUp 0.7s cubic-bezier(0.22,1,0.36,1) both; }
+    .anim-up-d1        { animation-delay: 0.10s; }
+    .anim-up-d2        { animation-delay: 0.22s; }
+    .anim-up-d3        { animation-delay: 0.34s; }
+    .anim-up-d4        { animation-delay: 0.46s; }
+    .anim-up-d5        { animation-delay: 0.58s; }
+    .anim-fade         { animation: fadeIn 1s ease both; }
+    .anim-fade-d2      { animation-delay: 0.3s; }
+    .anim-fade-d3      { animation-delay: 0.6s; }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 64px;
+      background: rgba(250,245,237,0.82);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(212,184,138,0.3);
+    }
+
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--clay);
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .nav-logo-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--clay) 0%, var(--ochre) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-warm-sm);
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 36px;
+      list-style: none;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: var(--bark-mid);
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--clay); }
+
+    .nav-cta {
+      background: var(--clay);
+      color: #fff !important;
+      padding: 10px 22px;
+      border-radius: 100px;
+      font-weight: 600 !important;
+      box-shadow: var(--shadow-warm-sm);
+      transition: background 0.2s, transform 0.15s !important;
+    }
+    .nav-cta:hover { background: var(--adobe) !important; transform: translateY(-1px); }
+
+    /* ─── HERO SECTION ─── */
+    .hero {
+      min-height: 100vh;
+      padding: 140px 64px 100px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Background blob shapes */
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -120px;
+      right: -180px;
+      width: 680px;
+      height: 680px;
+      background: radial-gradient(ellipse at 40% 40%, var(--clay-pale) 0%, transparent 70%);
+      border-radius: 60% 40% 55% 45% / 45% 55% 45% 55%;
+      animation: blobPulse 12s ease-in-out infinite;
+      z-index: 0;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -80px;
+      left: -100px;
+      width: 480px;
+      height: 480px;
+      background: radial-gradient(ellipse at 60% 60%, var(--agave-pale) 0%, transparent 65%);
+      border-radius: 45% 55% 40% 60% / 55% 40% 60% 45%;
+      animation: blobPulse 16s ease-in-out infinite reverse;
+      z-index: 0;
+    }
+
+    .hero-blob-mid {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 360px;
+      height: 360px;
+      background: radial-gradient(ellipse, var(--sand) 0%, transparent 70%);
+      border-radius: 50% 50% 40% 60% / 40% 60% 40% 60%;
+      animation: blobPulse 20s ease-in-out infinite;
+      z-index: 0;
+      opacity: 0.5;
+    }
+
+    .hero-left {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--agave-pale);
+      color: var(--agave);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 7px 16px;
+      border-radius: 100px;
+      margin-bottom: 28px;
+      border: 1px solid var(--agave-light);
+    }
+    .hero-eyebrow-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--agave);
+      border-radius: 50%;
+      animation: warnPulse 2.5s ease-in-out infinite;
+      --shadow-warn-color: rgba(74,122,94,0.4);
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(42px, 5.2vw, 72px);
+      font-weight: 600;
+      line-height: 1.08;
+      letter-spacing: -0.025em;
+      color: var(--soil);
+      margin-bottom: 20px;
+    }
+    .hero-title em {
+      font-style: italic;
+      color: var(--clay);
+    }
+    .hero-title .underline-clay {
+      display: inline-block;
+      position: relative;
+    }
+    .hero-title .underline-clay::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 12' preserveAspectRatio='none'%3E%3Cpath d='M0 8 Q25 2 50 8 Q75 14 100 8 Q125 2 150 8 Q175 14 200 8' stroke='%23C4673A' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") center/100% 100% no-repeat;
+      opacity: 0.85;
+    }
+
+    .hero-tagline {
+      font-size: 18px;
+      font-weight: 400;
+      color: var(--bark-mid);
+      line-height: 1.6;
+      margin-bottom: 16px;
+      font-style: italic;
+      font-family: var(--font-display);
+    }
+
+    .hero-subline {
+      font-size: 16px;
+      color: var(--bark-light);
+      line-height: 1.55;
+      margin-bottom: 44px;
+      max-width: 480px;
+      font-weight: 400;
+    }
+
+    .hero-features {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 48px;
+    }
+
+    .feature-pill {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 16px 20px;
+      background: rgba(255,252,246,0.8);
+      border-radius: 16px;
+      border: 1px solid var(--parchment);
+      box-shadow: var(--shadow-warm-sm);
+      backdrop-filter: blur(8px);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .feature-pill:hover {
+      transform: translateX(4px);
+      box-shadow: var(--shadow-warm-md);
+    }
+
+    .feature-icon {
+      width: 40px;
+      height: 40px;
+      flex-shrink: 0;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .feature-icon.clay   { background: var(--clay-pale); }
+    .feature-icon.agave  { background: var(--agave-pale); }
+    .feature-icon.ochre  { background: rgba(200,154,58,0.18); }
+
+    .feature-text-wrap strong {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--soil);
+      margin-bottom: 3px;
+    }
+    .feature-text-wrap span {
+      font-size: 13px;
+      color: var(--bark-light);
+      line-height: 1.4;
+    }
+
+    .hero-ctas {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 44px;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--clay) 0%, var(--adobe) 100%);
+      color: #fff;
+      font-family: var(--font-body);
+      font-size: 16px;
+      font-weight: 600;
+      padding: 16px 32px;
+      border-radius: 100px;
+      text-decoration: none;
+      box-shadow: 0 6px 24px rgba(168,78,42,0.38), inset 0 1px 0 rgba(255,255,255,0.18);
+      transition: transform 0.18s, box-shadow 0.18s;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 32px rgba(168,78,42,0.44), inset 0 1px 0 rgba(255,255,255,0.18);
+    }
+    .btn-primary:active { transform: translateY(0); }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--bark);
+      font-family: var(--font-body);
+      font-size: 16px;
+      font-weight: 500;
+      padding: 16px 28px;
+      border-radius: 100px;
+      text-decoration: none;
+      border: 1.5px solid var(--sand-deep);
+      background: transparent;
+      transition: background 0.18s, border-color 0.18s;
+      cursor: pointer;
+    }
+    .btn-secondary:hover {
+      background: var(--parchment);
+      border-color: var(--bark-light);
+    }
+
+    .trust-strip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--bark-light);
+      font-weight: 500;
+      letter-spacing: 0.03em;
+    }
+    .trust-dot {
+      width: 3px;
+      height: 3px;
+      background: var(--sand-deep);
+      border-radius: 50%;
+    }
+
+    /* ─── HERO RIGHT: ORGANIC RING VISUAL ─── */
+    .hero-right {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 580px;
+    }
+
+    .ring-visual {
+      position: relative;
+      width: 480px;
+      height: 480px;
+    }
+
+    /* Outer decorative ring — slowly rotating dashes */
+    .ring-outer {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px dashed rgba(196,103,58,0.25);
+      animation: ringRotate 30s linear infinite;
+    }
+
+    /* Mid organic ring */
+    .ring-mid {
+      position: absolute;
+      inset: 36px;
+      border-radius: 60% 40% 55% 45% / 45% 55% 45% 55%;
+      border: 1.5px solid rgba(212,184,138,0.6);
+      animation: ringRotateSlow 22s linear infinite;
+    }
+
+    /* Center pot display */
+    .ring-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 190px;
+      height: 190px;
+      border-radius: 60% 40% 50% 50% / 40% 50% 50% 60%;
+      background: linear-gradient(145deg, var(--cream) 0%, var(--parchment) 100%);
+      box-shadow: var(--shadow-warm-lg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      z-index: 5;
+    }
+    .ring-center-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--bark-light);
+      margin-bottom: 4px;
+    }
+    .ring-center-amount {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--clay);
+      line-height: 1;
+    }
+    .ring-center-denom {
+      font-size: 12px;
+      color: var(--bark-light);
+      margin-top: 4px;
+      font-weight: 500;
+    }
+    .ring-center-round {
+      margin-top: 10px;
+      font-size: 11px;
+      background: var(--sand);
+      padding: 4px 10px;
+      border-radius: 100px;
+      color: var(--bark);
+      font-weight: 600;
+    }
+
+    /* Member nodes on the ring */
+    .member-node {
+      position: absolute;
+      width: 84px;
+      height: 84px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      cursor: default;
+    }
+    .member-avatar {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 600;
+      color: #fff;
+      box-shadow: var(--shadow-warm-md);
+      position: relative;
+      transition: transform 0.2s;
+      border: 3px solid var(--cream);
+    }
+    .member-avatar::after {
+      content: attr(data-score);
+      position: absolute;
+      bottom: -6px;
+      right: -6px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--cream);
+      font-family: var(--font-body);
+      font-size: 9px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1.5px solid currentColor;
+    }
+    .member-node:hover .member-avatar { transform: scale(1.12); }
+
+    .member-name {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--bark);
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    /* High trust */
+    .av-high  { background: linear-gradient(135deg, var(--agave) 0%, var(--agave-light) 100%); color: var(--agave) !important; }
+    /* Good */
+    .av-mid   { background: linear-gradient(135deg, var(--clay) 0%, var(--clay-light) 100%); color: var(--clay) !important; }
+    /* Ok */
+    .av-low   { background: linear-gradient(135deg, var(--ochre) 0%, var(--ochre-light) 100%); color: var(--ochre) !important; }
+    /* At risk */
+    .av-risk  { background: linear-gradient(135deg, #B85533 0%, #D4714A 100%); color: #B85533 !important; border-color: rgba(184,85,51,0.3) !important; }
+
+    /* Connector lines from center to members */
+    .ring-visual svg.connectors {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    /* Position member nodes around the ring */
+    .node-top    { top: 14px;  left: 50%; transform: translateX(-50%); z-index: 4; }
+    .node-right  { top: 50%;  right: 14px; transform: translateY(-50%); z-index: 4; }
+    .node-bottom { bottom: 14px; left: 50%; transform: translateX(-50%); z-index: 4; }
+    .node-left   { top: 50%;  left: 14px; transform: translateY(-50%); z-index: 4; }
+
+    /* Small decorative pebble blobs */
+    .pebble {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.55;
+    }
+    .pebble-1 {
+      width: 22px; height: 22px;
+      background: var(--ochre-light);
+      top: 90px; right: 115px;
+      border-radius: 60% 40% 55% 45% / 45% 60% 40% 55%;
+    }
+    .pebble-2 {
+      width: 14px; height: 14px;
+      background: var(--agave-light);
+      bottom: 110px; left: 105px;
+    }
+    .pebble-3 {
+      width: 18px; height: 18px;
+      background: var(--clay-pale);
+      bottom: 80px; right: 105px;
+      border-radius: 45% 55% 40% 60%;
+    }
+
+    /* ─── DIVIDER ─── */
+    .section-divider {
+      position: relative;
+      height: 60px;
+      overflow: hidden;
+      background: transparent;
+    }
+    .section-divider svg {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+    }
+
+    /* ─── DASHBOARD SECTION ─── */
+    .dashboard-section {
+      background: linear-gradient(180deg, var(--cream-warm) 0%, var(--parchment) 100%);
+      padding: 90px 64px 100px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .dashboard-section::before {
+      content: '';
+      position: absolute;
+      top: -60px;
+      right: -80px;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(ellipse, var(--sand) 0%, transparent 65%);
+      border-radius: 55% 45% 50% 50%;
+      opacity: 0.6;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 56px;
+      position: relative;
+      z-index: 1;
+    }
+    .section-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--clay);
+      background: var(--clay-pale);
+      padding: 6px 16px;
+      border-radius: 100px;
+      margin-bottom: 18px;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(28px, 3.2vw, 42px);
+      font-weight: 600;
+      color: var(--soil);
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+    }
+    .section-title em {
+      color: var(--clay);
+      font-style: italic;
+    }
+
+    /* Dashboard card */
+    .dashboard-card {
+      background: rgba(250,245,237,0.92);
+      border-radius: 32px;
+      padding: 40px;
+      box-shadow: var(--shadow-warm-xl), inset 0 1px 0 rgba(255,255,255,0.7);
+      border: 1px solid rgba(212,184,138,0.45);
+      position: relative;
+      z-index: 1;
+      max-width: 1080px;
+      margin: 0 auto;
+      backdrop-filter: blur(8px);
+    }
+
+    /* ─── WARNING BANNER ─── */
+    .warning-banner {
+      background: linear-gradient(135deg, rgba(200,90,42,0.12) 0%, rgba(200,154,58,0.08) 100%);
+      border: 1.5px solid rgba(200,90,42,0.35);
+      border-radius: 16px;
+      padding: 16px 22px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 36px;
+      animation: warnPulse 3s ease-in-out infinite;
+    }
+    .warn-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .warn-text {
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--bark);
+    }
+    .warn-text strong {
+      color: var(--clay);
+      font-weight: 600;
+    }
+    .warn-label {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      background: var(--clay);
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    /* ─── ROUND HEADER ─── */
+    .round-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-bottom: 36px;
+      padding: 24px 28px;
+      background: linear-gradient(135deg, var(--soil) 0%, var(--bark) 100%);
+      border-radius: 20px;
+      color: var(--cream);
+      box-shadow: var(--shadow-warm-md);
+    }
+
+    .round-title-group {}
+    .round-name {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--sand);
+      letter-spacing: -0.01em;
+    }
+    .round-sub {
+      font-size: 13px;
+      color: rgba(232,213,176,0.7);
+      margin-top: 4px;
+    }
+
+    .round-stats {
+      display: flex;
+      gap: 32px;
+    }
+    .round-stat {}
+    .round-stat-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(232,213,176,0.6);
+      margin-bottom: 4px;
+    }
+    .round-stat-value {
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--sand);
+      line-height: 1;
+    }
+    .round-stat-value.highlight { color: var(--ochre-light); }
+
+    .next-recipient {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,255,255,0.1);
+      padding: 12px 18px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+    .next-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--agave) 0%, var(--agave-light) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .next-info-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: rgba(232,213,176,0.55);
+      margin-bottom: 2px;
+    }
+    .next-info-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--sand);
+    }
+
+    /* ─── MEMBERS GRID ─── */
+    .members-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-bottom: 32px;
+    }
+
+    .member-card {
+      background: var(--cream);
+      border-radius: 20px;
+      padding: 22px 18px 18px;
+      border: 1.5px solid var(--parchment);
+      box-shadow: var(--shadow-warm-sm);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .member-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-warm-md);
+    }
+    .member-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      border-radius: 20px 20px 0 0;
+    }
+    .member-card.trust-high::before  { background: linear-gradient(90deg, var(--agave) 0%, var(--agave-light) 100%); }
+    .member-card.trust-mid::before   { background: linear-gradient(90deg, var(--clay) 0%, var(--clay-light) 100%); }
+    .member-card.trust-ok::before    { background: linear-gradient(90deg, var(--ochre) 0%, var(--ochre-light) 100%); }
+    .member-card.trust-risk::before  { background: linear-gradient(90deg, #B85533 0%, #D4714A 100%); }
+    .member-card.trust-risk {
+      border-color: rgba(184,85,51,0.28);
+      background: linear-gradient(180deg, var(--cream) 0%, rgba(220,120,80,0.07) 100%);
+    }
+
+    .mc-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .mc-avatar {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .mc-avatar.high  { background: linear-gradient(135deg, var(--agave), var(--agave-light)); }
+    .mc-avatar.mid   { background: linear-gradient(135deg, var(--clay), var(--clay-light)); }
+    .mc-avatar.ok    { background: linear-gradient(135deg, var(--ochre), var(--ochre-light)); }
+    .mc-avatar.risk  { background: linear-gradient(135deg, #B85533, #D4714A); }
+
+    .mc-name {
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--soil);
+    }
+    .mc-handle {
+      font-size: 12px;
+      color: var(--bark-light);
+      margin-top: 1px;
+    }
+
+    /* AI score ring */
+    .score-ring-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .score-ring {
+      transform: rotate(-90deg);
+      overflow: visible;
+    }
+    .score-ring-bg {
+      fill: none;
+      stroke: var(--parchment);
+      stroke-width: 6;
+    }
+    .score-ring-fill {
+      fill: none;
+      stroke-width: 6;
+      stroke-linecap: round;
+      animation: scoreGrow 1.2s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    .score-ring-fill.high  { stroke: var(--agave); }
+    .score-ring-fill.mid   { stroke: var(--clay); }
+    .score-ring-fill.ok    { stroke: var(--ochre); }
+    .score-ring-fill.risk  { stroke: #B85533; }
+
+    .score-ring-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+    .score-number {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .score-number.high  { color: var(--agave); }
+    .score-number.mid   { color: var(--clay); }
+    .score-number.ok    { color: var(--ochre); }
+    .score-number.risk  { color: #B85533; }
+    .score-label {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--bark-light);
+      margin-top: 2px;
+    }
+
+    .mc-stats {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .mc-stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .mc-stat-key {
+      font-size: 11px;
+      color: var(--bark-light);
+      font-weight: 500;
+    }
+    .mc-stat-val {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--bark);
+    }
+    .mc-stat-val.risk { color: #B85533; }
+
+    .mc-slot {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 100px;
+    }
+    .mc-slot.done    { background: var(--agave-pale); color: var(--agave); }
+    .mc-slot.current { background: linear-gradient(90deg, var(--ochre-light), var(--clay-pale)); color: var(--bark); }
+    .mc-slot.future  { background: var(--parchment); color: var(--bark-light); }
+    .mc-slot.flagged { background: rgba(184,85,51,0.14); color: #B85533; }
+
+    .mc-rationale {
+      font-size: 11px;
+      color: var(--bark-light);
+      line-height: 1.45;
+      padding: 8px 10px;
+      background: var(--cream-warm);
+      border-radius: 8px;
+      border-left: 2.5px solid;
+      margin-top: 10px;
+      font-style: italic;
+    }
+    .mc-rationale.high  { border-color: var(--agave-light); }
+    .mc-rationale.mid   { border-color: var(--clay-light); }
+    .mc-rationale.ok    { border-color: var(--ochre-light); }
+    .mc-rationale.risk  { border-color: #D4714A; }
+
+    .ai-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--bark-light);
+      margin-bottom: 6px;
+      opacity: 0.7;
+    }
+
+    /* ─── DASHBOARD FOOTER ROW ─── */
+    .dashboard-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+      padding: 20px 24px;
+      background: linear-gradient(135deg, var(--cream-warm) 0%, var(--parchment) 100%);
+      border-radius: 16px;
+      border: 1px solid var(--sand-deep);
+    }
+
+    .insurance-pool {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .insurance-icon {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, var(--agave) 0%, var(--agave-light) 100%);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: var(--shadow-warm-sm);
+    }
+    .insurance-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--bark-light);
+      margin-bottom: 2px;
+    }
+    .insurance-amount {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--agave);
+      line-height: 1;
+    }
+    .insurance-sub {
+      font-size: 11px;
+      color: var(--bark-light);
+      margin-top: 1px;
+    }
+
+    .contract-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--bark-light);
+    }
+    .contract-dot {
+      width: 8px; height: 8px;
+      background: var(--agave);
+      border-radius: 50%;
+      box-shadow: 0 0 0 3px var(--agave-pale);
+    }
+
+    .round-progress {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .progress-dots {
+      display: flex;
+      gap: 6px;
+    }
+    .progress-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+    }
+    .progress-dot.done    { background: var(--agave); }
+    .progress-dot.current { background: var(--clay); box-shadow: 0 0 0 3px var(--clay-pale); }
+    .progress-dot.pending { background: var(--parchment); border: 1.5px solid var(--sand-deep); }
+    .progress-label {
+      font-size: 12px;
+      color: var(--bark-light);
+      font-weight: 500;
+    }
+
+    /* ─── FOOTER ─── */
+    .site-footer {
+      background: var(--soil);
+      color: var(--sand);
+      padding: 48px 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+    .footer-logo {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--clay-pale);
+      letter-spacing: -0.02em;
+    }
+    .footer-copy {
+      font-size: 13px;
+      color: rgba(232,213,176,0.5);
+    }
+    .footer-strip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: rgba(232,213,176,0.6);
+    }
+    .footer-strip span { color: var(--ochre-light); font-weight: 600; }
+
+    /* ─── ANIMATION DELAYS for dashboard ─── */
+    .member-card:nth-child(1) { animation: floatUp 0.6s 0.2s both cubic-bezier(0.22,1,0.36,1); }
+    .member-card:nth-child(2) { animation: floatUp 0.6s 0.32s both cubic-bezier(0.22,1,0.36,1); }
+    .member-card:nth-child(3) { animation: floatUp 0.6s 0.44s both cubic-bezier(0.22,1,0.36,1); }
+    .member-card:nth-child(4) { animation: floatUp 0.6s 0.56s both cubic-bezier(0.22,1,0.36,1); }
+
+    /* score ring animation delays */
+    .member-card:nth-child(1) .score-ring-fill { animation-delay: 0.4s; }
+    .member-card:nth-child(2) .score-ring-fill { animation-delay: 0.52s; }
+    .member-card:nth-child(3) .score-ring-fill { animation-delay: 0.64s; }
+    .member-card:nth-child(4) .score-ring-fill { animation-delay: 0.76s; }
+
+    /* ─── RESPONSIVE BASICS ─── */
+    @media (max-width: 1100px) {
+      nav { padding: 16px 32px; }
+      .hero { padding: 120px 32px 80px; gap: 40px; }
+      .dashboard-section { padding: 70px 32px 80px; }
+      .dashboard-card { padding: 28px 24px; }
+      .members-grid { grid-template-columns: repeat(2, 1fr); }
+      .site-footer { padding: 40px 32px; }
+    }
+    @media (max-width: 768px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero-right { height: 380px; }
+      .ring-visual { width: 340px; height: 340px; }
+      .ring-center { width: 140px; height: 140px; }
+      .members-grid { grid-template-columns: 1fr; }
+      .round-stats { gap: 20px; }
+      nav .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── NAVIGATION ─── -->
+  <nav class="anim-fade">
+    <div class="nav-logo">
+      <div class="nav-logo-mark">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <circle cx="9" cy="9" r="7" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-dasharray="3 2"/>
+          <circle cx="9" cy="9" r="3" fill="rgba(255,255,255,0.9)"/>
+        </svg>
+      </div>
+      Tanda
+    </div>
+    <ul class="nav-links">
+      <li><a href="#">Cómo funciona</a></li>
+      <li><a href="#">Seguridad</a></li>
+      <li><a href="#">Comunidad</a></li>
+      <li><a href="#" class="nav-cta">Crear tanda</a></li>
+    </ul>
+  </nav>
+
+  <!-- ─── HERO SECTION ─── -->
+  <section class="hero">
+    <div class="hero-blob-mid"></div>
+
+    <div class="hero-left">
+      <div class="hero-eyebrow anim-up">
+        <span class="hero-eyebrow-dot"></span>
+        En Arbitrum · MXNB Stablecoin
+      </div>
+
+      <h1 class="hero-title anim-up anim-up-d1">
+        La tanda<br>
+        de <em>siempre</em>,<br>
+        <span class="underline-clay">sin el riesgo</span>.
+      </h1>
+
+      <p class="hero-tagline anim-up anim-up-d2">
+        "Sin el riesgo de que te dejen colgado."
+      </p>
+
+      <p class="hero-subline anim-up anim-up-d3">
+        AI-organized savings circles on-chain. Save together, in pesos, without the trust problem — backed by smart contracts, collateral, and an insurance pool.
+      </p>
+
+      <div class="hero-features anim-up anim-up-d3">
+        <div class="feature-pill">
+          <div class="feature-icon clay">🧠</div>
+          <div class="feature-text-wrap">
+            <strong>Calificación IA de confianza</strong>
+            <span>El agente evalúa el historial on-chain de cada miembro y define su colateral automáticamente.</span>
+          </div>
+        </div>
+        <div class="feature-pill">
+          <div class="feature-icon agave">🛡️</div>
+          <div class="feature-text-wrap">
+            <strong>A prueba de impagos</strong>
+            <span>Si alguien falla, su colateral se confisca y el fondo de seguro completa el pago — el receptor siempre cobra.</span>
+          </div>
+        </div>
+        <div class="feature-pill">
+          <div class="feature-icon ochre">⚡</div>
+          <div class="feature-text-wrap">
+            <strong>Gasless onboarding</strong>
+            <span>Únete con passkey. Sin seed phrase, sin gas. Diseñado para la próxima ola de usuarios LATAM.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-ctas anim-up anim-up-d4">
+        <a href="#" class="btn-primary">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-dasharray="2.5 2"/><circle cx="8" cy="8" r="2.5" fill="white"/></svg>
+          Crear una tanda
+        </a>
+        <a href="#dashboard" class="btn-secondary">
+          Cómo funciona ↓
+        </a>
+      </div>
+
+      <div class="trust-strip anim-up anim-up-d5">
+        <span>Construido en Arbitrum</span>
+        <span class="trust-dot"></span>
+        <span>Liquida en MXNB</span>
+        <span class="trust-dot"></span>
+        <span>Non-custodial</span>
+      </div>
+    </div>
+
+    <!-- ─── ORGANIC RING VISUAL ─── -->
+    <div class="hero-right anim-fade anim-fade-d2">
+      <div class="ring-visual">
+        <div class="ring-outer"></div>
+        <div class="ring-mid"></div>
+
+        <!-- SVG connector lines -->
+        <svg class="connectors" viewBox="0 0 480 480">
+          <line x1="240" y1="240" x2="240" y2="96"  stroke="rgba(196,103,58,0.18)" stroke-width="1.5" stroke-dasharray="4 3"/>
+          <line x1="240" y1="240" x2="384" y2="240" stroke="rgba(74,122,94,0.18)"  stroke-width="1.5" stroke-dasharray="4 3"/>
+          <line x1="240" y1="240" x2="240" y2="384" stroke="rgba(200,154,58,0.18)" stroke-width="1.5" stroke-dasharray="4 3"/>
+          <line x1="240" y1="240" x2="96"  y2="240" stroke="rgba(184,85,51,0.25)"  stroke-width="1.5" stroke-dasharray="4 3"/>
+        </svg>
+
+        <!-- Center pot -->
+        <div class="ring-center">
+          <div class="ring-center-label">Pote total</div>
+          <div class="ring-center-amount">400</div>
+          <div class="ring-center-denom">MXNB</div>
+          <div class="ring-center-round">Ronda 2 de 4</div>
+        </div>
+
+        <!-- Member nodes -->
+        <div class="member-node node-top">
+          <div class="member-avatar av-high" data-score="82">M</div>
+          <div class="member-name">María</div>
+        </div>
+        <div class="member-node node-right">
+          <div class="member-avatar av-mid" data-score="66">D</div>
+          <div class="member-name">Diego</div>
+        </div>
+        <div class="member-node node-bottom">
+          <div class="member-avatar av-low" data-score="50">L</div>
+          <div class="member-name">Lupe</div>
+        </div>
+        <div class="member-node node-left">
+          <div class="member-avatar av-risk" data-score="28">0x</div>
+          <div class="member-name">0xkito</div>
+        </div>
+
+        <!-- Decorative pebbles -->
+        <div class="pebble pebble-1"></div>
+        <div class="pebble pebble-2"></div>
+        <div class="pebble pebble-3"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── WAVE DIVIDER ─── -->
+  <div class="section-divider">
+    <svg viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 30 Q180 0 360 30 Q540 60 720 30 Q900 0 1080 30 Q1260 60 1440 30 L1440 60 L0 60 Z" fill="var(--cream-warm)"/>
+    </svg>
+  </div>
+
+  <!-- ─── DASHBOARD SECTION ─── -->
+  <section class="dashboard-section" id="dashboard">
+    <div class="section-header anim-up">
+      <div class="section-eyebrow">
+        ✦ Vista previa del círculo activo
+      </div>
+      <h2 class="section-title">
+        Tu tanda, <em>siempre visible</em><br>y siempre protegida
+      </h2>
+    </div>
+
+    <div class="dashboard-card">
+
+      <!-- ⚠ Warning Banner -->
+      <div class="warning-banner anim-up">
+        <span class="warn-icon">⚠</span>
+        <div class="warn-text">
+          <span class="warn-label">Alerta IA</span>
+          El agente detectó <strong>riesgo de impago de 0xkito</strong> esta ronda —
+          se solicitó refuerzo de colateral adicional de <strong>50 MXNB</strong>.
+          El fondo de protección respalda el pago completo al receptor.
+        </div>
+      </div>
+
+      <!-- Round Header -->
+      <div class="round-header anim-up anim-up-d1">
+        <div class="round-title-group">
+          <div class="round-name">Tanda Oaxaca</div>
+          <div class="round-sub">100 MXNB por ronda · 4 miembros · contrato verificado</div>
+        </div>
+
+        <div class="round-stats">
+          <div class="round-stat">
+            <div class="round-stat-label">Pote</div>
+            <div class="round-stat-value highlight">400 MXNB</div>
+          </div>
+          <div class="round-stat">
+            <div class="round-stat-label">Ronda</div>
+            <div class="round-stat-value">2 de 4</div>
+          </div>
+        </div>
+
+        <div class="next-recipient">
+          <div class="next-avatar">D</div>
+          <div>
+            <div class="next-info-label">Siguiente en cobrar</div>
+            <div class="next-info-name">Diego</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Members Grid -->
+      <div class="members-grid">
+
+        <!-- María — high trust -->
+        <div class="member-card trust-high">
+          <div class="mc-header">
+            <div class="mc-avatar high">M</div>
+            <div>
+              <div class="mc-name">María</div>
+              <div class="mc-handle">@maria.oax</div>
+            </div>
+          </div>
+
+          <div class="score-ring-wrap">
+            <svg class="score-ring" width="90" height="90" viewBox="0 0 90 90">
+              <circle class="score-ring-bg" cx="45" cy="45" r="34"/>
+              <!-- 82/100 → dasharray = (82/100)*213.6 = 175 -->
+              <circle class="score-ring-fill high" cx="45" cy="45" r="34"
+                stroke-dasharray="175 214" style="animation-delay:0.4s"/>
+            </svg>
+            <div class="score-ring-center">
+              <div class="score-number high">82</div>
+              <div class="score-label">Score IA</div>
+            </div>
+          </div>
+
+          <div class="mc-stats">
+            <div class="mc-stat-row">
+              <span class="mc-stat-key">Colateral</span>
+              <span class="mc-stat-val">0.5× · 50 MXNB</span>
+            </div>
+            <div class="mc-stat-row">
+              <span class="mc-stat-key">Slot de cobro</span>
+              <span class="mc-slot done">✓ Ronda 1</span>
+            </div>
+          </div>
+
+          <div class="ai-badge">🤖 IA dice</div>
+          <div class="mc-rationale high">
+            6 rondas a tiempo, 1 círculo completado. Perfil sólido.
+          </div>
+        </div>
+
+        <!-- Diego — mid trust, next recipient -->
+        <div class="member-card trust-mid">
+          <div class="mc-header">
+            <div class="mc-avatar mid">D</div>
+            <div>
+              <div class="mc-name">Diego</div>
+              <div class="mc-handle">@diego_mx</div>
+            </div>
+          </div>
+
+          <div class="score-ring-wrap">
+            <svg class="score-ring" width="90" height="90" viewBox="0 0 90 90">
+              <circle class="score-ring-bg" cx="45" cy="45" r="34"/>
+              <!-- 66/100 → 141 -->
+              <circle class="score-ring-fill mid" cx="45" cy="45" r="34"
+                stroke-dasharray="141 214" style="animation-delay:0.52s"/>
+            </svg>
+            <div class="score-ring-center">
+              <div class="score-number mid">66</div>
+              <div class="score-label">Score IA</div>
+            </div>
+          </div>
+
+          <div class="mc-stats">
+            <div class="mc-stat-row">
+              <span class="mc-stat-key">Colateral</span>
+              <span class="mc-stat-val">1× · 100 MXNB</span>
+            </div>
+            <div class="mc-stat-row">
+              <span class="mc-stat-key">Slot de cobro</span>
+              <span class="mc-slot current">→ Ronda 2 ★</span>
+            </div>
+          </div>
+
+          <div class="ai-badge">🤖 IA dice</div>
+          <div class="mc-rationale mid">
+            3 rondas completadas, sin impagos. Historial moderado.
+          </div>
+        </div>
+
+        <!-- Lupe — ok trust -->
+        <div class="member-card trust-ok">
+          <div class="mc-header">
+            <div class="mc-avatar ok">L</div>
+            <div>
+              <div class="mc-name">Lupe</div>
+              <div class="mc-handle">@lupe.tlx</div>
+            </div>
+          </div>
+
+          <div class="score-ring-wrap">
+            <svg class="score-ring" width="90" height="90" viewBox="0 0 90 90">
+              <circle class="score-ring-bg" cx="45" cy="45" r="34"/>
+              <!-- 50/100 → 107 -->
+              <circle class="score-ring-fill ok" cx="45" cy="45" r="34"
+                stroke-dasharray="107 214" style="animation-delay:0.64s"/>
+            </svg>
+            <div class="score-ring-center">
+              <div class="score-number ok">50</div>
+              <div class="score-label">Score IA</div>
+            </div>
+          </div>
+
+          <div class="mc-stats">
+            <div class="mc-stat-row">
+              <span class="mc-stat-key">Colateral</span>
+              <span class="mc-stat-val">2× · 200 MXNB</span>
+            </div>
+            <div class="mc-stat-row">
+              <span class="mc-stat-key">Slot de cobro</span>
+              <span class="mc-slot future">Ronda 3</span>
+            </div>
+          </div>
+
+          <div class="ai-badge">🤖 IA dice</div>
+          <div class="mc-rationale ok">
+            Primera tanda. Wallet con 2 meses de actividad. Colateral elevado preventivamente.
+          </div>
+        </div>
+
+        <!-- 0xkito — at risk -->
+        <div class="member-card trust-risk">
+          <div class="mc-header">
+            <div class="mc-avatar risk">0x</div>
+            <div>
+              <div class="mc-name">0xkito</div>
+              <div class="mc-handle">@0xkito</div>
+            </div>
+          </div>
+
+          <div class="score-ring-wrap">
+            <svg class="score-ring" width="90" height="90" viewBox="0 0 90 90">
+              <circle class="score-ring-bg" cx="45" cy="45" r="34"/>
+              <!-- 28/100 → 60 -->
+              <circle class="score-ring-fill risk" cx="45" cy="45" r="34"
+                stroke-dasharray="60 214" style="animation-delay:0.76s"/>
+            </svg>
+            <div class="score-ring-center">
+              <div class="score-number risk">28</div>
+              <div class="score-label">Score IA</div>
+            </div>
+          </div>
+
+          <div class="mc-stats">
+            <div class="mc-stat-row">
+              <span class="mc-stat-key">Colateral</span>
+              <span class="mc-stat-val risk">3× · 300 MXNB ⚠</span>
+            </div>
+            <div class="mc-stat-row">
+              <span class="mc-stat-key">Slot de cobro</span>
+              <span class="mc-slot flagged">Ronda 4 · bajo revisión</span>
+            </div>
+          </div>
+
+          <div class="ai-badge">🤖 IA dice</div>
+          <div class="mc-rationale risk">
+            Wallet nueva, cold-start. Sin historial de tandas. Riesgo detectado esta ronda — colateral reforzado.
+          </div>
+        </div>
+
+      </div><!-- /members-grid -->
+
+      <!-- Dashboard Footer -->
+      <div class="dashboard-footer anim-up anim-up-d4">
+
+        <div class="insurance-pool">
+          <div class="insurance-icon">🌿</div>
+          <div>
+            <div class="insurance-label">Fondo de protección</div>
+            <div class="insurance-amount">1,240 MXNB</div>
+            <div class="insurance-sub">Cubre cualquier impago de esta ronda</div>
+          </div>
+        </div>
+
+        <div class="round-progress">
+          <div class="progress-dots">
+            <div class="progress-dot done"    title="Ronda 1 completada"></div>
+            <div class="progress-dot current" title="Ronda 2 en curso"></div>
+            <div class="progress-dot pending" title="Ronda 3 pendiente"></div>
+            <div class="progress-dot pending" title="Ronda 4 pendiente"></div>
+          </div>
+          <div class="progress-label">Ronda 2 de 4 en curso</div>
+        </div>
+
+        <div class="contract-info">
+          <div class="contract-dot"></div>
+          <span>Contrato activo · Arbitrum · Non-custodial</span>
+        </div>
+
+      </div>
+    </div><!-- /dashboard-card -->
+  </section>
+
+  <!-- ─── FOOTER ─── -->
+  <footer class="site-footer">
+    <div class="footer-logo">Tanda</div>
+    <div class="footer-strip">
+      <span>Arbitrum</span> · <span>MXNB</span> · Non-custodial · Open Source
+    </div>
+    <div class="footer-copy">© 2026 Tanda Protocol. Hecho con raíces.</div>
+  </footer>
+
+</body>
+</html>

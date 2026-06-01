@@ -1,0 +1,1517 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tanda — Technical Blueprint</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;700;800;900&family=JetBrains+Mono:wght@300;400;500;700&family=Hanken+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #0a0f1e;
+  --bg2: #0d1426;
+  --grid: rgba(40, 90, 180, 0.18);
+  --grid-strong: rgba(60, 120, 220, 0.28);
+  --cyan: #00e5ff;
+  --cyan-dim: rgba(0, 229, 255, 0.55);
+  --cyan-faint: rgba(0, 229, 255, 0.12);
+  --blue: #1e5eff;
+  --blue-mid: #2d78f0;
+  --indigo: #1a2f6e;
+  --line: rgba(0, 229, 255, 0.35);
+  --line-strong: rgba(0, 229, 255, 0.7);
+  --white: #e8f0ff;
+  --white-dim: rgba(232, 240, 255, 0.6);
+  --white-faint: rgba(232, 240, 255, 0.15);
+  --red-ann: #ff3a5c;
+  --red-ann-dim: rgba(255, 58, 92, 0.6);
+  --amber: #ffb300;
+  --amber-dim: rgba(255, 179, 0, 0.6);
+  --green: #00e676;
+  --green-dim: rgba(0, 230, 118, 0.5);
+  --font-display: 'Archivo', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-body: 'Hanken Grotesk', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ─── BLUEPRINT GRID BACKGROUND ─── */
+.blueprint-grid {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+    linear-gradient(var(--grid-strong) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-strong) 1px, transparent 1px);
+  background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px;
+  background-position: -1px -1px, -1px -1px, -1px -1px, -1px -1px;
+}
+
+/* ─── CORNER MARKS ─── */
+.corner-mark {
+  position: fixed;
+  width: 40px;
+  height: 40px;
+  pointer-events: none;
+  z-index: 2;
+}
+.corner-mark::before,
+.corner-mark::after {
+  content: '';
+  position: absolute;
+  background: var(--cyan);
+}
+.corner-mark.tl { top: 16px; left: 16px; }
+.corner-mark.tr { top: 16px; right: 16px; }
+.corner-mark.bl { bottom: 16px; left: 16px; }
+.corner-mark.br { bottom: 16px; right: 16px; }
+.corner-mark.tl::before { top: 0; left: 0; width: 20px; height: 2px; }
+.corner-mark.tl::after  { top: 0; left: 0; width: 2px; height: 20px; }
+.corner-mark.tr::before { top: 0; right: 0; width: 20px; height: 2px; }
+.corner-mark.tr::after  { top: 0; right: 0; width: 2px; height: 20px; }
+.corner-mark.bl::before { bottom: 0; left: 0; width: 20px; height: 2px; }
+.corner-mark.bl::after  { bottom: 0; left: 0; width: 2px; height: 20px; }
+.corner-mark.br::before { bottom: 0; right: 0; width: 20px; height: 2px; }
+.corner-mark.br::after  { bottom: 0; right: 0; width: 2px; height: 20px; }
+
+/* ─── STAMP / TITLE BLOCK ─── */
+.title-block {
+  position: fixed;
+  bottom: 16px;
+  right: 60px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--cyan-dim);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1.8;
+  border: 1px solid var(--line);
+  padding: 8px 12px;
+  pointer-events: none;
+  z-index: 2;
+}
+.title-block span { display: block; }
+
+/* ─── MAIN LAYOUT ─── */
+main {
+  position: relative;
+  z-index: 1;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 60px;
+}
+
+/* ─── HEADER ─── */
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 16px 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+  background: rgba(10, 15, 30, 0.85);
+  backdrop-filter: blur(10px);
+}
+
+.logo {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.logo-wordmark {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 22px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  text-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
+}
+
+.logo-tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--cyan-dim);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  border: 1px solid var(--line);
+  padding: 2px 6px;
+  position: relative;
+  top: -2px;
+}
+
+.header-nav {
+  display: flex;
+  gap: 32px;
+  align-items: center;
+}
+
+.nav-link {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--white-dim);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-link:hover { color: var(--cyan); }
+
+.header-spec {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: rgba(0, 229, 255, 0.35);
+  letter-spacing: 0.1em;
+}
+
+/* ─── HERO ─── */
+.hero {
+  padding: 140px 0 80px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.hero-left {
+  opacity: 0;
+  animation: fadeInUp 0.8s ease forwards 0.2s;
+}
+
+.spec-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cyan-dim);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.spec-label::before {
+  content: '';
+  width: 24px;
+  height: 1px;
+  background: var(--cyan-dim);
+}
+.spec-label::after {
+  content: attr(data-ref);
+  font-size: 9px;
+  color: rgba(0, 229, 255, 0.3);
+  margin-left: auto;
+  letter-spacing: 0.1em;
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(48px, 5.5vw, 80px);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  color: var(--white);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.hero-title .accent {
+  color: var(--cyan);
+  text-shadow: 0 0 40px rgba(0, 229, 255, 0.4);
+}
+
+.hero-tagline {
+  font-family: var(--font-body);
+  font-size: 18px;
+  color: var(--white-dim);
+  margin-bottom: 8px;
+  font-style: italic;
+  font-weight: 300;
+}
+
+.hero-tagline-en {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--cyan-dim);
+  letter-spacing: 0.08em;
+  margin-bottom: 40px;
+  padding-left: 2px;
+  border-left: 2px solid var(--line);
+  padding-left: 12px;
+}
+
+/* ─── FEATURE CALLOUTS ─── */
+.feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.feature-item {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  position: relative;
+}
+
+.feat-marker {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--cyan);
+  position: relative;
+}
+.feat-marker::before {
+  content: '';
+  position: absolute;
+  top: -4px; left: -4px; right: -4px; bottom: -4px;
+  border: 1px dashed var(--line);
+}
+
+.feat-content {}
+.feat-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--red-ann);
+  margin-bottom: 2px;
+}
+.feat-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--white);
+  letter-spacing: 0.03em;
+  margin-bottom: 2px;
+}
+.feat-desc {
+  font-size: 13px;
+  color: var(--white-dim);
+  line-height: 1.5;
+}
+
+/* ─── CTA BUTTONS ─── */
+.cta-group {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 36px;
+}
+
+.btn-primary {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--bg);
+  background: var(--cyan);
+  border: none;
+  padding: 14px 28px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+}
+.btn-primary::after {
+  content: '→';
+  margin-left: 8px;
+}
+.btn-primary:hover {
+  background: var(--white);
+  box-shadow: 0 0 30px rgba(0, 229, 255, 0.5);
+}
+
+.btn-secondary {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  background: transparent;
+  border: 1px solid var(--line-strong);
+  padding: 13px 28px;
+  cursor: pointer;
+  transition: all 0.2s;
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+}
+.btn-secondary:hover {
+  background: var(--cyan-faint);
+  border-color: var(--cyan);
+}
+
+/* ─── TRUST STRIP ─── */
+.trust-strip {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+.trust-item {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(0, 229, 255, 0.4);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.trust-item::before {
+  content: '◆';
+  font-size: 6px;
+  color: var(--cyan-dim);
+}
+.trust-item:first-child::before { display: none; }
+
+/* ─── HERO SCHEMATIC (right side) ─── */
+.hero-schematic {
+  position: relative;
+  height: 520px;
+  opacity: 0;
+  animation: fadeIn 1s ease forwards 0.5s;
+}
+
+.schematic-svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ─── SECTION DIVIDER ─── */
+.section-divider {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 40px 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cyan-dim);
+}
+.section-divider::before,
+.section-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--line), transparent);
+}
+
+/* ─── DASHBOARD SECTION ─── */
+.dashboard-section {
+  padding: 60px 0 120px;
+  opacity: 0;
+  animation: fadeInUp 0.8s ease forwards 0.8s;
+}
+
+.dashboard-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 48px;
+}
+
+.dashboard-title-block {
+  position: relative;
+  padding-left: 20px;
+  border-left: 3px solid var(--cyan);
+}
+
+.dash-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--red-ann);
+  margin-bottom: 4px;
+}
+
+.dash-title {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 36px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--white);
+  margin-bottom: 4px;
+}
+
+.dash-subtitle {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--cyan-dim);
+  letter-spacing: 0.1em;
+}
+
+.round-indicators {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.round-pip {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  transition: all 0.3s;
+}
+.round-pip.active {
+  background: var(--cyan);
+  color: var(--bg);
+  border-color: var(--cyan);
+  box-shadow: 0 0 16px rgba(0, 229, 255, 0.5);
+}
+.round-pip.done {
+  color: var(--green-dim);
+  border-color: var(--green-dim);
+}
+.round-pip.pending {
+  color: var(--white-faint);
+  border-color: rgba(232, 240, 255, 0.1);
+}
+
+.round-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--white-dim);
+  margin-left: 8px;
+}
+
+/* ─── STATS BAR ─── */
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  margin-bottom: 32px;
+  border: 1px solid var(--line);
+}
+
+.stat-cell {
+  padding: 16px 20px;
+  border-right: 1px solid var(--line);
+  position: relative;
+}
+.stat-cell:last-child { border-right: none; }
+.stat-cell::before {
+  content: attr(data-label);
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--cyan-dim);
+  margin-bottom: 6px;
+}
+
+.stat-value {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 24px;
+  color: var(--white);
+  letter-spacing: -0.01em;
+}
+.stat-value .unit {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cyan);
+  margin-left: 4px;
+}
+
+/* ─── WARNING BANNER ─── */
+.warning-banner {
+  border: 1px solid var(--red-ann-dim);
+  background: rgba(255, 58, 92, 0.06);
+  padding: 16px 20px;
+  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: relative;
+  animation: pulse-border 2s ease-in-out infinite;
+}
+
+@keyframes pulse-border {
+  0%, 100% { border-color: var(--red-ann-dim); box-shadow: none; }
+  50% { border-color: var(--red-ann); box-shadow: 0 0 16px rgba(255, 58, 92, 0.15); }
+}
+
+.warning-banner::before {
+  content: 'ALERTA IA // AI ALERT';
+  position: absolute;
+  top: -9px;
+  left: 16px;
+  background: var(--bg);
+  padding: 0 8px;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.2em;
+  color: var(--red-ann);
+  text-transform: uppercase;
+}
+
+.warning-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.warning-text {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: rgba(255, 200, 200, 0.9);
+  line-height: 1.5;
+}
+
+.warning-text strong {
+  color: var(--red-ann);
+  font-weight: 600;
+}
+
+.warning-badge {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--red-ann);
+  border: 1px solid var(--red-ann-dim);
+  padding: 4px 10px;
+  text-transform: uppercase;
+  animation: blink 1.5s step-end infinite;
+}
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+/* ─── MEMBERS GRID ─── */
+.members-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  margin-bottom: 32px;
+}
+
+.member-card {
+  border: 1px solid var(--line);
+  padding: 20px;
+  position: relative;
+  background: rgba(10, 20, 50, 0.6);
+  transition: all 0.3s;
+}
+.member-card:hover {
+  border-color: var(--cyan-dim);
+  background: rgba(0, 229, 255, 0.04);
+}
+
+.member-card.flagged {
+  border-color: var(--red-ann-dim);
+  background: rgba(255, 58, 92, 0.04);
+}
+.member-card.flagged:hover {
+  border-color: var(--red-ann);
+}
+
+.member-card.current-winner {
+  border-color: var(--amber-dim);
+  background: rgba(255, 179, 0, 0.04);
+}
+.member-card.current-winner::before {
+  content: 'PAGO ACTUAL // CURRENT';
+  position: absolute;
+  top: -9px;
+  left: 12px;
+  background: var(--bg);
+  padding: 0 6px;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.15em;
+  color: var(--amber);
+  text-transform: uppercase;
+}
+
+.member-slot {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--white-dim);
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.slot-num {
+  font-weight: 700;
+  color: var(--cyan-dim);
+}
+
+.member-avatar {
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 16px;
+  color: var(--cyan);
+  margin-bottom: 10px;
+  position: relative;
+}
+.member-avatar::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border: 1px dashed var(--line);
+}
+.member-card.flagged .member-avatar {
+  color: var(--red-ann);
+  border-color: var(--red-ann-dim);
+}
+.member-card.flagged .member-avatar::before {
+  border-color: var(--red-ann-dim);
+}
+.member-card.current-winner .member-avatar {
+  color: var(--amber);
+  border-color: var(--amber-dim);
+}
+
+.member-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--white);
+  margin-bottom: 14px;
+  letter-spacing: 0.02em;
+}
+
+/* ─── SCORE GAUGE ─── */
+.score-section {
+  margin-bottom: 12px;
+}
+.score-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--white-dim);
+  margin-bottom: 4px;
+  display: flex;
+  justify-content: space-between;
+}
+.score-label span {
+  color: var(--cyan);
+  font-weight: 700;
+}
+.member-card.flagged .score-label span { color: var(--red-ann); }
+.member-card.current-winner .score-label span { color: var(--amber); }
+
+.score-bar {
+  height: 4px;
+  background: rgba(232, 240, 255, 0.08);
+  position: relative;
+  overflow: visible;
+}
+.score-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--blue-mid), var(--cyan));
+  position: relative;
+  transition: width 0.8s ease;
+}
+.score-fill::after {
+  content: '';
+  position: absolute;
+  right: 0; top: -3px;
+  width: 2px; height: 10px;
+  background: var(--cyan);
+  box-shadow: 0 0 6px var(--cyan);
+}
+.member-card.flagged .score-fill {
+  background: linear-gradient(90deg, #6b0018, var(--red-ann));
+}
+.member-card.flagged .score-fill::after { background: var(--red-ann); box-shadow: 0 0 6px var(--red-ann); }
+.member-card.current-winner .score-fill {
+  background: linear-gradient(90deg, #7a4000, var(--amber));
+}
+.member-card.current-winner .score-fill::after { background: var(--amber); box-shadow: 0 0 6px var(--amber); }
+
+/* ─── MEMBER DETAIL ROWS ─── */
+.member-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  border-bottom: 1px dashed rgba(232, 240, 255, 0.07);
+  padding-bottom: 5px;
+}
+.detail-key {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--white-dim);
+}
+.detail-val {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--white);
+}
+.detail-val.high { color: var(--green); }
+.detail-val.mid { color: var(--cyan); }
+.detail-val.warn { color: var(--amber); }
+.detail-val.flag { color: var(--red-ann); }
+
+/* ─── AI RATIONALE ─── */
+.ai-rationale {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  line-height: 1.6;
+  color: rgba(232, 240, 255, 0.4);
+  border-top: 1px dashed rgba(232, 240, 255, 0.1);
+  padding-top: 10px;
+  letter-spacing: 0.04em;
+}
+.ai-rationale::before {
+  content: 'AI // ';
+  color: var(--cyan-dim);
+  font-weight: 700;
+}
+.member-card.flagged .ai-rationale::before { color: var(--red-ann-dim); }
+
+/* ─── INSURANCE POOL ─── */
+.bottom-panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+}
+
+.panel {
+  border: 1px solid var(--line);
+  padding: 24px;
+  background: rgba(10, 20, 50, 0.4);
+  position: relative;
+}
+.panel::before {
+  content: attr(data-title);
+  position: absolute;
+  top: -9px;
+  left: 16px;
+  background: var(--bg);
+  padding: 0 8px;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cyan-dim);
+}
+
+.insurance-value {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.ins-num {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 32px;
+  color: var(--green);
+  text-shadow: 0 0 20px rgba(0, 230, 118, 0.3);
+}
+.ins-unit {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--green-dim);
+  font-weight: 500;
+}
+
+.pool-bar {
+  height: 6px;
+  background: rgba(0, 230, 118, 0.1);
+  border: 1px solid rgba(0, 230, 118, 0.2);
+  margin-bottom: 8px;
+}
+.pool-fill {
+  height: 100%;
+  background: linear-gradient(90deg, rgba(0, 100, 50, 0.8), var(--green));
+  width: 62%;
+}
+
+.pool-note {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: rgba(0, 230, 118, 0.5);
+}
+
+/* Contract addresses panel */
+.contract-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.contract-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px dashed rgba(232, 240, 255, 0.07);
+  padding-bottom: 8px;
+}
+.contract-key {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--white-dim);
+}
+.contract-val {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--cyan-dim);
+  letter-spacing: 0.04em;
+}
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes scanline {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(100vh); }
+}
+
+/* Scanline effect */
+.scanline {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.06), transparent);
+  animation: scanline 4s linear infinite;
+  pointer-events: none;
+  z-index: 200;
+}
+
+/* ─── DIMENSION MARKS ─── */
+.dim-mark {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: var(--red-ann-dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 1100px) {
+  main { padding: 0 32px; }
+  header { padding: 14px 32px; }
+  .hero { grid-template-columns: 1fr; gap: 40px; padding-top: 120px; }
+  .hero-schematic { height: 380px; }
+  .members-grid { grid-template-columns: repeat(2, 1fr); }
+  .stats-bar { grid-template-columns: repeat(2, 1fr); }
+  .title-block { display: none; }
+  .bottom-panels { grid-template-columns: 1fr; }
+}
+@media (max-width: 700px) {
+  .members-grid { grid-template-columns: 1fr; }
+  .hero-title { font-size: 36px; }
+  .header-nav { display: none; }
+  .header-spec { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- Blueprint grid -->
+<div class="blueprint-grid"></div>
+<div class="scanline"></div>
+
+<!-- Corner registration marks -->
+<div class="corner-mark tl"></div>
+<div class="corner-mark tr"></div>
+<div class="corner-mark bl"></div>
+<div class="corner-mark br"></div>
+
+<!-- Title block (draughting stamp) -->
+<div class="title-block">
+  <span>PROYECTO: TANDA ON-CHAIN</span>
+  <span>DWG: TND-ARCH-001</span>
+  <span>REV: A</span>
+  <span>SCALE: 1:1</span>
+  <span>ARBITRUM L2 · MXNB</span>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <span class="logo-wordmark">Tanda</span>
+    <span class="logo-tag">v1.0 · MXNB</span>
+  </div>
+  <nav class="header-nav">
+    <a href="#" class="nav-link">Cómo funciona</a>
+    <a href="#" class="nav-link">Seguridad</a>
+    <a href="#" class="nav-link">Docs</a>
+  </nav>
+  <div class="header-spec">SYS_REF: TND-001 · ARBITRUM L2 · MXNB_STABLE</div>
+</header>
+
+<main>
+
+  <!-- ═══════════════════════════════════
+       HERO SECTION
+  ═══════════════════════════════════ -->
+  <section class="hero">
+
+    <div class="hero-left">
+      <div class="spec-label" data-ref="§1.0 OVERVIEW">Ahorro colectivo · Rotating Savings</div>
+
+      <h1 class="hero-title">
+        La tanda<br>
+        de <span class="accent">siempre</span><br>
+        — sin el riesgo.
+      </h1>
+
+      <p class="hero-tagline">Sin el riesgo de que te dejen colgado.</p>
+      <p class="hero-tagline-en">// AI-organized savings circles on-chain. Save together, in pesos, without the trust problem.</p>
+
+      <div class="feature-list">
+        <div class="feature-item">
+          <div class="feat-marker">AI</div>
+          <div class="feat-content">
+            <div class="feat-label">§1.1 Scoring Engine</div>
+            <div class="feat-title">Calificación IA de confiabilidad</div>
+            <div class="feat-desc">El agente analiza tu historial on-chain y fija tu colateral automáticamente. Sin bancos, sin buró.</div>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feat-marker">⬡</div>
+          <div class="feat-content">
+            <div class="feat-label">§1.2 Default Protection</div>
+            <div class="feat-title">A prueba de incumplimiento</div>
+            <div class="feat-desc">Si alguien falla: colateral slashado + fondo de seguro cubre el monto completo al receptor.</div>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feat-marker">⚡</div>
+          <div class="feat-content">
+            <div class="feat-label">§1.3 Onboarding</div>
+            <div class="feat-title">Sin semilla, sin gas</div>
+            <div class="feat-desc">Ingresa con passkey. Sin seed phrase, sin ETH para gas — diseñado para la próxima ola de LATAM.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cta-group">
+        <button class="btn-primary">Crear una tanda</button>
+        <button class="btn-secondary">Cómo funciona</button>
+      </div>
+
+      <div class="trust-strip">
+        <div class="trust-item">Built on Arbitrum</div>
+        <div class="trust-item">Settles in MXNB</div>
+        <div class="trust-item">Non-custodial</div>
+      </div>
+    </div>
+
+    <!-- ─── MECHANISM SCHEMATIC SVG ─── -->
+    <div class="hero-schematic">
+      <svg class="schematic-svg" viewBox="0 0 560 520" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <!-- Glow filters -->
+          <filter id="glow-cyan" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="glow-red" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <!-- Arrow markers -->
+          <marker id="arrow-cyan" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="rgba(0,229,255,0.7)"/>
+          </marker>
+          <marker id="arrow-red" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="rgba(255,58,92,0.7)"/>
+          </marker>
+          <marker id="arrow-green" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="rgba(0,230,118,0.7)"/>
+          </marker>
+          <marker id="arrow-amber" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="rgba(255,179,0,0.7)"/>
+          </marker>
+          <!-- Dashed pattern -->
+          <pattern id="grid-small" width="20" height="20" patternUnits="userSpaceOnUse">
+            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(40,90,180,0.15)" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+
+        <!-- Background grid -->
+        <rect width="560" height="520" fill="url(#grid-small)"/>
+        <rect width="560" height="520" fill="rgba(10,15,30,0.3)"/>
+
+        <!-- Dimension lines (decorative) -->
+        <line x1="10" y1="10" x2="550" y2="10" stroke="rgba(0,229,255,0.15)" stroke-width="0.5"/>
+        <line x1="10" y1="510" x2="550" y2="510" stroke="rgba(0,229,255,0.15)" stroke-width="0.5"/>
+        <line x1="10" y1="10" x2="10" y2="510" stroke="rgba(0,229,255,0.15)" stroke-width="0.5"/>
+        <line x1="550" y1="10" x2="550" y2="510" stroke="rgba(0,229,255,0.15)" stroke-width="0.5"/>
+
+        <!-- Dim tick marks -->
+        <line x1="10" y1="10" x2="10" y2="20" stroke="rgba(0,229,255,0.4)" stroke-width="1"/>
+        <line x1="550" y1="10" x2="550" y2="20" stroke="rgba(0,229,255,0.4)" stroke-width="1"/>
+        <text x="280" y="8" fill="rgba(0,229,255,0.3)" font-family="JetBrains Mono, monospace" font-size="7" text-anchor="middle" letter-spacing="1">540 UNITS</text>
+
+        <!-- ── SMART CONTRACT (center, main box) ── -->
+        <rect x="195" y="195" width="170" height="110" fill="rgba(0,40,120,0.4)" stroke="rgba(0,229,255,0.7)" stroke-width="1.5" filter="url(#glow-cyan)"/>
+        <rect x="195" y="195" width="170" height="16" fill="rgba(0,229,255,0.12)"/>
+        <text x="280" y="207" fill="rgba(0,229,255,0.8)" font-family="JetBrains Mono, monospace" font-size="8" font-weight="700" text-anchor="middle" letter-spacing="1.5">SMART CONTRACT</text>
+        <text x="280" y="227" fill="rgba(232,240,255,0.7)" font-family="JetBrains Mono, monospace" font-size="9" text-anchor="middle">Escrow · Arbitrum</text>
+        <text x="280" y="243" fill="rgba(0,229,255,0.5)" font-family="JetBrains Mono, monospace" font-size="8" text-anchor="middle">0x7f4a...3c9d</text>
+        <text x="280" y="267" fill="rgba(0,229,255,0.4)" font-family="JetBrains Mono, monospace" font-size="8" text-anchor="middle">[ POT: 400 MXNB ]</text>
+        <text x="280" y="283" fill="rgba(0,229,255,0.35)" font-family="JetBrains Mono, monospace" font-size="7.5" text-anchor="middle">auto-execute · trustless</text>
+
+        <!-- Corner notches on SC box -->
+        <polyline points="195,202 195,195 202,195" fill="none" stroke="rgba(0,229,255,0.9)" stroke-width="1.5"/>
+        <polyline points="358,202 358,195 351,195" fill="none" stroke="rgba(0,229,255,0.9)" stroke-width="1.5"/>
+        <polyline points="195,298 195,305 202,305" fill="none" stroke="rgba(0,229,255,0.9)" stroke-width="1.5"/>
+        <polyline points="358,298 358,305 351,305" fill="none" stroke="rgba(0,229,255,0.9)" stroke-width="1.5"/>
+
+        <!-- ── AI UNDERWRITER (top) ── -->
+        <rect x="200" y="42" width="160" height="80" fill="rgba(30,94,255,0.15)" stroke="rgba(30,94,255,0.6)" stroke-width="1" stroke-dasharray="4,2"/>
+        <text x="280" y="60" fill="rgba(100,160,255,0.9)" font-family="JetBrains Mono, monospace" font-size="8" font-weight="700" text-anchor="middle" letter-spacing="1.5">AI UNDERWRITER</text>
+        <text x="280" y="76" fill="rgba(232,240,255,0.5)" font-family="JetBrains Mono, monospace" font-size="7.5" text-anchor="middle">Score Engine v2.1</text>
+        <!-- Mini gauge in AI box -->
+        <rect x="220" y="84" width="120" height="8" fill="rgba(30,94,255,0.1)" stroke="rgba(30,94,255,0.3)" stroke-width="0.5"/>
+        <rect x="220" y="84" width="74" height="8" fill="rgba(30,94,255,0.5)"/>
+        <text x="344" y="92" fill="rgba(100,160,255,0.6)" font-family="JetBrains Mono, monospace" font-size="7" text-anchor="end">62%</text>
+        <text x="280" y="113" fill="rgba(30,94,255,0.6)" font-family="JetBrains Mono, monospace" font-size="7" text-anchor="middle">on-chain reputation · history</text>
+
+        <!-- AI → SC arrow (dashed, downward) -->
+        <line x1="280" y1="122" x2="280" y2="193" stroke="rgba(30,94,255,0.6)" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-cyan)"/>
+        <text x="292" y="162" fill="rgba(30,94,255,0.7)" font-family="JetBrains Mono, monospace" font-size="8" letter-spacing="0.5">SCORE + COLLATERAL</text>
+
+        <!-- ── MEMBER NODES (left) ── -->
+        <!-- M1 -->
+        <rect x="22" y="118" width="100" height="48" fill="rgba(0,180,80,0.08)" stroke="rgba(0,230,118,0.45)" stroke-width="1"/>
+        <text x="72" y="136" fill="rgba(0,230,118,0.9)" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700" text-anchor="middle">María</text>
+        <text x="72" y="149" fill="rgba(0,230,118,0.6)" font-family="JetBrains Mono, monospace" font-size="8" text-anchor="middle">Score: 82 · Col: 0.5×</text>
+        <text x="72" y="161" fill="rgba(0,230,118,0.4)" font-family="JetBrains Mono, monospace" font-size="7" text-anchor="middle">HIGH TRUST</text>
+
+        <!-- M2 -->
+        <rect x="22" y="218" width="100" height="48" fill="rgba(0,100,200,0.08)" stroke="rgba(0,229,255,0.35)" stroke-width="1"/>
+        <text x="72" y="236" fill="rgba(0,229,255,0.8)" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700" text-anchor="middle">Diego</text>
+        <text x="72" y="249" fill="rgba(0,229,255,0.55)" font-family="JetBrains Mono, monospace" font-size="8" text-anchor="middle">Score: 66 · Col: 1×</text>
+        <text x="72" y="261" fill="rgba(0,229,255,0.35)" font-family="JetBrains Mono, monospace" font-size="7" text-anchor="middle">STANDARD</text>
+
+        <!-- ── MEMBER NODES (right) ── -->
+        <!-- M3 -->
+        <rect x="438" y="118" width="100" height="48" fill="rgba(255,180,0,0.06)" stroke="rgba(255,179,0,0.45)" stroke-width="1"/>
+        <text x="488" y="136" fill="rgba(255,179,0,0.9)" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700" text-anchor="middle">Lupe</text>
+        <text x="488" y="149" fill="rgba(255,179,0,0.6)" font-family="JetBrains Mono, monospace" font-size="8" text-anchor="middle">Score: 50 · Col: 2×</text>
+        <text x="488" y="161" fill="rgba(255,179,0,0.4)" font-family="JetBrains Mono, monospace" font-size="7" text-anchor="middle">ELEVATED RISK</text>
+
+        <!-- M4 (flagged) -->
+        <rect x="438" y="218" width="100" height="48" fill="rgba(255,58,92,0.08)" stroke="rgba(255,58,92,0.55)" stroke-width="1" stroke-dasharray="3,2"/>
+        <text x="488" y="236" fill="rgba(255,58,92,0.9)" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700" text-anchor="middle">0xkito</text>
+        <text x="488" y="249" fill="rgba(255,58,92,0.65)" font-family="JetBrains Mono, monospace" font-size="8" text-anchor="middle">Score: 28 · Col: 3×</text>
+        <text x="488" y="261" fill="rgba(255,58,92,0.5)" font-family="JetBrains Mono, monospace" font-size="7" text-anchor="middle">⚠ FLAGGED</text>
+
+        <!-- ── INSURANCE POOL (bottom) ── -->
+        <rect x="185" y="380" width="190" height="70" fill="rgba(0,80,40,0.2)" stroke="rgba(0,230,118,0.5)" stroke-width="1" stroke-dasharray="5,3"/>
+        <text x="280" y="398" fill="rgba(0,230,118,0.8)" font-family="JetBrains Mono, monospace" font-size="8" font-weight="700" text-anchor="middle" letter-spacing="1.5">INSURANCE POOL</text>
+        <text x="280" y="414" fill="rgba(0,230,118,0.9)" font-family="JetBrains Mono, monospace" font-size="11" text-anchor="middle" font-weight="700">1,240 MXNB</text>
+        <text x="280" y="430" fill="rgba(0,230,118,0.5)" font-family="JetBrains Mono, monospace" font-size="7.5" text-anchor="middle">fondo de protección · active</text>
+        <!-- pool level bar -->
+        <rect x="210" y="434" width="140" height="5" fill="rgba(0,80,40,0.3)" stroke="rgba(0,230,118,0.2)" stroke-width="0.5"/>
+        <rect x="210" y="434" width="87" height="5" fill="rgba(0,230,118,0.5)"/>
+        <text x="356" y="441" fill="rgba(0,230,118,0.4)" font-family="JetBrains Mono, monospace" font-size="7" text-anchor="start">62%</text>
+
+        <!-- SC → Insurance arrow -->
+        <line x1="280" y1="305" x2="280" y2="378" stroke="rgba(0,230,118,0.45)" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-green)"/>
+
+        <!-- ── FLOW LINES: members → SC ── -->
+        <!-- María → SC -->
+        <path d="M122,142 L193,250" stroke="rgba(0,230,118,0.5)" stroke-width="1.2" stroke-dasharray="4,2" marker-end="url(#arrow-green)"/>
+        <text x="148" y="188" fill="rgba(0,230,118,0.5)" font-family="JetBrains Mono, monospace" font-size="7.5" transform="rotate(-28,148,188)">contribute</text>
+
+        <!-- Diego → SC -->
+        <line x1="122" y1="242" x2="193" y2="250" stroke="rgba(0,229,255,0.45)" stroke-width="1.2" stroke-dasharray="4,2" marker-end="url(#arrow-cyan)"/>
+
+        <!-- SC → Lupe (payout) -->
+        <path d="M360,240 L436,142" stroke="rgba(255,179,0,0.6)" stroke-width="1.5" marker-end="url(#arrow-amber)"/>
+        <text x="408" y="185" fill="rgba(255,179,0,0.6)" font-family="JetBrains Mono, monospace" font-size="7.5" transform="rotate(28,408,185)">PAYOUT RONDA 2</text>
+
+        <!-- 0xkito → SC (flagged, red dashed) -->
+        <path d="M438,242 L360,250" stroke="rgba(255,58,92,0.45)" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arrow-red)"/>
+
+        <!-- AI → 0xkito collateral alert -->
+        <path d="M358,80 L500,80 L500,218" stroke="rgba(255,58,92,0.4)" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arrow-red)"/>
+        <text x="430" y="72" fill="rgba(255,58,92,0.6)" font-family="JetBrains Mono, monospace" font-size="7.5" text-anchor="middle">COLLATERAL ALERT</text>
+
+        <!-- ── CALLOUT LABELS ── -->
+        <!-- SC label: ROUND STATUS -->
+        <line x1="60" y1="340" x2="193" y2="290" stroke="rgba(255,58,92,0.3)" stroke-width="0.8"/>
+        <circle cx="59" cy="340" r="2" fill="rgba(255,58,92,0.5)"/>
+        <text x="10" y="360" fill="rgba(255,58,92,0.65)" font-family="JetBrains Mono, monospace" font-size="7.5">RONDA 2/4</text>
+        <text x="10" y="372" fill="rgba(255,58,92,0.45)" font-family="JetBrains Mono, monospace" font-size="7">auto-advance</text>
+
+        <!-- Center dimension mark -->
+        <line x1="195" y1="340" x2="358" y2="340" stroke="rgba(255,58,92,0.25)" stroke-width="0.7" stroke-dasharray="2,2"/>
+        <line x1="195" y1="336" x2="195" y2="344" stroke="rgba(255,58,92,0.4)" stroke-width="1"/>
+        <line x1="358" y1="336" x2="358" y2="344" stroke="rgba(255,58,92,0.4)" stroke-width="1"/>
+        <text x="276" y="336" fill="rgba(255,58,92,0.4)" font-family="JetBrains Mono, monospace" font-size="7" text-anchor="middle">163u</text>
+
+        <!-- Title annotation -->
+        <text x="20" y="492" fill="rgba(0,229,255,0.3)" font-family="JetBrains Mono, monospace" font-size="7.5" letter-spacing="1">FIG.1 — TANDA MECHANISM OVERVIEW · TND-ARCH-001-A</text>
+        <text x="540" y="492" fill="rgba(0,229,255,0.3)" font-family="JetBrains Mono, monospace" font-size="7.5" text-anchor="end" letter-spacing="0.5">ARBITRUM L2 · MXNB</text>
+
+        <!-- Animated flow dot on María→SC line -->
+        <circle r="3" fill="rgba(0,230,118,0.9)" filter="url(#glow-cyan)">
+          <animateMotion dur="3s" repeatCount="indefinite">
+            <mpath href="#path-maria"/>
+          </animateMotion>
+        </circle>
+        <path id="path-maria" d="M122,142 L193,250" fill="none"/>
+
+        <!-- Animated flow dot on SC→Lupe -->
+        <circle r="3" fill="rgba(255,179,0,0.9)">
+          <animateMotion dur="2.5s" repeatCount="indefinite" begin="0.5s">
+            <mpath href="#path-payout"/>
+          </animateMotion>
+        </circle>
+        <path id="path-payout" d="M360,240 L436,142" fill="none"/>
+
+        <!-- Animated pulse on 0xkito box -->
+        <rect x="438" y="218" width="100" height="48" fill="none" stroke="rgba(255,58,92,0.4)" stroke-width="1">
+          <animate attributeName="stroke-opacity" values="0.1;0.8;0.1" dur="1.8s" repeatCount="indefinite"/>
+        </rect>
+
+      </svg>
+    </div><!-- /hero-schematic -->
+  </section>
+
+  <!-- ─── SECTION DIVIDER ─── -->
+  <div class="section-divider">
+    §2.0 &nbsp;Active Circle · Tanda Dashboard Preview &nbsp;// &nbsp;Tanda Activa
+  </div>
+
+  <!-- ═══════════════════════════════════
+       DASHBOARD SECTION
+  ═══════════════════════════════════ -->
+  <section class="dashboard-section">
+
+    <div class="dashboard-header">
+      <div class="dashboard-title-block">
+        <div class="dash-label">§2.1 Circle Status · Estado del Círculo</div>
+        <div class="dash-title">Tanda Oaxaca</div>
+        <div class="dash-subtitle">// 100 MXNB/ROUND · 4 MEMBERS · ARBITRUM · TXN 0x8f2c...1a4e</div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:flex-end; gap:10px;">
+        <div class="round-indicators">
+          <span class="round-label">Ronda //</span>
+          <div class="round-pip done">1</div>
+          <div class="round-pip active">2</div>
+          <div class="round-pip pending">3</div>
+          <div class="round-pip pending">4</div>
+        </div>
+        <div style="font-family:var(--font-mono); font-size:9px; color:var(--amber); letter-spacing:0.1em;">
+          PRÓXIMO RECEPTOR: Lupe — slot 2
+        </div>
+      </div>
+    </div>
+
+    <!-- STATS BAR -->
+    <div class="stats-bar">
+      <div class="stat-cell" data-label="Pote / Total Pot">
+        <div class="stat-value">400 <span class="unit">MXNB</span></div>
+      </div>
+      <div class="stat-cell" data-label="Ronda / Round">
+        <div class="stat-value">2 <span class="unit">de 4</span></div>
+      </div>
+      <div class="stat-cell" data-label="Miembros / Members">
+        <div class="stat-value">4 <span class="unit">activos</span></div>
+      </div>
+      <div class="stat-cell" data-label="Estado / Status">
+        <div class="stat-value" style="font-size:16px; color:var(--green);">EN CURSO</div>
+      </div>
+    </div>
+
+    <!-- ─── AI WARNING BANNER ─── -->
+    <div class="warning-banner">
+      <span class="warning-icon">⚠</span>
+      <div class="warning-text">
+        <strong>El agente detectó riesgo de impago de <em>0xkito</em> esta ronda</strong> — se solicitó refuerzo de colateral de 3× → 3.5× (35 MXNB adicionales). El fondo de protección cubre en caso de incumplimiento.
+        <br><span style="font-family:var(--font-mono); font-size:10px; color:rgba(255,100,120,0.6); letter-spacing:0.05em;">// AI detected default risk · collateral top-up requested · insurance pool on standby</span>
+      </div>
+      <div class="warning-badge">RIESGO ALTO</div>
+    </div>
+
+    <!-- ─── MEMBERS GRID ─── -->
+    <div class="members-grid">
+
+      <!-- María — HIGH TRUST -->
+      <div class="member-card">
+        <div class="member-slot">
+          <span>Slot pago</span>
+          <span class="slot-num">01</span>
+        </div>
+        <div class="member-avatar">M</div>
+        <div class="member-name">María</div>
+        <div class="score-section">
+          <div class="score-label">AI Score <span>82 / 100</span></div>
+          <div class="score-bar"><div class="score-fill" style="width:82%"></div></div>
+        </div>
+        <div class="member-detail">
+          <div class="detail-row">
+            <span class="detail-key">Colateral</span>
+            <span class="detail-val high">0.5× · 50 MXNB</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-key">Estado</span>
+            <span class="detail-val high">✓ Al corriente</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-key">Pago recibido</span>
+            <span class="detail-val mid">Ronda 1 ✓</span>
+          </div>
+        </div>
+        <div class="ai-rationale">6 rondas a tiempo, 1 círculo completado. Alto puntaje histórico.</div>
+      </div>
+
+      <!-- Diego — CURRENT WINNER (receiving this round) — but using standard style -->
+      <div class="member-card" style="border-color: rgba(0,229,255,0.5);">
+        <div class="member-slot">
+          <span>Slot pago</span>
+          <span class="slot-num">02</span>
+        </div>
+        <div class="member-avatar">D</div>
+        <div class="member-name">Diego</div>
+        <div class="score-section">
+          <div class="score-label">AI Score <span>66 / 100</span></div>
+          <div class="score-bar"><div class="score-fill" style="width:66%"></div></div>
+        </div>
+        <div class="member-detail">
+          <div class="detail-row">
+            <span class="detail-key">Colateral</span>
+            <span class="detail-val mid">1× · 100 MXNB</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-key">Estado</span>
+            <span class="detail-val mid">Al corriente</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-key">Pago</span>
+            <span class="detail-val mid">Pendiente ronda 3</span>
+          </div>
+        </div>
+        <div class="ai-rationale">3 tandas parciales. Consistente en pagos recientes.</div>
+      </div>
+
+      <!-- Lupe — CURRENT PAYOUT RECIPIENT -->
+      <div class="member-card current-winner">
+        <div class="member-slot">
+          <span>Slot pago</span>
+          <span class="slot-num">03</span>
+        </div>
+        <div class="member-avatar" style="color:var(--amber); border-color:var(--amber-dim);">L</div>
+        <div class="member-name">Lupe</div>
+        <div class="score-section">
+          <div class="score-label" style="color:var(--amber-dim);">AI Score <span style="color:var(--amber);">50 / 100</span></div>
+          <div class="score-bar">
+            <div class="score-fill" style="width:50%; background: linear-gradient(90deg, #7a4000, var(--amber));">
+              <div style="position:absolute; right:0; top:-3px; width:2px; height:10px; background:var(--amber); box-shadow: 0 0 6px var(--amber);"></div>
+            </div>
+          </div>
+        </div>
+        <div class="member-detail">
+          <div class="detail-row">
+            <span class="detail-key">Colateral</span>
+            <span class="detail-val warn">2× · 200 MXNB</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-key">Estado</span>
+            <span class="detail-val warn">⬡ Recibiendo ronda 2</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-key">Pago activo</span>
+            <span class="detail-val" style="color:var(--amber); font-weight:700;">400 MXNB →</span>
+          </div>
+        </div>
+        <div class="ai-rationale" style="color:rgba(255,179,0,0.4);">Wallet de 8 meses, 2 tandas. Colateral elevado por historial corto.</div>
+      </div>
+
+      <!-- 0xkito — FLAGGED -->
+      <div class="member-card flagged">
+        <div class="member-slot">
+          <span>Slot pago</span>
+          <span class="slot-num">04</span>
+        </div>
+        <div class="member-avatar">K</div>
+        <div class="member-name">0xkito</div>
+        <div class="score-section">
+          <div class="score-label">AI Score <span>28 / 100</span></div>
+          <div class="score-bar"><div class="score-fill" style="width:28%"></div></div>
+        </div>
+        <div class="member-detail">
+          <div class="detail-row">
+            <span class="detail-key">Colateral</span>
+            <span class="detail-val flag">3× · 300 MXNB</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-key">Estado</span>
+            <span class="detail-val flag">⚠ Refuerzo solicitado</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-key">Riesgo IA</span>
+            <span class="detail-val flag" style="font-weight:700;">ALTO · MONITOREO</span>
+          </div>
+        </div>
+        <div class="ai-rationale">New wallet, cold-start. Sin historial de tandas previas. Riesgo detectado.</div>
+      </div>
+
+    </div><!-- /members-grid -->
+
+    <!-- ─── BOTTOM PANELS ─── -->
+    <div class="bottom-panels">
+
+      <!-- Insurance Pool -->
+      <div class="panel" data-title="§2.4 FONDO DE PROTECCIÓN // INSURANCE POOL">
+        <div class="insurance-value">
+          <span class="ins-num">1,240</span>
+          <span class="ins-unit">MXNB</span>
+        </div>
+        <div class="pool-bar">
+          <div class="pool-fill"></div>
+        </div>
+        <div class="pool-note">
+          CAPACIDAD POOL: 2,000 MXNB &nbsp;·&nbsp; UTILIZACIÓN: 62%<br>
+          Cubre incumplimientos totales hasta 2 rondas completas.
+        </div>
+        <div style="margin-top:14px; display:flex; gap:16px;">
+          <div style="font-family:var(--font-mono); font-size:9px; color:var(--green-dim); letter-spacing:0.1em;">
+            ✓ ACTIVO Y FONDEADO
+          </div>
+          <div style="font-family:var(--font-mono); font-size:9px; color:rgba(0,230,118,0.35); letter-spacing:0.1em;">
+            ABI: pool_v2.sol
+          </div>
+        </div>
+      </div>
+
+      <!-- Contract Info -->
+      <div class="panel" data-title="§2.5 CONTRATO INTELIGENTE // SMART CONTRACT">
+        <div class="contract-info">
+          <div class="contract-row">
+            <span class="contract-key">Contract Address</span>
+            <span class="contract-val">0x7f4a8b2e...3c9d</span>
+          </div>
+          <div class="contract-row">
+            <span class="contract-key">Network</span>
+            <span class="contract-val">Arbitrum One · Chain 42161</span>
+          </div>
+          <div class="contract-row">
+            <span class="contract-key">Token</span>
+            <span class="contract-val">MXNB · Mexican Peso Stablecoin</span>
+          </div>
+          <div class="contract-row">
+            <span class="contract-key">Escrow Status</span>
+            <span class="contract-val" style="color:var(--green);">LOCKED · 400 MXNB</span>
+          </div>
+          <div class="contract-row">
+            <span class="contract-key">AI Engine</span>
+            <span class="contract-val">ScoreEngine v2.1 · on-chain oracle</span>
+          </div>
+          <div class="contract-row">
+            <span class="contract-key">Custodian</span>
+            <span class="contract-val" style="color:var(--cyan);">NON-CUSTODIAL · TRUSTLESS</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /bottom-panels -->
+
+  </section><!-- /dashboard-section -->
+
+</main>
+
+<script>
+// Staggered reveal for member cards
+document.addEventListener('DOMContentLoaded', () => {
+  const cards = document.querySelectorAll('.member-card');
+  cards.forEach((card, i) => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(20px)';
+    card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    setTimeout(() => {
+      card.style.opacity = '1';
+      card.style.transform = 'translateY(0)';
+    }, 900 + i * 120);
+  });
+
+  // Animate score bars
+  const fills = document.querySelectorAll('.score-fill');
+  fills.forEach(fill => {
+    const targetWidth = fill.style.width;
+    fill.style.width = '0';
+    setTimeout(() => { fill.style.width = targetWidth; }, 1100);
+  });
+
+  // Pool bar
+  const poolFill = document.querySelector('.pool-fill');
+  if (poolFill) {
+    poolFill.style.width = '0';
+    setTimeout(() => {
+      poolFill.style.width = '62%';
+      poolFill.style.transition = 'width 1s ease';
+    }, 1200);
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TANDA — AI-Powered Savings Circles</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --black: #0a0a0a;
+      --near-black: #111111;
+      --concrete: #c8c4bc;
+      --off-white: #f0ede8;
+      --acid: #b8ff00;
+      --border: 3px solid #0a0a0a;
+      --border-thin: 1.5px solid #0a0a0a;
+      --font-display: 'Anton', sans-serif;
+      --font-mono: 'Space Mono', monospace;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--off-white);
+      color: var(--black);
+      font-family: var(--font-mono);
+      font-size: 14px;
+      line-height: 1.4;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      border-bottom: var(--border);
+      display: flex;
+      align-items: stretch;
+      height: 56px;
+      background: var(--off-white);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      padding: 0 28px;
+      border-right: var(--border);
+      font-family: var(--font-display);
+      font-size: 28px;
+      letter-spacing: 0.04em;
+    }
+
+    .nav-logo span {
+      background: var(--acid);
+      color: var(--black);
+      padding: 2px 6px;
+      margin-left: 4px;
+      font-size: 10px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      vertical-align: middle;
+      position: relative;
+      top: -2px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: stretch;
+      margin-left: auto;
+    }
+
+    .nav-links a {
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      border-left: var(--border);
+      text-decoration: none;
+      color: var(--black);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: background 0.1s;
+    }
+
+    .nav-links a:hover { background: var(--black); color: var(--off-white); }
+
+    .nav-links a.cta-nav {
+      background: var(--acid);
+      font-weight: 700;
+    }
+
+    .nav-links a.cta-nav:hover { background: var(--black); color: var(--acid); }
+
+    /* ── TRUST STRIP ── */
+    .trust-strip {
+      background: var(--black);
+      color: var(--acid);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 8px 0;
+      text-align: center;
+      border-bottom: var(--border);
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .trust-strip-inner {
+      display: inline-block;
+      animation: marquee 18s linear infinite;
+    }
+
+    .trust-strip-inner span {
+      margin: 0 32px;
+    }
+
+    .trust-strip-inner span::before {
+      content: '//';
+      margin-right: 8px;
+      opacity: 0.5;
+    }
+
+    @keyframes marquee {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ── HERO ── */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 480px;
+      border-bottom: var(--border);
+      min-height: calc(100vh - 100px);
+      animation: fadeIn 0.6s ease both;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-left {
+      padding: 60px 60px 60px 60px;
+      border-right: var(--border);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .hero-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      background: var(--acid);
+      display: inline-block;
+      padding: 4px 10px;
+      border: var(--border-thin);
+      margin-bottom: 32px;
+      animation: fadeIn 0.4s 0.1s ease both;
+    }
+
+    .hero-headline {
+      font-family: var(--font-display);
+      font-size: clamp(72px, 8vw, 120px);
+      line-height: 0.92;
+      letter-spacing: -0.01em;
+      text-transform: uppercase;
+      margin-bottom: 0;
+      animation: fadeIn 0.5s 0.2s ease both;
+    }
+
+    .hero-headline .accent { color: var(--acid); -webkit-text-stroke: 2px var(--black); }
+    .hero-headline .outline {
+      -webkit-text-stroke: 3px var(--black);
+      color: transparent;
+    }
+
+    .hero-tagline {
+      font-family: var(--font-mono);
+      font-size: 18px;
+      font-style: italic;
+      margin-top: 32px;
+      margin-bottom: 24px;
+      max-width: 560px;
+      border-left: 5px solid var(--acid);
+      padding-left: 16px;
+      animation: fadeIn 0.5s 0.3s ease both;
+    }
+
+    .hero-value-prop {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #555;
+      margin-bottom: 48px;
+      max-width: 480px;
+      animation: fadeIn 0.5s 0.35s ease both;
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: 0;
+      animation: fadeIn 0.5s 0.4s ease both;
+    }
+
+    .btn-primary {
+      background: var(--black);
+      color: var(--acid);
+      border: var(--border);
+      font-family: var(--font-display);
+      font-size: 20px;
+      letter-spacing: 0.05em;
+      padding: 16px 36px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      text-transform: uppercase;
+      transition: background 0.1s, color 0.1s;
+    }
+
+    .btn-primary:hover { background: var(--acid); color: var(--black); }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--black);
+      border: var(--border);
+      border-left: none;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 16px 28px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      text-transform: uppercase;
+      transition: background 0.1s;
+    }
+
+    .btn-secondary:hover { background: var(--concrete); }
+
+    /* ── HERO RIGHT — FEATURES ── */
+    .hero-right {
+      display: flex;
+      flex-direction: column;
+      animation: fadeIn 0.6s 0.25s ease both;
+    }
+
+    .feature-block {
+      flex: 1;
+      border-bottom: var(--border);
+      padding: 32px 36px;
+      position: relative;
+      transition: background 0.15s;
+    }
+
+    .feature-block:last-child { border-bottom: none; }
+    .feature-block:hover { background: var(--black); color: var(--off-white); }
+    .feature-block:hover .feature-num { color: var(--acid); }
+    .feature-block:hover .feature-tag { background: var(--acid); color: var(--black); }
+
+    .feature-num {
+      font-family: var(--font-display);
+      font-size: 56px;
+      line-height: 1;
+      color: var(--concrete);
+      margin-bottom: 8px;
+      transition: color 0.15s;
+    }
+
+    .feature-tag {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      background: var(--black);
+      color: var(--acid);
+      display: inline-block;
+      padding: 3px 8px;
+      margin-bottom: 12px;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .feature-title {
+      font-family: var(--font-display);
+      font-size: 22px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .feature-desc {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.6;
+      color: #555;
+      transition: color 0.15s;
+    }
+
+    .feature-block:hover .feature-desc { color: var(--concrete); }
+
+    /* ── SECTION HEADER ── */
+    .section-header {
+      display: flex;
+      align-items: stretch;
+      border-bottom: var(--border);
+      background: var(--near-black);
+    }
+
+    .section-header-label {
+      font-family: var(--font-display);
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--acid);
+      padding: 14px 28px;
+      border-right: 3px solid var(--acid);
+    }
+
+    .section-header-title {
+      font-family: var(--font-display);
+      font-size: 22px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--off-white);
+      padding: 14px 28px;
+      flex: 1;
+    }
+
+    .section-header-meta {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--concrete);
+      padding: 14px 28px;
+      border-left: var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--acid);
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.4; transform: scale(0.7); }
+    }
+
+    /* ── DASHBOARD ── */
+    .dashboard {
+      background: var(--off-white);
+      animation: fadeIn 0.7s 0.1s ease both;
+    }
+
+    /* ── WARNING BANNER ── */
+    .warning-banner {
+      background: #ff4500;
+      border-bottom: var(--border);
+      padding: 14px 36px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .warning-icon {
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .warning-text {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--off-white);
+      letter-spacing: 0.03em;
+    }
+
+    .warning-text strong { color: #fff; text-transform: uppercase; }
+
+    .warning-badge {
+      margin-left: auto;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      background: var(--off-white);
+      color: #ff4500;
+      padding: 4px 10px;
+      border: 2px solid var(--off-white);
+      flex-shrink: 0;
+    }
+
+    /* ── POT HEADER ── */
+    .pot-header {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border-bottom: var(--border);
+    }
+
+    .pot-cell {
+      padding: 28px 32px;
+      border-right: var(--border);
+    }
+
+    .pot-cell:last-child { border-right: none; }
+
+    .pot-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 8px;
+    }
+
+    .pot-value {
+      font-family: var(--font-display);
+      font-size: 36px;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+
+    .pot-value.highlight { color: var(--acid); background: var(--black); padding: 4px 8px; display: inline-block; }
+
+    .pot-sub {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: #888;
+      margin-top: 6px;
+    }
+
+    /* ── LEDGER TABLE ── */
+    .ledger-wrap {
+      overflow: hidden;
+    }
+
+    .ledger-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .ledger-table thead tr {
+      background: var(--black);
+    }
+
+    .ledger-table thead th {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--acid);
+      padding: 12px 24px;
+      text-align: left;
+      border-right: 2px solid #333;
+    }
+
+    .ledger-table thead th:last-child { border-right: none; }
+
+    .ledger-table tbody tr {
+      border-bottom: var(--border);
+      transition: background 0.1s;
+      animation: fadeIn 0.4s ease both;
+    }
+
+    .ledger-table tbody tr:nth-child(1) { animation-delay: 0.05s; }
+    .ledger-table tbody tr:nth-child(2) { animation-delay: 0.10s; }
+    .ledger-table tbody tr:nth-child(3) { animation-delay: 0.15s; }
+    .ledger-table tbody tr:nth-child(4) { animation-delay: 0.20s; }
+
+    .ledger-table tbody tr:hover { background: #e8e4de; }
+    .ledger-table tbody tr.flagged { background: #fff0ed; }
+    .ledger-table tbody tr.flagged:hover { background: #ffddd6; }
+    .ledger-table tbody tr.top-trust { background: #f4ffcc; }
+    .ledger-table tbody tr.top-trust:hover { background: #eaffa0; }
+    .ledger-table tbody tr.paid-out { background: #f0f0f0; }
+
+    .ledger-table tbody td {
+      padding: 20px 24px;
+      border-right: var(--border-thin);
+      vertical-align: middle;
+    }
+
+    .ledger-table tbody td:last-child { border-right: none; }
+
+    /* Member name cell */
+    .member-name {
+      font-family: var(--font-display);
+      font-size: 22px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .member-address {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: #888;
+      margin-top: 2px;
+    }
+
+    .member-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border: 1.5px solid;
+      margin-top: 4px;
+    }
+
+    .badge-trusted { border-color: #4a9e00; color: #4a9e00; background: #f0ffe0; }
+    .badge-flagged { border-color: #cc3300; color: #cc3300; background: #fff0ed; }
+    .badge-watch   { border-color: #cc8800; color: #cc8800; background: #fff8e0; }
+    .badge-cold    { border-color: #888;    color: #888;    background: #f5f5f5; }
+
+    /* Score cell */
+    .score-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .score-number {
+      font-family: var(--font-display);
+      font-size: 42px;
+      line-height: 1;
+      min-width: 56px;
+    }
+
+    .score-bar-track {
+      flex: 1;
+      height: 8px;
+      background: #ddd;
+      border: 1.5px solid var(--black);
+      position: relative;
+      min-width: 80px;
+    }
+
+    .score-bar-fill {
+      position: absolute;
+      top: 0; left: 0; bottom: 0;
+      transition: width 0.8s ease;
+    }
+
+    .score-rationale {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: #777;
+      margin-top: 4px;
+      font-style: italic;
+    }
+
+    /* Collateral cell */
+    .collateral-mult {
+      font-family: var(--font-display);
+      font-size: 28px;
+      letter-spacing: 0.03em;
+    }
+
+    .collateral-amount {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: #888;
+      margin-top: 2px;
+    }
+
+    /* Slot cell */
+    .slot-number {
+      font-family: var(--font-display);
+      font-size: 36px;
+      letter-spacing: 0.03em;
+    }
+
+    .slot-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #888;
+    }
+
+    .slot-done {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      color: #4a9e00;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      background: #e8ffe0;
+      padding: 3px 8px;
+      border: 1.5px solid #4a9e00;
+      display: inline-block;
+    }
+
+    /* Status cell */
+    .status-current {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      background: var(--acid);
+      color: var(--black);
+      padding: 4px 10px;
+      border: var(--border-thin);
+      display: inline-block;
+    }
+
+    .status-wait {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #888;
+      border: 1.5px solid #ccc;
+      padding: 4px 10px;
+      display: inline-block;
+    }
+
+    .status-done-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #4a9e00;
+      border: 1.5px solid #4a9e00;
+      padding: 4px 10px;
+      display: inline-block;
+    }
+
+    .status-risk {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      background: #ff4500;
+      color: #fff;
+      padding: 4px 10px;
+      border: var(--border-thin);
+      display: inline-block;
+    }
+
+    /* ── BOTTOM STRIP ── */
+    .bottom-strip {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      border-top: var(--border);
+    }
+
+    .bottom-cell {
+      padding: 28px 36px;
+      border-right: var(--border);
+    }
+
+    .bottom-cell:last-child { border-right: none; }
+
+    .bottom-cell-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 8px;
+    }
+
+    .bottom-cell-value {
+      font-family: var(--font-display);
+      font-size: 32px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .bottom-cell-value.green { color: #4a9e00; }
+    .bottom-cell-value.acid-bg {
+      background: var(--acid);
+      color: var(--black);
+      padding: 4px 12px;
+      display: inline-block;
+    }
+
+    .bottom-cell-sub {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: #888;
+      margin-top: 6px;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--black);
+      color: var(--concrete);
+      border-top: var(--border);
+      padding: 32px 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-logo {
+      font-family: var(--font-display);
+      font-size: 32px;
+      color: var(--off-white);
+      letter-spacing: 0.04em;
+    }
+
+    .footer-logo span {
+      color: var(--acid);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 32px;
+    }
+
+    .footer-links a {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--concrete);
+      text-decoration: none;
+    }
+
+    .footer-links a:hover { color: var(--acid); }
+
+    .footer-copy {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #555;
+    }
+
+    /* ── GRID LINE DECORATION ── */
+    .grid-rule {
+      height: 1px;
+      background: repeating-linear-gradient(
+        to right,
+        var(--concrete) 0px,
+        var(--concrete) 8px,
+        transparent 8px,
+        transparent 16px
+      );
+      margin: 0;
+    }
+
+    /* Ledger row highlight for grid rule */
+    .ledger-table tbody tr.row-rule td {
+      padding-top: 0;
+      padding-bottom: 0;
+      height: 1px;
+    }
+
+    /* ── AI LABEL ── */
+    .ai-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: var(--black);
+      color: var(--acid);
+      padding: 2px 6px;
+      margin-bottom: 4px;
+    }
+
+    .ai-label::before {
+      content: '◆';
+      font-size: 7px;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .hero {
+        grid-template-columns: 1fr;
+        min-height: auto;
+      }
+
+      .hero-right {
+        border-top: var(--border);
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+
+      .feature-block {
+        flex: 1 1 50%;
+        border-right: var(--border);
+      }
+
+      .feature-block:nth-child(even) { border-right: none; }
+
+      .pot-header { grid-template-columns: repeat(2, 1fr); }
+      .bottom-strip { grid-template-columns: 1fr; }
+      .bottom-cell { border-right: none; border-bottom: var(--border); }
+      .bottom-cell:last-child { border-bottom: none; }
+
+      footer { flex-direction: column; gap: 24px; text-align: center; }
+      .footer-links { flex-wrap: wrap; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <div class="nav-logo">TANDA<span>BETA</span></div>
+  <div class="nav-links">
+    <a href="#como-funciona">Cómo Funciona</a>
+    <a href="#dashboard">Demo</a>
+    <a href="#" class="cta-nav">Crear una Tanda →</a>
+  </div>
+</nav>
+
+<!-- ── TRUST STRIP ── -->
+<div class="trust-strip">
+  <div class="trust-strip-inner">
+    <span>Built on Arbitrum</span>
+    <span>Settles in MXNB</span>
+    <span>Non-Custodial</span>
+    <span>AI Underwriter</span>
+    <span>Passkey Onboarding</span>
+    <span>Insurance Pool Active</span>
+    <span>Built on Arbitrum</span>
+    <span>Settles in MXNB</span>
+    <span>Non-Custodial</span>
+    <span>AI Underwriter</span>
+    <span>Passkey Onboarding</span>
+    <span>Insurance Pool Active</span>
+  </div>
+</div>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-left">
+    <div>
+      <div class="hero-eyebrow">Rotating Savings · On-Chain · LATAM</div>
+      <h1 class="hero-headline">
+        LA<br>
+        <span class="accent">TANDA</span><br>
+        <span class="outline">SIN</span><br>
+        RIESGOS
+      </h1>
+      <p class="hero-tagline">
+        "La tanda de siempre — sin el riesgo<br>de que te dejen colgado."
+      </p>
+      <p class="hero-value-prop">
+        AI-organized savings circles on-chain.<br>
+        Save together, in pesos, without the trust problem.
+      </p>
+    </div>
+
+    <div>
+      <div class="hero-ctas">
+        <a href="#" class="btn-primary">Crear una Tanda</a>
+        <a href="#como-funciona" class="btn-secondary">Cómo Funciona</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-right" id="como-funciona">
+    <div class="feature-block">
+      <div class="feature-num">01</div>
+      <div class="feature-tag">AI Scoring</div>
+      <div class="feature-title">Confiabilidad Verificada</div>
+      <p class="feature-desc">
+        Un agente de IA analiza tu historial on-chain y asigna un score de confiabilidad (0–100). Tu colateral se determina automáticamente — los miembros de alto puntaje pagan menos.
+      </p>
+    </div>
+    <div class="feature-block">
+      <div class="feature-num">02</div>
+      <div class="feature-tag">Default-Proof</div>
+      <div class="feature-title">A prueba de morosos</div>
+      <p class="feature-desc">
+        Si alguien no paga, su colateral se liquida automáticamente. El fondo de seguro cubre cualquier diferencia — el receptor siempre recibe el pote completo.
+      </p>
+    </div>
+    <div class="feature-block">
+      <div class="feature-num">03</div>
+      <div class="feature-tag">Gasless</div>
+      <div class="feature-title">Sin wallet. Sin gas. Listo.</div>
+      <p class="feature-desc">
+        Únete con tu huella digital o Face ID. Sin frase semilla, sin ETH para gas. Diseñado para la siguiente ola de usuarios LATAM — no solo para crypto-nativos.
+      </p>
+    </div>
+  </div>
+</section>
+
+<div class="grid-rule"></div>
+
+<!-- ── DASHBOARD SECTION ── -->
+<section class="dashboard" id="dashboard">
+
+  <div class="section-header">
+    <div class="section-header-label">◆ LIVE PREVIEW</div>
+    <div class="section-header-title">Tanda Oaxaca — Circle Dashboard</div>
+    <div class="section-header-meta">
+      <div class="pulse-dot"></div>
+      Ronda 2 de 4 · Activa
+    </div>
+  </div>
+
+  <!-- WARNING BANNER -->
+  <div class="warning-banner">
+    <div class="warning-icon">⚠</div>
+    <div class="warning-text">
+      <strong>Alerta AI:</strong> El agente detectó riesgo de impago de <strong>0xKITO</strong> esta ronda — se solicitó refuerzo de colateral. Monitoreo activo.
+    </div>
+    <div class="warning-badge">AI ALERT ACTIVE</div>
+  </div>
+
+  <!-- POT HEADER -->
+  <div class="pot-header">
+    <div class="pot-cell">
+      <div class="pot-label">Pote Ronda</div>
+      <div class="pot-value highlight">400 MXNB</div>
+      <div class="pot-sub">4 miembros × 100 MXNB</div>
+    </div>
+    <div class="pot-cell">
+      <div class="pot-label">Ronda Actual</div>
+      <div class="pot-value">2 / 4</div>
+      <div class="pot-sub">50% completado</div>
+    </div>
+    <div class="pot-cell">
+      <div class="pot-label">Próximo Receptor</div>
+      <div class="pot-value">DIEGO</div>
+      <div class="pot-sub">Score AI: 82 · Slot #2</div>
+    </div>
+    <div class="pot-cell">
+      <div class="pot-label">Fondo de Protección</div>
+      <div class="pot-value" style="font-size:28px;">1,240 MXNB</div>
+      <div class="pot-sub">Pool activo — cubre impagos</div>
+    </div>
+  </div>
+
+  <!-- LEDGER TABLE -->
+  <div class="ledger-wrap">
+    <table class="ledger-table">
+      <thead>
+        <tr>
+          <th style="width:22%">// Miembro</th>
+          <th style="width:26%">◆ Score AI / Historial</th>
+          <th style="width:16%">Colateral</th>
+          <th style="width:12%">Slot</th>
+          <th style="width:24%">Estado Ronda</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <!-- MARÍA — top trust -->
+        <tr class="top-trust">
+          <td>
+            <div class="member-name">María</div>
+            <div class="member-address">0x3a7f…c841</div>
+            <div class="member-badge badge-trusted">★ Alto Puntaje</div>
+          </td>
+          <td>
+            <div class="ai-label">AI Score</div>
+            <div class="score-wrap">
+              <div class="score-number" style="color:#4a9e00;">91</div>
+              <div style="flex:1;">
+                <div class="score-bar-track">
+                  <div class="score-bar-fill" style="width:91%;background:#b8ff00;"></div>
+                </div>
+                <div class="score-rationale">8 rondas a tiempo · 2 círculos completados · billetera 18 meses</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="collateral-mult" style="color:#4a9e00;">0.5×</div>
+            <div class="collateral-amount">50 MXNB staked</div>
+          </td>
+          <td>
+            <div class="slot-done">✓ COBRÓ</div>
+            <div class="slot-label">Ronda 1</div>
+          </td>
+          <td>
+            <div class="status-done-label">✓ Pagado</div>
+          </td>
+        </tr>
+
+        <!-- DIEGO — current recipient -->
+        <tr>
+          <td>
+            <div class="member-name">Diego</div>
+            <div class="member-address">0x99ba…2f1e</div>
+            <div class="member-badge badge-trusted">Confiable</div>
+          </td>
+          <td>
+            <div class="ai-label">AI Score</div>
+            <div class="score-wrap">
+              <div class="score-number" style="color:#3a7a00;">82</div>
+              <div style="flex:1;">
+                <div class="score-bar-track">
+                  <div class="score-bar-fill" style="width:82%;background:#b8ff00;"></div>
+                </div>
+                <div class="score-rationale">6 rondas a tiempo · 1 círculo completo · buen historial DeFi</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="collateral-mult">1×</div>
+            <div class="collateral-amount">100 MXNB staked</div>
+          </td>
+          <td>
+            <div class="slot-number">2</div>
+            <div class="slot-label">Esta Ronda</div>
+          </td>
+          <td>
+            <div class="status-current">← PRÓXIMO COBRO</div>
+          </td>
+        </tr>
+
+        <!-- LUPE — medium risk, watch -->
+        <tr>
+          <td>
+            <div class="member-name">Lupe</div>
+            <div class="member-address">0x61cd…a3b2</div>
+            <div class="member-badge badge-watch">⚡ Vigilancia</div>
+          </td>
+          <td>
+            <div class="ai-label">AI Score</div>
+            <div class="score-wrap">
+              <div class="score-number" style="color:#b07000;">66</div>
+              <div style="flex:1;">
+                <div class="score-bar-track">
+                  <div class="score-bar-fill" style="width:66%;background:#ffcc00;"></div>
+                </div>
+                <div class="score-rationale">3 rondas a tiempo · 1 pago tardío · actividad irregular</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="collateral-mult" style="color:#b07000;">2×</div>
+            <div class="collateral-amount">200 MXNB staked</div>
+          </td>
+          <td>
+            <div class="slot-number">3</div>
+            <div class="slot-label">Ronda 3</div>
+          </td>
+          <td>
+            <div class="status-wait">En Espera</div>
+          </td>
+        </tr>
+
+        <!-- 0xKITO — flagged, at risk -->
+        <tr class="flagged">
+          <td>
+            <div class="member-name">0xKito</div>
+            <div class="member-address">0xde44…77f9</div>
+            <div class="member-badge badge-flagged">⚠ Alto Riesgo</div>
+          </td>
+          <td>
+            <div class="ai-label">AI Score</div>
+            <div class="score-wrap">
+              <div class="score-number" style="color:#cc3300;">28</div>
+              <div style="flex:1;">
+                <div class="score-bar-track">
+                  <div class="score-bar-fill" style="width:28%;background:#ff4500;"></div>
+                </div>
+                <div class="score-rationale">billetera nueva · cold-start · sin historial previo · colateral reforzado solicitado</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="collateral-mult" style="color:#cc3300;">3×</div>
+            <div class="collateral-amount">300 MXNB staked</div>
+          </td>
+          <td>
+            <div class="slot-number">4</div>
+            <div class="slot-label">Ronda 4</div>
+          </td>
+          <td>
+            <div class="status-risk">⚠ Bajo Monitor</div>
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+
+  <!-- BOTTOM STRIP -->
+  <div class="bottom-strip">
+    <div class="bottom-cell">
+      <div class="bottom-cell-label">Colateral Total Staked</div>
+      <div class="bottom-cell-value">650 MXNB</div>
+      <div class="bottom-cell-sub">en smart contract · no-custodial</div>
+    </div>
+    <div class="bottom-cell">
+      <div class="bottom-cell-label">Fondo de Protección</div>
+      <div class="bottom-cell-value green">1,240 MXNB</div>
+      <div class="bottom-cell-sub">cubre hasta 3.1× el pote · activo</div>
+    </div>
+    <div class="bottom-cell">
+      <div class="bottom-cell-label">Contrato en Arbitrum</div>
+      <div class="bottom-cell-value acid-bg">MXNB</div>
+      <div class="bottom-cell-sub">0x4f2a…3d9e · verificado · no-custodial</div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-logo">TANDA<span>.</span></div>
+  <div class="footer-links">
+    <a href="#">Docs</a>
+    <a href="#">GitHub</a>
+    <a href="#">Arbitrum</a>
+    <a href="#">MXNB</a>
+    <a href="#">Privacidad</a>
+  </div>
+  <div class="footer-copy">© 2026 Tanda · Non-custodial · Built in LATAM</div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tanda — La tanda de siempre, sin el riesgo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Mulish:ital,wght@0,300;0,400;0,600;0,700;0,900;1,400&display=swap" rel="stylesheet" />
+  <style>
+    /* ═══════════════════════════════════════════════
+       CSS VARIABLES — Talavera ceramic palette
+    ═══════════════════════════════════════════════ */
+    :root {
+      --cobalt:        #1B3A8C;
+      --cobalt-deep:   #0E2160;
+      --cobalt-mid:    #2952B3;
+      --cobalt-light:  #4A7FD6;
+      --cobalt-pale:   #BDD0F5;
+      --majolica:      #F7F4EE;
+      --white-glaze:   #FEFCF8;
+      --marigold:      #E8A520;
+      --marigold-deep: #C27D00;
+      --terra:         #C94B2A;
+      --sage:          #3A7A5A;
+      --sage-light:    #5DAA82;
+      --shadow:        rgba(14, 33, 96, 0.18);
+      --ink:           #0E1A3A;
+
+      --font-display: 'Yeseva One', Georgia, serif;
+      --font-body:    'Mulish', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--cobalt-deep);
+      color: var(--ink);
+      overflow-x: hidden;
+    }
+
+    /* ═══════════════════════════════════════════════
+       TALAVERA TILE PATTERN (pure CSS SVG data-uri)
+       A repeating 60×60 cobalt-on-white geometric tile
+    ═══════════════════════════════════════════════ */
+
+    /* 60×60 tile: cross, diamond, corner arcs — pure Puebla geometry */
+    :root {
+      --tile-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Crect width='60' height='60' fill='%23F7F4EE'/%3E%3C!-- outer corner arcs --%3E%3Cpath d='M0,0 A20,20 0 0,1 20,20 L0,20 Z' fill='none' stroke='%231B3A8C' stroke-width='1.5'/%3E%3Cpath d='M60,0 A20,20 0 0,0 40,20 L60,20 Z' fill='none' stroke='%231B3A8C' stroke-width='1.5'/%3E%3Cpath d='M0,60 A20,20 0 0,0 20,40 L0,40 Z' fill='none' stroke='%231B3A8C' stroke-width='1.5'/%3E%3Cpath d='M60,60 A20,20 0 0,1 40,40 L60,40 Z' fill='none' stroke='%231B3A8C' stroke-width='1.5'/%3E%3C!-- center diamond --%3E%3Cpolygon points='30,16 44,30 30,44 16,30' fill='none' stroke='%231B3A8C' stroke-width='1.5'/%3E%3C!-- center dot --%3E%3Ccircle cx='30' cy='30' r='3.5' fill='%231B3A8C'/%3E%3C!-- cross arms --%3E%3Cline x1='30' y1='0' x2='30' y2='16' stroke='%231B3A8C' stroke-width='1.5'/%3E%3Cline x1='30' y1='44' x2='30' y2='60' stroke='%231B3A8C' stroke-width='1.5'/%3E%3Cline x1='0' y1='30' x2='16' y2='30' stroke='%231B3A8C' stroke-width='1.5'/%3E%3Cline x1='44' y1='30' x2='60' y2='30' stroke='%231B3A8C' stroke-width='1.5'/%3E%3C!-- small corner squares --%3E%3Crect x='1' y='1' width='8' height='8' fill='none' stroke='%231B3A8C' stroke-width='1'/%3E%3Crect x='51' y='1' width='8' height='8' fill='none' stroke='%231B3A8C' stroke-width='1'/%3E%3Crect x='1' y='51' width='8' height='8' fill='none' stroke='%231B3A8C' stroke-width='1'/%3E%3Crect x='51' y='51' width='8' height='8' fill='none' stroke='%231B3A8C' stroke-width='1'/%3E%3C/svg%3E");
+
+      /* Darker tile for cobalt bg use */
+      --tile-dark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Crect width='60' height='60' fill='%230E2160'/%3E%3Cpath d='M0,0 A20,20 0 0,1 20,20 L0,20 Z' fill='none' stroke='%234A7FD6' stroke-width='1.2' opacity='0.6'/%3E%3Cpath d='M60,0 A20,20 0 0,0 40,20 L60,20 Z' fill='none' stroke='%234A7FD6' stroke-width='1.2' opacity='0.6'/%3E%3Cpath d='M0,60 A20,20 0 0,0 20,40 L0,40 Z' fill='none' stroke='%234A7FD6' stroke-width='1.2' opacity='0.6'/%3E%3Cpath d='M60,60 A20,20 0 0,1 40,40 L60,40 Z' fill='none' stroke='%234A7FD6' stroke-width='1.2' opacity='0.6'/%3E%3Cpolygon points='30,16 44,30 30,44 16,30' fill='none' stroke='%234A7FD6' stroke-width='1.2' opacity='0.6'/%3E%3Ccircle cx='30' cy='30' r='3' fill='%234A7FD6' opacity='0.5'/%3E%3Cline x1='30' y1='0' x2='30' y2='16' stroke='%234A7FD6' stroke-width='1.2' opacity='0.6'/%3E%3Cline x1='30' y1='44' x2='30' y2='60' stroke='%234A7FD6' stroke-width='1.2' opacity='0.6'/%3E%3Cline x1='0' y1='30' x2='16' y2='30' stroke='%234A7FD6' stroke-width='1.2' opacity='0.6'/%3E%3Cline x1='44' y1='30' x2='60' y2='30' stroke='%234A7FD6' stroke-width='1.2' opacity='0.6'/%3E%3Crect x='1' y='1' width='8' height='8' fill='none' stroke='%234A7FD6' stroke-width='0.8' opacity='0.4'/%3E%3Crect x='51' y='1' width='8' height='8' fill='none' stroke='%234A7FD6' stroke-width='0.8' opacity='0.4'/%3E%3Crect x='1' y='51' width='8' height='8' fill='none' stroke='%234A7FD6' stroke-width='0.8' opacity='0.4'/%3E%3Crect x='51' y='51' width='8' height='8' fill='none' stroke='%234A7FD6' stroke-width='0.8' opacity='0.4'/%3E%3C/svg%3E");
+    }
+
+    /* ═══════════════════════════════════════════════
+       ANIMATIONS
+    ═══════════════════════════════════════════════ */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; } to { opacity: 1; }
+    }
+    @keyframes shimmer {
+      0%   { background-position: -400px 0; }
+      100% { background-position: 400px 0; }
+    }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 12px 2px rgba(232, 165, 32, 0.4); }
+      50%       { box-shadow: 0 0 24px 6px rgba(232, 165, 32, 0.7); }
+    }
+    @keyframes scoreFill {
+      from { stroke-dashoffset: 220; }
+      to   { /* set inline */ }
+    }
+    @keyframes tileReveal {
+      from { opacity: 0; transform: scale(0.96); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    @keyframes warnPulse {
+      0%, 100% { border-color: rgba(201, 75, 42, 0.5); }
+      50%       { border-color: rgba(201, 75, 42, 1); }
+    }
+
+    .anim-up-1  { animation: fadeUp 0.7s cubic-bezier(.22,.8,.38,1) 0.1s both; }
+    .anim-up-2  { animation: fadeUp 0.7s cubic-bezier(.22,.8,.38,1) 0.25s both; }
+    .anim-up-3  { animation: fadeUp 0.7s cubic-bezier(.22,.8,.38,1) 0.4s both; }
+    .anim-up-4  { animation: fadeUp 0.7s cubic-bezier(.22,.8,.38,1) 0.55s both; }
+    .anim-up-5  { animation: fadeUp 0.7s cubic-bezier(.22,.8,.38,1) 0.7s both; }
+    .anim-up-6  { animation: fadeUp 0.7s cubic-bezier(.22,.8,.38,1) 0.85s both; }
+
+    /* ═══════════════════════════════════════════════
+       TILE BORDER UTILITY — the "courtyard wall" frame
+    ═══════════════════════════════════════════════ */
+    .tile-border {
+      position: relative;
+    }
+    .tile-border::before,
+    .tile-border::after {
+      content: '';
+      display: block;
+      width: 100%;
+      height: 60px;
+      background-image: var(--tile-pattern);
+      background-size: 60px 60px;
+      background-repeat: repeat-x;
+      flex-shrink: 0;
+    }
+    .tile-border-v {
+      position: relative;
+    }
+    .tile-border-v::before,
+    .tile-border-v::after {
+      content: '';
+      position: absolute;
+      top: 0; bottom: 0;
+      width: 60px;
+      background-image: var(--tile-pattern);
+      background-size: 60px 60px;
+      background-repeat: repeat-y;
+    }
+    .tile-border-v::before { left: 0; }
+    .tile-border-v::after  { right: 0; }
+
+    /* ═══════════════════════════════════════════════
+       NAVBAR
+    ═══════════════════════════════════════════════ */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(14, 33, 96, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 2px solid var(--cobalt-mid);
+      padding: 0 48px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      color: var(--majolica);
+      letter-spacing: 0.04em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .nav-logo-dot {
+      width: 10px; height: 10px;
+      background: var(--marigold);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--marigold);
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--cobalt-pale);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--marigold); }
+    .nav-cta {
+      background: var(--marigold);
+      color: var(--cobalt-deep) !important;
+      padding: 7px 18px;
+      border-radius: 4px;
+      font-weight: 800 !important;
+    }
+    .nav-cta:hover { background: var(--marigold-deep); color: white !important; }
+
+    /* ═══════════════════════════════════════════════
+       HERO SECTION
+    ═══════════════════════════════════════════════ */
+    .hero {
+      min-height: 100vh;
+      background-image: var(--tile-dark);
+      background-size: 60px 60px;
+      background-repeat: repeat;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 120px 48px 80px;
+      overflow: hidden;
+    }
+
+    /* Cobalt vignette overlay for depth */
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 60% at 50% 40%, rgba(14,33,96,0.65) 0%, transparent 100%),
+        linear-gradient(180deg, rgba(14,33,96,0.3) 0%, rgba(14,33,96,0.8) 100%);
+      pointer-events: none;
+    }
+
+    /* Top and bottom tile bands */
+    .hero-tile-top,
+    .hero-tile-bottom {
+      position: absolute;
+      left: 0; right: 0;
+      height: 120px;
+      background-image: var(--tile-pattern);
+      background-size: 60px 60px;
+      background-repeat: repeat-x;
+      opacity: 0.85;
+    }
+    .hero-tile-top    { top: 64px; border-bottom: 3px solid var(--cobalt-mid); }
+    .hero-tile-bottom { bottom: 0; border-top: 3px solid var(--cobalt-mid); }
+
+    /* Left and right tile columns */
+    .hero-tile-left,
+    .hero-tile-right {
+      position: absolute;
+      top: 184px; bottom: 120px;
+      width: 120px;
+      background-image: var(--tile-pattern);
+      background-size: 60px 60px;
+      background-repeat: repeat;
+      opacity: 0.7;
+    }
+    .hero-tile-left  { left: 0; border-right: 3px solid var(--cobalt-mid); }
+    .hero-tile-right { right: 0; border-left: 3px solid var(--cobalt-mid); }
+
+    .hero-inner {
+      position: relative;
+      z-index: 2;
+      max-width: 900px;
+      text-align: center;
+    }
+
+    .hero-eyebrow {
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--marigold);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+    .hero-eyebrow::before,
+    .hero-eyebrow::after {
+      content: '';
+      width: 40px; height: 1px;
+      background: var(--marigold);
+      opacity: 0.6;
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(4rem, 8vw, 7rem);
+      line-height: 1.0;
+      color: var(--majolica);
+      letter-spacing: -0.01em;
+      margin-bottom: 12px;
+      text-shadow: 0 4px 40px rgba(14,33,96,0.8), 0 2px 4px rgba(0,0,0,0.4);
+    }
+    .hero-title-accent {
+      color: var(--marigold);
+      display: inline-block;
+      position: relative;
+    }
+    .hero-title-accent::after {
+      content: '';
+      position: absolute;
+      bottom: 4px; left: 0; right: 0;
+      height: 3px;
+      background: var(--marigold);
+      opacity: 0.4;
+      border-radius: 2px;
+    }
+
+    .hero-tagline {
+      font-family: var(--font-body);
+      font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+      font-style: italic;
+      font-weight: 300;
+      color: var(--cobalt-pale);
+      margin-bottom: 10px;
+      letter-spacing: 0.01em;
+    }
+
+    .hero-valueprop {
+      font-family: var(--font-body);
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: rgba(247, 244, 238, 0.75);
+      margin-bottom: 44px;
+      letter-spacing: 0.02em;
+    }
+
+    /* 3 feature pills */
+    .hero-features {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 44px;
+    }
+    .feature-pill {
+      background: rgba(247, 244, 238, 0.08);
+      border: 1.5px solid rgba(74, 127, 214, 0.5);
+      border-radius: 100px;
+      padding: 12px 22px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--majolica);
+      font-size: 0.9rem;
+      font-weight: 600;
+      backdrop-filter: blur(4px);
+      transition: background 0.25s, border-color 0.25s;
+    }
+    .feature-pill:hover {
+      background: rgba(247, 244, 238, 0.15);
+      border-color: var(--marigold);
+    }
+    .feature-pill-icon {
+      width: 28px; height: 28px;
+      background: var(--cobalt-mid);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .feature-pill-text strong {
+      display: block;
+      font-size: 0.82rem;
+      color: var(--marigold);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 2px;
+    }
+    .feature-pill-text span {
+      font-size: 0.78rem;
+      font-weight: 400;
+      color: var(--cobalt-pale);
+    }
+
+    /* CTA Buttons */
+    .hero-ctas {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 36px;
+    }
+    .btn-primary {
+      background: var(--marigold);
+      color: var(--cobalt-deep);
+      font-family: var(--font-body);
+      font-size: 1rem;
+      font-weight: 800;
+      padding: 16px 36px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      box-shadow: 0 4px 20px rgba(232, 165, 32, 0.45);
+      transition: transform 0.18s, box-shadow 0.18s, background 0.18s;
+      animation: pulseGlow 2.5s ease-in-out infinite;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(232, 165, 32, 0.6);
+      background: var(--marigold-deep);
+      color: white;
+      animation: none;
+    }
+    .btn-secondary {
+      background: transparent;
+      color: var(--majolica);
+      font-family: var(--font-body);
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 15px 34px;
+      border: 2px solid rgba(247, 244, 238, 0.4);
+      border-radius: 6px;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      transition: border-color 0.18s, color 0.18s, background 0.18s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-secondary:hover {
+      border-color: var(--cobalt-pale);
+      background: rgba(247, 244, 238, 0.08);
+    }
+
+    /* Trust strip */
+    .trust-strip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .trust-strip-item {
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(189, 208, 245, 0.65);
+    }
+    .trust-sep {
+      color: var(--cobalt-light);
+      font-size: 0.6rem;
+    }
+
+    /* Scroll hint */
+    .scroll-hint {
+      position: absolute;
+      bottom: 140px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      animation: fadeIn 1s 1.5s both;
+    }
+    .scroll-hint span {
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--cobalt-pale);
+      opacity: 0.5;
+    }
+    .scroll-arrow {
+      width: 20px; height: 30px;
+      border: 2px solid rgba(189, 208, 245, 0.3);
+      border-radius: 10px;
+      position: relative;
+    }
+    .scroll-arrow::after {
+      content: '';
+      position: absolute;
+      top: 5px; left: 50%;
+      transform: translateX(-50%);
+      width: 4px; height: 4px;
+      background: var(--cobalt-pale);
+      border-radius: 50%;
+      animation: scrollDot 1.5s ease-in-out infinite;
+    }
+    @keyframes scrollDot {
+      0%   { top: 5px; opacity: 1; }
+      80%  { top: 16px; opacity: 0.3; }
+      100% { top: 5px; opacity: 0; }
+    }
+
+    /* ═══════════════════════════════════════════════
+       TRANSITION BAND between hero & dashboard
+    ═══════════════════════════════════════════════ */
+    .section-transition {
+      height: 120px;
+      background-image: var(--tile-pattern);
+      background-size: 60px 60px;
+      background-repeat: repeat-x;
+      border-top: 3px solid var(--cobalt-mid);
+      border-bottom: 3px solid var(--cobalt-mid);
+    }
+
+    /* ═══════════════════════════════════════════════
+       DASHBOARD SECTION
+    ═══════════════════════════════════════════════ */
+    .dashboard-section {
+      background: var(--cobalt-deep);
+      position: relative;
+      padding: 0 0 0;
+    }
+
+    .dashboard-section-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    /* Tile column frames on left & right */
+    .dash-tile-frame {
+      display: grid;
+      grid-template-columns: 120px 1fr 120px;
+      gap: 0;
+    }
+    .dash-tile-col {
+      background-image: var(--tile-pattern);
+      background-size: 60px 60px;
+      background-repeat: repeat;
+      opacity: 0.6;
+      border-right: 3px solid var(--cobalt-mid);
+    }
+    .dash-tile-col-right {
+      background-image: var(--tile-pattern);
+      background-size: 60px 60px;
+      background-repeat: repeat;
+      opacity: 0.6;
+      border-left: 3px solid var(--cobalt-mid);
+    }
+    .dash-content {
+      padding: 60px 48px 80px;
+      background: var(--cobalt-deep);
+    }
+
+    /* Section heading */
+    .section-label {
+      font-family: var(--font-body);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--marigold);
+      text-align: center;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      animation: fadeUp 0.6s 0.2s both;
+    }
+    .section-label::before,
+    .section-label::after {
+      content: '';
+      flex: 1;
+      max-width: 80px;
+      height: 1px;
+      background: var(--marigold);
+      opacity: 0.4;
+    }
+    .section-heading {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      color: var(--majolica);
+      text-align: center;
+      margin-bottom: 6px;
+      animation: fadeUp 0.6s 0.35s both;
+    }
+    .section-sub {
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      font-weight: 400;
+      color: var(--cobalt-pale);
+      text-align: center;
+      margin-bottom: 44px;
+      animation: fadeUp 0.6s 0.5s both;
+    }
+
+    /* ── Circle card ── */
+    .circle-card {
+      background: var(--white-glaze);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow:
+        0 2px 0 var(--cobalt-mid),
+        0 8px 40px rgba(14, 33, 96, 0.45),
+        inset 0 1px 0 rgba(255,255,255,0.8);
+      animation: tileReveal 0.7s 0.6s both;
+      border: 3px solid var(--cobalt-mid);
+    }
+
+    /* Tile header strip on top of card */
+    .card-tile-header {
+      height: 48px;
+      background-image: var(--tile-pattern);
+      background-size: 48px 48px;
+      background-repeat: repeat-x;
+      border-bottom: 2px solid var(--cobalt-mid);
+    }
+
+    /* Circle top info bar */
+    .circle-info-bar {
+      background: var(--cobalt);
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .circle-name {
+      font-family: var(--font-display);
+      font-size: 1.7rem;
+      color: var(--majolica);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .circle-badge {
+      background: var(--marigold);
+      color: var(--cobalt-deep);
+      font-family: var(--font-body);
+      font-size: 0.68rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 100px;
+    }
+    .circle-meta {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+    .circle-stat {
+      text-align: center;
+    }
+    .circle-stat-val {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      color: var(--marigold);
+      display: block;
+      line-height: 1;
+    }
+    .circle-stat-lbl {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--cobalt-pale);
+      margin-top: 3px;
+    }
+    .circle-stat-divider {
+      width: 1px;
+      height: 40px;
+      background: rgba(74, 127, 214, 0.35);
+    }
+
+    /* Round progress bar */
+    .round-progress-wrap {
+      padding: 16px 32px;
+      background: rgba(27, 58, 140, 0.08);
+      border-bottom: 1.5px solid rgba(27, 58, 140, 0.12);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .round-progress-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--cobalt);
+      white-space: nowrap;
+    }
+    .round-progress-bar {
+      flex: 1;
+      height: 8px;
+      background: rgba(27, 58, 140, 0.12);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+    .round-progress-fill {
+      height: 100%;
+      width: 50%;
+      background: linear-gradient(90deg, var(--cobalt-mid), var(--cobalt-light));
+      border-radius: 100px;
+    }
+    .round-next-recipient {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--cobalt);
+    }
+    .round-next-recipient strong {
+      color: var(--sage);
+      font-size: 0.88rem;
+    }
+
+    /* ── AI Warning Banner ── */
+    .ai-warning {
+      margin: 24px 32px 0;
+      background: linear-gradient(135deg, rgba(201, 75, 42, 0.08), rgba(201, 75, 42, 0.04));
+      border: 2px solid var(--terra);
+      border-radius: 8px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      animation: warnPulse 2s ease-in-out infinite, fadeUp 0.7s 0.9s both;
+    }
+    .ai-warning-icon {
+      width: 36px; height: 36px;
+      background: var(--terra);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+      box-shadow: 0 2px 12px rgba(201, 75, 42, 0.4);
+    }
+    .ai-warning-body {}
+    .ai-warning-title {
+      font-family: var(--font-body);
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--terra);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .ai-warning-title::before {
+      content: 'IA';
+      background: var(--terra);
+      color: white;
+      font-size: 0.62rem;
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+    .ai-warning-text {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.5;
+    }
+    .ai-warning-text em {
+      color: var(--terra);
+      font-style: normal;
+      font-weight: 800;
+    }
+    .ai-warning-action {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--cobalt);
+      margin-top: 6px;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    /* ── Members grid ── */
+    .members-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      margin-top: 24px;
+    }
+    .member-card {
+      padding: 24px 20px 20px;
+      border-right: 1.5px solid rgba(27, 58, 140, 0.1);
+      position: relative;
+      transition: background 0.2s;
+      animation: fadeUp 0.6s both;
+    }
+    .member-card:last-child { border-right: none; }
+    .member-card:hover { background: rgba(27, 58, 140, 0.03); }
+
+    /* Top tile accent strip per card */
+    .member-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      border-radius: 0;
+    }
+    .member-card.trust-high::before  { background: var(--sage); }
+    .member-card.trust-mid::before   { background: var(--cobalt-light); }
+    .member-card.trust-low::before   { background: var(--marigold); }
+    .member-card.trust-risk::before  { background: var(--terra); }
+
+    /* Score ring */
+    .score-ring-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 14px;
+      position: relative;
+    }
+    .score-ring-svg {
+      transform: rotate(-90deg);
+    }
+    .score-ring-track {
+      fill: none;
+      stroke: rgba(27, 58, 140, 0.1);
+      stroke-width: 5;
+    }
+    .score-ring-fill {
+      fill: none;
+      stroke-width: 5;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 1s cubic-bezier(.4,0,.2,1);
+    }
+    .score-ring-fill.high   { stroke: var(--sage); }
+    .score-ring-fill.mid    { stroke: var(--cobalt-light); }
+    .score-ring-fill.low    { stroke: var(--marigold); }
+    .score-ring-fill.risk   { stroke: var(--terra); }
+
+    .score-center {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+    .score-number {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      line-height: 1;
+      display: block;
+    }
+    .score-number.high   { color: var(--sage); }
+    .score-number.mid    { color: var(--cobalt-mid); }
+    .score-number.low    { color: var(--marigold-deep); }
+    .score-number.risk   { color: var(--terra); }
+
+    .score-label {
+      font-size: 0.58rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(14, 26, 58, 0.45);
+    }
+
+    .member-name {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      color: var(--ink);
+      text-align: center;
+      margin-bottom: 4px;
+    }
+    .member-handle {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      color: rgba(14, 26, 58, 0.45);
+      text-align: center;
+      margin-bottom: 14px;
+    }
+
+    .member-stats {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .member-stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .member-stat-key {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(14, 26, 58, 0.45);
+    }
+    .member-stat-val {
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--ink);
+    }
+    .collateral-chip {
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 100px;
+    }
+    .collateral-chip.low-col  { background: rgba(58, 122, 90, 0.12); color: var(--sage); }
+    .collateral-chip.mid-col  { background: rgba(74, 127, 214, 0.12); color: var(--cobalt-mid); }
+    .collateral-chip.high-col { background: rgba(232, 165, 32, 0.15); color: var(--marigold-deep); }
+    .collateral-chip.risk-col { background: rgba(201, 75, 42, 0.12); color: var(--terra); }
+
+    /* Payout slot */
+    .slot-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      font-size: 0.72rem;
+      font-weight: 900;
+      margin-left: 4px;
+    }
+    .slot-badge.done    { background: var(--sage); color: white; }
+    .slot-badge.current { background: var(--marigold); color: var(--cobalt-deep); box-shadow: 0 0 8px rgba(232,165,32,0.5); }
+    .slot-badge.next    { background: var(--cobalt-light); color: white; }
+    .slot-badge.later   { background: rgba(14,26,58,0.1); color: rgba(14,26,58,0.5); }
+
+    /* AI rationale caption */
+    .member-rationale {
+      margin-top: 12px;
+      padding: 8px 10px;
+      background: rgba(27, 58, 140, 0.05);
+      border-left: 2px solid;
+      border-radius: 0 4px 4px 0;
+      font-size: 0.72rem;
+      font-weight: 600;
+      line-height: 1.5;
+      color: rgba(14, 26, 58, 0.6);
+    }
+    .member-rationale.high  { border-color: var(--sage); }
+    .member-rationale.mid   { border-color: var(--cobalt-light); }
+    .member-rationale.low   { border-color: var(--marigold); }
+    .member-rationale.risk  { border-color: var(--terra); }
+
+    .member-rationale .rationale-ai-tag {
+      font-size: 0.6rem;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--cobalt-mid);
+      margin-bottom: 3px;
+      display: block;
+    }
+
+    /* Trust badge */
+    .trust-flag {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      margin-bottom: 10px;
+      font-size: 0.68rem;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .trust-flag.high  { color: var(--sage); }
+    .trust-flag.mid   { color: var(--cobalt-mid); }
+    .trust-flag.low   { color: var(--marigold-deep); }
+    .trust-flag.risk  { color: var(--terra); }
+    .trust-flag-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .trust-flag.high  .trust-flag-dot { background: var(--sage); }
+    .trust-flag.mid   .trust-flag-dot { background: var(--cobalt-light); }
+    .trust-flag.low   .trust-flag-dot { background: var(--marigold-deep); }
+    .trust-flag.risk  .trust-flag-dot { background: var(--terra); animation: warnPulse2 1s infinite; }
+    @keyframes warnPulse2 {
+      0%,100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* ── Insurance pool footer ── */
+    .insurance-bar {
+      background: linear-gradient(90deg, rgba(27,58,140,0.06), rgba(27,58,140,0.03));
+      border-top: 1.5px solid rgba(27, 58, 140, 0.1);
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 0;
+    }
+    .insurance-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .insurance-icon {
+      width: 36px; height: 36px;
+      background: var(--cobalt);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .insurance-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(14, 26, 58, 0.5);
+      margin-bottom: 2px;
+    }
+    .insurance-amount {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      color: var(--cobalt);
+    }
+    .insurance-amount span {
+      font-family: var(--font-body);
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--cobalt-mid);
+    }
+    .insurance-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: rgba(14, 26, 58, 0.5);
+    }
+    .insurance-mini-bar {
+      width: 120px; height: 6px;
+      background: rgba(27, 58, 140, 0.1);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+    .insurance-mini-fill {
+      height: 100%;
+      width: 62%;
+      background: linear-gradient(90deg, var(--cobalt), var(--cobalt-light));
+      border-radius: 100px;
+    }
+    .insurance-pct {
+      font-weight: 800;
+      color: var(--cobalt);
+    }
+
+    /* Tile footer band */
+    .card-tile-footer {
+      height: 48px;
+      background-image: var(--tile-pattern);
+      background-size: 48px 48px;
+      background-repeat: repeat-x;
+      border-top: 2px solid var(--cobalt-mid);
+    }
+
+    /* ═══════════════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════════════ */
+    footer {
+      background: var(--cobalt-deep);
+      border-top: 60px solid transparent;
+      border-top-image: var(--tile-dark);
+      padding: 48px;
+      position: relative;
+    }
+    .footer-tile-band {
+      height: 60px;
+      background-image: var(--tile-dark);
+      background-size: 60px 60px;
+      background-repeat: repeat-x;
+      border-bottom: 2px solid var(--cobalt-mid);
+      margin-bottom: 40px;
+    }
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      padding: 0 24px;
+    }
+    .footer-brand {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      color: var(--majolica);
+    }
+    .footer-copy {
+      font-size: 0.75rem;
+      font-weight: 400;
+      color: rgba(189, 208, 245, 0.4);
+      letter-spacing: 0.04em;
+    }
+    .footer-trust {
+      display: flex;
+      gap: 18px;
+    }
+    .footer-trust-item {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(189, 208, 245, 0.4);
+    }
+    .footer-bottom-tile {
+      height: 60px;
+      background-image: var(--tile-dark);
+      background-size: 60px 60px;
+      background-repeat: repeat-x;
+      border-top: 2px solid var(--cobalt-mid);
+      margin-top: 40px;
+    }
+
+    /* ═══════════════════════════════════════════════
+       ORNAMENT — Talavera flower / cross motif SVGs
+       used as decorative elements in the hero
+    ═══════════════════════════════════════════════ */
+    .hero-ornament {
+      position: absolute;
+      z-index: 2;
+      opacity: 0.15;
+      pointer-events: none;
+    }
+    .hero-ornament-tl {
+      top: 180px; left: 160px;
+      width: 180px; height: 180px;
+    }
+    .hero-ornament-tr {
+      top: 180px; right: 160px;
+      width: 140px; height: 140px;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- ═══ NAVBAR ═══ -->
+  <nav>
+    <div class="nav-logo">
+      <div class="nav-logo-dot"></div>
+      Tanda
+    </div>
+    <ul class="nav-links">
+      <li><a href="#">Cómo funciona</a></li>
+      <li><a href="#">Seguridad</a></li>
+      <li><a href="#">Comunidad</a></li>
+      <li><a href="#" class="nav-cta">Crear una tanda</a></li>
+    </ul>
+  </nav>
+
+  <!-- ═══ HERO ═══ -->
+  <section class="hero">
+
+    <!-- Tile frame bands -->
+    <div class="hero-tile-top"></div>
+    <div class="hero-tile-bottom"></div>
+    <div class="hero-tile-left"></div>
+    <div class="hero-tile-right"></div>
+
+    <!-- Decorative SVG ornaments -->
+    <div class="hero-ornament hero-ornament-tl">
+      <svg viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg" fill="none">
+        <circle cx="90" cy="90" r="80" stroke="#F7F4EE" stroke-width="2"/>
+        <circle cx="90" cy="90" r="60" stroke="#F7F4EE" stroke-width="1.5"/>
+        <circle cx="90" cy="90" r="40" stroke="#F7F4EE" stroke-width="1.5"/>
+        <circle cx="90" cy="90" r="12" fill="#E8A520" opacity="0.7"/>
+        <!-- petals -->
+        <ellipse cx="90" cy="30" rx="10" ry="18" fill="#F7F4EE" opacity="0.5"/>
+        <ellipse cx="90" cy="150" rx="10" ry="18" fill="#F7F4EE" opacity="0.5"/>
+        <ellipse cx="30" cy="90" rx="18" ry="10" fill="#F7F4EE" opacity="0.5"/>
+        <ellipse cx="150" cy="90" rx="18" ry="10" fill="#F7F4EE" opacity="0.5"/>
+        <!-- diagonals -->
+        <ellipse cx="45" cy="45" rx="10" ry="18" fill="#F7F4EE" opacity="0.35" transform="rotate(45 45 45)"/>
+        <ellipse cx="135" cy="45" rx="10" ry="18" fill="#F7F4EE" opacity="0.35" transform="rotate(-45 135 45)"/>
+        <ellipse cx="45" cy="135" rx="10" ry="18" fill="#F7F4EE" opacity="0.35" transform="rotate(-45 45 135)"/>
+        <ellipse cx="135" cy="135" rx="10" ry="18" fill="#F7F4EE" opacity="0.35" transform="rotate(45 135 135)"/>
+      </svg>
+    </div>
+    <div class="hero-ornament hero-ornament-tr">
+      <svg viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg" fill="none">
+        <rect x="10" y="10" width="120" height="120" stroke="#F7F4EE" stroke-width="1.5" rx="2"/>
+        <rect x="30" y="30" width="80" height="80" stroke="#F7F4EE" stroke-width="1.5" rx="2" transform="rotate(45 70 70)"/>
+        <rect x="50" y="50" width="40" height="40" stroke="#F7F4EE" stroke-width="1.5" rx="1"/>
+        <circle cx="70" cy="70" r="8" fill="#3A7A5A" opacity="0.6"/>
+        <line x1="70" y1="10" x2="70" y2="130" stroke="#F7F4EE" stroke-width="1" opacity="0.4"/>
+        <line x1="10" y1="70" x2="130" y2="70" stroke="#F7F4EE" stroke-width="1" opacity="0.4"/>
+      </svg>
+    </div>
+
+    <!-- Content -->
+    <div class="hero-inner">
+
+      <div class="hero-eyebrow anim-up-1">
+        Ahorro comunitario · On-Chain · MXNB
+      </div>
+
+      <h1 class="hero-title anim-up-2">
+        <span class="hero-title-accent">Tanda</span>
+      </h1>
+
+      <p class="hero-tagline anim-up-3">
+        "La tanda de siempre — sin el riesgo de que te dejen colgado."
+      </p>
+
+      <p class="hero-valueprop anim-up-4">
+        Savings circles organized by AI, on-chain in pesos. Save together — without the trust problem.
+      </p>
+
+      <!-- Feature pills -->
+      <div class="hero-features anim-up-5">
+        <div class="feature-pill">
+          <div class="feature-pill-icon">🧠</div>
+          <div class="feature-pill-text">
+            <strong>AI Underwriting</strong>
+            <span>Colateral según tu historial on-chain</span>
+          </div>
+        </div>
+        <div class="feature-pill">
+          <div class="feature-pill-icon">🛡</div>
+          <div class="feature-pill-text">
+            <strong>A prueba de impagos</strong>
+            <span>Colateral + fondo seguro garantizan el pago</span>
+          </div>
+        </div>
+        <div class="feature-pill">
+          <div class="feature-pill-icon">🔑</div>
+          <div class="feature-pill-text">
+            <strong>Onboarding sin gas</strong>
+            <span>Passkey, sin frase semilla, sin fees</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CTAs -->
+      <div class="hero-ctas anim-up-6">
+        <a href="#" class="btn-primary">Crear una tanda &nbsp;→</a>
+        <a href="#" class="btn-secondary">Cómo funciona</a>
+      </div>
+
+      <!-- Trust strip -->
+      <div class="trust-strip anim-up-6">
+        <span class="trust-strip-item">Built on Arbitrum</span>
+        <span class="trust-sep">◆</span>
+        <span class="trust-strip-item">Settles in MXNB</span>
+        <span class="trust-sep">◆</span>
+        <span class="trust-strip-item">Non-custodial</span>
+      </div>
+
+    </div>
+
+    <!-- Scroll hint -->
+    <div class="scroll-hint">
+      <div class="scroll-arrow"></div>
+      <span>Ver demo</span>
+    </div>
+
+  </section>
+
+  <!-- ═══ TRANSITION BAND ═══ -->
+  <div class="section-transition"></div>
+
+  <!-- ═══ DASHBOARD SECTION ═══ -->
+  <section class="dashboard-section">
+    <div class="dashboard-section-inner">
+      <div class="dash-tile-frame">
+
+        <!-- Left tile column -->
+        <div class="dash-tile-col"></div>
+
+        <!-- Main content -->
+        <div class="dash-content">
+
+          <div class="section-label">Demo · Círculo activo</div>
+          <h2 class="section-heading">Tanda en vivo</h2>
+          <p class="section-sub">Así se ve el agente de IA trabajando por tu círculo en tiempo real.</p>
+
+          <!-- Circle card -->
+          <div class="circle-card">
+
+            <!-- Tile header strip -->
+            <div class="card-tile-header"></div>
+
+            <!-- Info bar -->
+            <div class="circle-info-bar">
+              <div class="circle-name">
+                Tanda Oaxaca
+                <span class="circle-badge">🔴 En curso</span>
+              </div>
+              <div class="circle-meta">
+                <div class="circle-stat">
+                  <span class="circle-stat-val">400</span>
+                  <div class="circle-stat-lbl">Pote MXNB</div>
+                </div>
+                <div class="circle-stat-divider"></div>
+                <div class="circle-stat">
+                  <span class="circle-stat-val">2 / 4</span>
+                  <div class="circle-stat-lbl">Ronda actual</div>
+                </div>
+                <div class="circle-stat-divider"></div>
+                <div class="circle-stat">
+                  <span class="circle-stat-val">100</span>
+                  <div class="circle-stat-lbl">MXNB / ronda</div>
+                </div>
+                <div class="circle-stat-divider"></div>
+                <div class="circle-stat">
+                  <span class="circle-stat-val">4</span>
+                  <div class="circle-stat-lbl">Miembros</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Round progress -->
+            <div class="round-progress-wrap">
+              <span class="round-progress-label">Ronda 2 de 4</span>
+              <div class="round-progress-bar">
+                <div class="round-progress-fill"></div>
+              </div>
+              <span class="round-next-recipient">Próxima receptora: <strong>María</strong></span>
+            </div>
+
+            <!-- AI Warning banner -->
+            <div class="ai-warning">
+              <div class="ai-warning-icon">⚠️</div>
+              <div class="ai-warning-body">
+                <div class="ai-warning-title">Alerta del agente IA</div>
+                <p class="ai-warning-text">
+                  El agente detectó riesgo de impago de <em>0xkito</em> esta ronda —
+                  se solicitó refuerzo de colateral. El fondo de protección cubre el déficit si no responde.
+                </p>
+                <div class="ai-warning-action">Ver detalles del análisis →</div>
+              </div>
+            </div>
+
+            <!-- Members grid -->
+            <div class="members-grid">
+
+              <!-- María — high trust -->
+              <div class="member-card trust-high" style="animation-delay:0.7s">
+                <div class="score-ring-wrap">
+                  <svg class="score-ring-svg" width="80" height="80" viewBox="0 0 80 80">
+                    <circle class="score-ring-track" cx="40" cy="40" r="32"/>
+                    <!-- circumference = 2π×32 ≈ 201 | fill = 82% → dashoffset = 201 - 0.82×201 ≈ 36 -->
+                    <circle class="score-ring-fill high" cx="40" cy="40" r="32"
+                            stroke-dasharray="201"
+                            stroke-dashoffset="36"
+                            style="transition-delay:1s"/>
+                  </svg>
+                  <div class="score-center">
+                    <span class="score-number high">82</span>
+                    <span class="score-label">Score</span>
+                  </div>
+                </div>
+                <div class="trust-flag high"><span class="trust-flag-dot"></span>Alta confianza</div>
+                <div class="member-name">María</div>
+                <div class="member-handle">@maria.eth</div>
+                <div class="member-stats">
+                  <div class="member-stat-row">
+                    <span class="member-stat-key">Colateral</span>
+                    <span class="collateral-chip low-col">0.5× (50 MXNB)</span>
+                  </div>
+                  <div class="member-stat-row">
+                    <span class="member-stat-key">Turno</span>
+                    <span class="member-stat-val">
+                      Ronda 2 <span class="slot-badge current">2</span>
+                    </span>
+                  </div>
+                </div>
+                <div class="member-rationale high">
+                  <span class="rationale-ai-tag">🧠 IA · Underwriter</span>
+                  6 rondas a tiempo · 1 círculo completado · wallet activa 18 meses
+                </div>
+              </div>
+
+              <!-- Diego — mid trust -->
+              <div class="member-card trust-mid" style="animation-delay:0.85s">
+                <div class="score-ring-wrap">
+                  <svg class="score-ring-svg" width="80" height="80" viewBox="0 0 80 80">
+                    <circle class="score-ring-track" cx="40" cy="40" r="32"/>
+                    <!-- 66% → dashoffset = 201 - 0.66×201 ≈ 68 -->
+                    <circle class="score-ring-fill mid" cx="40" cy="40" r="32"
+                            stroke-dasharray="201"
+                            stroke-dashoffset="68"
+                            style="transition-delay:1.15s"/>
+                  </svg>
+                  <div class="score-center">
+                    <span class="score-number mid">66</span>
+                    <span class="score-label">Score</span>
+                  </div>
+                </div>
+                <div class="trust-flag mid"><span class="trust-flag-dot"></span>Confiable</div>
+                <div class="member-name">Diego</div>
+                <div class="member-handle">@diego_mx</div>
+                <div class="member-stats">
+                  <div class="member-stat-row">
+                    <span class="member-stat-key">Colateral</span>
+                    <span class="collateral-chip mid-col">1× (100 MXNB)</span>
+                  </div>
+                  <div class="member-stat-row">
+                    <span class="member-stat-key">Turno</span>
+                    <span class="member-stat-val">
+                      Ronda 3 <span class="slot-badge next">3</span>
+                    </span>
+                  </div>
+                </div>
+                <div class="member-rationale mid">
+                  <span class="rationale-ai-tag">🧠 IA · Underwriter</span>
+                  3 rondas a tiempo · 1 retraso menor · historial moderado
+                </div>
+              </div>
+
+              <!-- Lupe — low trust -->
+              <div class="member-card trust-low" style="animation-delay:1s">
+                <div class="score-ring-wrap">
+                  <svg class="score-ring-svg" width="80" height="80" viewBox="0 0 80 80">
+                    <circle class="score-ring-track" cx="40" cy="40" r="32"/>
+                    <!-- 50% → dashoffset = 201 - 0.5×201 ≈ 101 -->
+                    <circle class="score-ring-fill low" cx="40" cy="40" r="32"
+                            stroke-dasharray="201"
+                            stroke-dashoffset="101"
+                            style="transition-delay:1.3s"/>
+                  </svg>
+                  <div class="score-center">
+                    <span class="score-number low">50</span>
+                    <span class="score-label">Score</span>
+                  </div>
+                </div>
+                <div class="trust-flag low"><span class="trust-flag-dot"></span>En observación</div>
+                <div class="member-name">Lupe</div>
+                <div class="member-handle">@lupe2024</div>
+                <div class="member-stats">
+                  <div class="member-stat-row">
+                    <span class="member-stat-key">Colateral</span>
+                    <span class="collateral-chip high-col">2× (200 MXNB)</span>
+                  </div>
+                  <div class="member-stat-row">
+                    <span class="member-stat-key">Turno</span>
+                    <span class="member-stat-val">
+                      Ronda 1 <span class="slot-badge done">✓</span>
+                    </span>
+                  </div>
+                </div>
+                <div class="member-rationale low">
+                  <span class="rationale-ai-tag">🧠 IA · Underwriter</span>
+                  Wallet nueva · 2 rondas historial · bajo volumen de transacciones
+                </div>
+              </div>
+
+              <!-- 0xkito — at risk -->
+              <div class="member-card trust-risk" style="animation-delay:1.15s">
+                <div class="score-ring-wrap">
+                  <svg class="score-ring-svg" width="80" height="80" viewBox="0 0 80 80">
+                    <circle class="score-ring-track" cx="40" cy="40" r="32"/>
+                    <!-- 28% → dashoffset = 201 - 0.28×201 ≈ 145 -->
+                    <circle class="score-ring-fill risk" cx="40" cy="40" r="32"
+                            stroke-dasharray="201"
+                            stroke-dashoffset="145"
+                            style="transition-delay:1.45s"/>
+                  </svg>
+                  <div class="score-center">
+                    <span class="score-number risk">28</span>
+                    <span class="score-label">Score</span>
+                  </div>
+                </div>
+                <div class="trust-flag risk"><span class="trust-flag-dot"></span>⚠ En riesgo</div>
+                <div class="member-name">0xkito</div>
+                <div class="member-handle">0xk…f3a2</div>
+                <div class="member-stats">
+                  <div class="member-stat-row">
+                    <span class="member-stat-key">Colateral</span>
+                    <span class="collateral-chip risk-col">3× (300 MXNB)</span>
+                  </div>
+                  <div class="member-stat-row">
+                    <span class="member-stat-key">Turno</span>
+                    <span class="member-stat-val">
+                      Ronda 4 <span class="slot-badge later">4</span>
+                    </span>
+                  </div>
+                </div>
+                <div class="member-rationale risk">
+                  <span class="rationale-ai-tag">🧠 IA · Alerta activa</span>
+                  Cold-start · wallet nueva sin historial · señal de impago esta ronda
+                </div>
+              </div>
+
+            </div><!-- /members-grid -->
+
+            <!-- Insurance pool -->
+            <div class="insurance-bar">
+              <div class="insurance-left">
+                <div class="insurance-icon">🏦</div>
+                <div>
+                  <div class="insurance-label">Fondo de protección</div>
+                  <div class="insurance-amount">1,240 <span>MXNB</span></div>
+                </div>
+              </div>
+              <div class="insurance-right">
+                <span>Cobertura de ronda:</span>
+                <div class="insurance-mini-bar">
+                  <div class="insurance-mini-fill"></div>
+                </div>
+                <span class="insurance-pct">62%</span>
+                <span style="color:var(--sage); font-weight:700;">● Activo</span>
+              </div>
+            </div>
+
+            <!-- Tile footer strip -->
+            <div class="card-tile-footer"></div>
+
+          </div><!-- /circle-card -->
+
+        </div><!-- /dash-content -->
+
+        <!-- Right tile column -->
+        <div class="dash-tile-col-right"></div>
+
+      </div><!-- /dash-tile-frame -->
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer>
+    <div class="footer-tile-band"></div>
+    <div class="footer-inner">
+      <div class="footer-brand">Tanda</div>
+      <div class="footer-copy">
+        © 2026 Tanda Protocol · Hecho en México · Arbitrum · MXNB
+      </div>
+      <div class="footer-trust">
+        <span class="footer-trust-item">Arbitrum</span>
+        <span class="footer-trust-item">MXNB</span>
+        <span class="footer-trust-item">Non-custodial</span>
+      </div>
+    </div>
+    <div class="footer-bottom-tile"></div>
+  </footer>
+
+  <script>
+    // Animate score rings on scroll into view
+    const rings = document.querySelectorAll('.score-ring-fill');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.transition = 'stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1)';
+          // already set inline via stroke-dashoffset; trigger reflow then animate to final value
+          // The values are set in HTML already — just ensure transition fires
+          const current = entry.target.getAttribute('stroke-dashoffset');
+          entry.target.style.strokeDashoffset = '201'; // start full (invisible)
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              entry.target.style.strokeDashoffset = current;
+            });
+          });
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3 });
+    rings.forEach(r => observer.observe(r));
+  </script>
+
+</body>
+</html>

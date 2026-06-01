@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tanda — La tanda de siempre, sin el riesgo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&family=Newsreader:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── DESIGN TOKENS ────────────────────────────────────────── */
+    :root {
+      --cream:        #F8F4ED;
+      --cream-warm:   #F2EBE0;
+      --cream-deep:   #EAE0D0;
+      --ink:          #1A1612;
+      --ink-mid:      #3A3228;
+      --ink-soft:     #6B5F52;
+      --ink-faint:    #9E8F80;
+      --gold:         #8B6914;
+      --gold-light:   #B8912A;
+      --gold-muted:   #C9A84C;
+      --gold-pale:    #E8D5A3;
+      --oxblood:      #5C1A1A;
+      --oxblood-mid:  #7A2828;
+      --oxblood-pale: #C9A0A0;
+      --risk-amber:   #7A5B14;
+      --risk-bg:      #F5EDDA;
+
+      --rule:         rgba(138, 105, 20, 0.25);
+      --rule-faint:   rgba(138, 105, 20, 0.12);
+
+      --font-display: 'Fraunces', 'Cormorant Garamond', Georgia, serif;
+      --font-body:    'Newsreader', Georgia, serif;
+
+      --transition: 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+
+    /* ─── RESET & BASE ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--cream);
+      color: var(--ink);
+      font-family: var(--font-body);
+      font-weight: 300;
+      font-size: 1.0625rem;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ─── PAPER TEXTURE OVERLAY ────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      opacity: 1;
+    }
+
+    /* ─── ANIMATIONS ───────────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes ruleExpand {
+      from { transform: scaleX(0); }
+      to   { transform: scaleX(1); }
+    }
+    @keyframes pulse-soft {
+      0%, 100% { opacity: 0.7; }
+      50%       { opacity: 1; }
+    }
+
+    .anim-fade-up  { animation: fadeUp  var(--transition) both; }
+    .anim-fade-in  { animation: fadeIn  var(--transition) both; }
+
+    .d1  { animation-delay: 0.10s; }
+    .d2  { animation-delay: 0.22s; }
+    .d3  { animation-delay: 0.36s; }
+    .d4  { animation-delay: 0.50s; }
+    .d5  { animation-delay: 0.64s; }
+    .d6  { animation-delay: 0.78s; }
+    .d7  { animation-delay: 0.92s; }
+    .d8  { animation-delay: 1.06s; }
+
+    /* ─── LAYOUT UTILITIES ─────────────────────────────────────── */
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 64px;
+    }
+
+    .hairline {
+      display: block;
+      width: 100%;
+      height: 1px;
+      background: var(--rule);
+    }
+    .hairline--faint { background: var(--rule-faint); }
+
+    /* ─── NAVIGATION ───────────────────────────────────────────── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(248, 244, 237, 0.94);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--rule-faint);
+    }
+
+    .nav-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 64px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+
+    .nav-logo-word {
+      font-family: var(--font-display);
+      font-size: 1.375rem;
+      font-weight: 400;
+      font-style: italic;
+      letter-spacing: 0.02em;
+      color: var(--ink);
+    }
+
+    .nav-logo-tag {
+      font-family: var(--font-body);
+      font-size: 0.6875rem;
+      font-weight: 300;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: var(--font-body);
+      font-size: 0.8125rem;
+      font-weight: 300;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .nav-links a:hover { color: var(--gold); }
+
+    .nav-cta {
+      font-family: var(--font-body);
+      font-size: 0.8125rem;
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--cream);
+      background: var(--ink);
+      border: none;
+      padding: 10px 24px;
+      cursor: pointer;
+      transition: background 0.3s;
+      text-decoration: none;
+    }
+    .nav-cta:hover { background: var(--gold); }
+
+    /* ─── HERO ─────────────────────────────────────────────────── */
+    .hero {
+      min-height: calc(100vh - 64px);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-left {
+      padding: 96px 64px 96px 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      border-right: 1px solid var(--rule-faint);
+    }
+
+    .hero-right {
+      padding: 96px 0 96px 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    /* Eyebrow */
+    .hero-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .hero-eyebrow-rule {
+      flex: 0 0 40px;
+      height: 1px;
+      background: var(--gold);
+      transform-origin: left;
+      animation: ruleExpand 0.8s 0.3s cubic-bezier(0.25,0.1,0.25,1) both;
+    }
+
+    .hero-eyebrow-text {
+      font-family: var(--font-body);
+      font-size: 0.6875rem;
+      font-weight: 300;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    /* Display headline */
+    .hero-headline {
+      font-family: var(--font-display);
+      font-size: clamp(3.5rem, 5.5vw, 5.25rem);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+      margin-bottom: 36px;
+    }
+
+    .hero-headline em {
+      font-style: normal;
+      color: var(--gold);
+    }
+
+    .hero-headline .line-normal {
+      font-style: normal;
+      font-weight: 400;
+    }
+
+    /* Sub tagline */
+    .hero-tagline {
+      font-family: var(--font-body);
+      font-size: 1.0625rem;
+      font-weight: 300;
+      font-style: italic;
+      color: var(--ink-soft);
+      margin-bottom: 12px;
+      line-height: 1.6;
+    }
+
+    .hero-value-prop {
+      font-family: var(--font-body);
+      font-size: 0.9375rem;
+      font-weight: 300;
+      color: var(--ink-faint);
+      margin-bottom: 52px;
+      line-height: 1.7;
+      letter-spacing: 0.01em;
+    }
+
+    /* CTA cluster */
+    .hero-ctas {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 56px;
+    }
+
+    .btn-primary {
+      font-family: var(--font-body);
+      font-size: 0.875rem;
+      font-weight: 400;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--cream);
+      background: var(--ink);
+      border: none;
+      padding: 16px 36px;
+      cursor: pointer;
+      transition: background 0.35s, transform 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-primary:hover {
+      background: var(--gold);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      font-family: var(--font-body);
+      font-size: 0.875rem;
+      font-weight: 300;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      background: transparent;
+      border: 1px solid var(--rule);
+      padding: 15px 36px;
+      cursor: pointer;
+      transition: color 0.3s, border-color 0.3s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-secondary:hover {
+      color: var(--gold);
+      border-color: var(--gold-muted);
+    }
+
+    /* Trust strip */
+    .trust-strip {
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+
+    .trust-item {
+      font-family: var(--font-body);
+      font-size: 0.6875rem;
+      font-weight: 300;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      padding-right: 20px;
+      margin-right: 20px;
+      border-right: 1px solid var(--rule-faint);
+    }
+    .trust-item:last-child { border-right: none; padding-right: 0; margin-right: 0; }
+
+    /* ─── HERO RIGHT — FEATURES ────────────────────────────────── */
+    .features-label {
+      font-family: var(--font-body);
+      font-size: 0.6875rem;
+      font-weight: 300;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 40px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .features-label::before {
+      content: '';
+      flex: 0 0 40px;
+      height: 1px;
+      background: var(--gold);
+    }
+
+    .feature-list {
+      list-style: none;
+    }
+
+    .feature-item {
+      padding: 32px 0;
+      border-bottom: 1px solid var(--rule-faint);
+      display: grid;
+      grid-template-columns: 56px 1fr;
+      gap: 0 24px;
+      align-items: start;
+    }
+    .feature-item:first-child { border-top: 1px solid var(--rule-faint); }
+
+    .feature-num {
+      font-family: var(--font-display);
+      font-size: 0.875rem;
+      font-weight: 300;
+      font-style: italic;
+      color: var(--gold-muted);
+      letter-spacing: 0.05em;
+      padding-top: 4px;
+    }
+
+    .feature-title {
+      font-family: var(--font-display);
+      font-size: 1.1875rem;
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 8px;
+      line-height: 1.3;
+      letter-spacing: 0.01em;
+    }
+
+    .feature-body {
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 300;
+      color: var(--ink-soft);
+      line-height: 1.65;
+    }
+
+    /* ─── SECTION DIVIDER ──────────────────────────────────────── */
+    .section-divider {
+      padding: 64px 0 0;
+      position: relative;
+    }
+
+    .divider-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 48px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .section-title-block {}
+
+    .section-overline {
+      font-family: var(--font-body);
+      font-size: 0.6875rem;
+      font-weight: 300;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 3vw, 2.875rem);
+      font-weight: 300;
+      font-style: italic;
+      line-height: 1.15;
+      color: var(--ink);
+    }
+
+    .section-desc {
+      font-family: var(--font-body);
+      font-size: 0.9375rem;
+      font-weight: 300;
+      color: var(--ink-soft);
+      max-width: 360px;
+      text-align: right;
+      line-height: 1.7;
+    }
+
+    /* ─── DASHBOARD ────────────────────────────────────────────── */
+    .dashboard {
+      padding: 0 0 100px;
+      background: var(--cream);
+    }
+
+    .dashboard-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 64px 64px 0;
+    }
+
+    /* Warning banner */
+    .warning-banner {
+      background: var(--risk-bg);
+      border: 1px solid rgba(122, 91, 20, 0.3);
+      border-left: 3px solid var(--risk-amber);
+      padding: 20px 28px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+
+    .warning-icon {
+      font-size: 1rem;
+      color: var(--risk-amber);
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .warning-text {
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 300;
+      color: var(--risk-amber);
+      line-height: 1.6;
+    }
+
+    .warning-text strong {
+      font-weight: 400;
+      font-style: italic;
+    }
+
+    /* Circle header */
+    .circle-header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 32px;
+      align-items: end;
+      padding-bottom: 40px;
+      margin-bottom: 0;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .circle-name {
+      font-family: var(--font-display);
+      font-size: clamp(1.75rem, 2.5vw, 2.5rem);
+      font-weight: 400;
+      font-style: italic;
+      color: var(--ink);
+      margin-bottom: 8px;
+      letter-spacing: 0.01em;
+    }
+
+    .circle-meta {
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+
+    .circle-meta-item {
+      font-family: var(--font-body);
+      font-size: 0.8125rem;
+      font-weight: 300;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      padding-right: 18px;
+      margin-right: 18px;
+      border-right: 1px solid var(--rule-faint);
+    }
+    .circle-meta-item:last-child { border-right: none; padding-right: 0; margin-right: 0; }
+    .circle-meta-item span {
+      color: var(--ink-soft);
+      font-style: italic;
+    }
+
+    .circle-stats {
+      text-align: right;
+    }
+
+    .pot-amount {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 3.5vw, 3.25rem);
+      font-weight: 300;
+      color: var(--ink);
+      line-height: 1;
+      margin-bottom: 4px;
+      letter-spacing: -0.02em;
+    }
+
+    .pot-label {
+      font-family: var(--font-body);
+      font-size: 0.6875rem;
+      font-weight: 300;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    /* Round progress */
+    .round-progress {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .round-pip {
+      width: 32px;
+      height: 3px;
+      background: var(--cream-deep);
+    }
+    .round-pip.active  { background: var(--gold); }
+    .round-pip.done    { background: var(--ink-faint); }
+
+    .round-label {
+      font-family: var(--font-body);
+      font-size: 0.6875rem;
+      font-weight: 300;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-left: 4px;
+    }
+
+    /* ─── MEMBERS GRID ─────────────────────────────────────────── */
+    .members-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--rule-faint);
+      border: 1px solid var(--rule-faint);
+      margin: 40px 0;
+    }
+
+    .member-card {
+      background: var(--cream);
+      padding: 36px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      position: relative;
+      transition: background 0.3s;
+    }
+    .member-card:hover { background: var(--cream-warm); }
+
+    .member-card.flagged { background: #FDF8F0; }
+    .member-card.flagged:hover { background: #F8F0E4; }
+
+    /* Trust indicator line at top */
+    .member-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: transparent;
+    }
+    .member-card.trust-high::before  { background: var(--gold); }
+    .member-card.trust-mid::before   { background: var(--gold-muted); }
+    .member-card.trust-low::before   { background: var(--ink-faint); }
+    .member-card.trust-risk::before  { background: var(--oxblood); }
+
+    .member-slot {
+      font-family: var(--font-body);
+      font-size: 0.625rem;
+      font-weight: 300;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-bottom: 20px;
+    }
+    .member-slot .slot-num {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 0.75rem;
+      color: var(--gold-muted);
+    }
+
+    .member-name {
+      font-family: var(--font-display);
+      font-size: 1.375rem;
+      font-weight: 400;
+      color: var(--ink);
+      margin-bottom: 28px;
+      line-height: 1.2;
+    }
+
+    /* Score display */
+    .score-area {
+      margin-bottom: 24px;
+    }
+
+    .score-label {
+      font-family: var(--font-body);
+      font-size: 0.625rem;
+      font-weight: 300;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-bottom: 6px;
+    }
+
+    .score-num {
+      font-family: var(--font-display);
+      font-size: 3rem;
+      font-weight: 300;
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+    .score-num.s-high  { color: var(--gold); }
+    .score-num.s-mid   { color: var(--ink-soft); }
+    .score-num.s-low   { color: var(--ink-faint); }
+    .score-num.s-risk  { color: var(--oxblood); }
+
+    .score-max {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 300;
+      font-style: italic;
+      color: var(--ink-faint);
+      margin-left: 3px;
+    }
+
+    /* Score bar */
+    .score-bar-track {
+      height: 2px;
+      background: var(--cream-deep);
+      margin-top: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+    .score-bar-fill {
+      position: absolute;
+      inset: 0 auto 0 0;
+      height: 100%;
+      transition: width 1.2s cubic-bezier(0.25, 0.1, 0.25, 1) 0.8s;
+    }
+    .score-bar-fill.s-high  { background: var(--gold); }
+    .score-bar-fill.s-mid   { background: var(--ink-soft); }
+    .score-bar-fill.s-low   { background: var(--ink-faint); }
+    .score-bar-fill.s-risk  { background: var(--oxblood); }
+
+    /* Member details */
+    .member-detail {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--rule-faint);
+    }
+    .member-detail:last-of-type { border-bottom: none; }
+
+    .detail-label {
+      font-family: var(--font-body);
+      font-size: 0.6875rem;
+      font-weight: 300;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+
+    .detail-val {
+      font-family: var(--font-display);
+      font-size: 0.9375rem;
+      font-weight: 400;
+      color: var(--ink-soft);
+      font-style: italic;
+    }
+    .detail-val.highlight { color: var(--gold); }
+    .detail-val.alert     { color: var(--oxblood); }
+
+    /* AI rationale */
+    .ai-rationale {
+      margin-top: 20px;
+      padding: 14px 16px;
+      background: rgba(138, 105, 20, 0.05);
+      border-left: 2px solid var(--gold-pale);
+    }
+
+    .member-card.flagged .ai-rationale {
+      background: rgba(92, 26, 26, 0.05);
+      border-left-color: var(--oxblood-pale);
+    }
+
+    .ai-rationale-label {
+      font-family: var(--font-body);
+      font-size: 0.5625rem;
+      font-weight: 400;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold-muted);
+      margin-bottom: 5px;
+    }
+    .member-card.flagged .ai-rationale-label { color: var(--oxblood-pale); }
+
+    .ai-rationale-text {
+      font-family: var(--font-body);
+      font-size: 0.8125rem;
+      font-weight: 300;
+      font-style: italic;
+      color: var(--ink-soft);
+      line-height: 1.55;
+    }
+    .member-card.flagged .ai-rationale-text { color: var(--oxblood-mid); }
+
+    /* Next recipient badge */
+    .next-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 8px;
+      font-family: var(--font-body);
+      font-size: 0.5625rem;
+      font-weight: 400;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--cream);
+      background: var(--gold);
+      padding: 4px 10px;
+    }
+
+    /* ─── DASHBOARD FOOTER ─────────────────────────────────────── */
+    .dashboard-footer {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--rule-faint);
+      border: 1px solid var(--rule-faint);
+      margin-top: 0;
+    }
+
+    .insurance-panel {
+      background: var(--cream);
+      padding: 36px 40px;
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .insurance-icon-block {
+      width: 56px;
+      height: 56px;
+      border: 1px solid var(--rule);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .insurance-icon {
+      font-size: 1.25rem;
+      color: var(--gold);
+    }
+
+    .insurance-amount {
+      font-family: var(--font-display);
+      font-size: 1.875rem;
+      font-weight: 300;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .insurance-label {
+      font-family: var(--font-body);
+      font-size: 0.6875rem;
+      font-weight: 300;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+
+    .insurance-desc {
+      font-family: var(--font-body);
+      font-size: 0.8125rem;
+      font-weight: 300;
+      color: var(--ink-faint);
+      font-style: italic;
+      line-height: 1.5;
+    }
+
+    .next-panel {
+      background: var(--cream-warm);
+      padding: 36px 40px;
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .next-panel-details {}
+
+    .next-label {
+      font-family: var(--font-body);
+      font-size: 0.6875rem;
+      font-weight: 300;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 8px;
+    }
+
+    .next-name {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 400;
+      font-style: italic;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+
+    .next-desc {
+      font-family: var(--font-body);
+      font-size: 0.875rem;
+      font-weight: 300;
+      color: var(--ink-soft);
+      font-style: italic;
+    }
+
+    .next-amount-block { margin-left: auto; text-align: right; }
+
+    .next-amount {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 300;
+      color: var(--gold);
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+
+    .next-amount-sub {
+      font-family: var(--font-body);
+      font-size: 0.6875rem;
+      font-weight: 300;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-top: 4px;
+    }
+
+    /* ─── FOOTER ───────────────────────────────────────────────── */
+    footer {
+      background: var(--ink);
+      color: var(--cream);
+      padding: 56px 0;
+    }
+
+    .footer-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-logo {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 300;
+      font-style: italic;
+      letter-spacing: 0.02em;
+      color: var(--cream);
+    }
+
+    .footer-copy {
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      font-weight: 300;
+      letter-spacing: 0.12em;
+      color: rgba(248,244,237,0.35);
+    }
+
+    .footer-tagline {
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      font-weight: 300;
+      font-style: italic;
+      color: rgba(248,244,237,0.5);
+      max-width: 240px;
+      text-align: right;
+      line-height: 1.6;
+    }
+
+    /* ─── RESPONSIVE ───────────────────────────────────────────── */
+    @media (max-width: 1100px) {
+      .container, .nav-inner, .dashboard-inner, .footer-inner, .divider-inner {
+        padding-left: 40px;
+        padding-right: 40px;
+      }
+      .hero-left { padding-right: 40px; }
+      .hero-right { padding-left: 48px; }
+      .members-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 768px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero-left {
+        padding: 64px 0 48px;
+        border-right: none;
+        border-bottom: 1px solid var(--rule-faint);
+      }
+      .hero-right { padding: 48px 0 64px; }
+      .members-grid { grid-template-columns: 1fr; }
+      .dashboard-footer { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── NAV ──────────────────────────────────────────────── -->
+  <nav>
+    <div class="nav-inner">
+      <div class="nav-logo">
+        <span class="nav-logo-word">Tanda</span>
+        <span class="nav-logo-tag">On-Chain</span>
+      </div>
+      <ul class="nav-links">
+        <li><a href="#">Cómo funciona</a></li>
+        <li><a href="#">Para grupos</a></li>
+        <li><a href="#">Seguridad</a></li>
+      </ul>
+      <a href="#" class="nav-cta">Crear una Tanda</a>
+    </div>
+  </nav>
+
+  <!-- ── HERO ─────────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="container" style="display: contents;">
+
+      <div class="hero-left container" style="max-width: none; padding-right: 0; padding-left: 64px;">
+        <div class="hero-eyebrow anim-fade-in d1">
+          <div class="hero-eyebrow-rule"></div>
+          <span class="hero-eyebrow-text">Savings circle · Blockchain · MXNB</span>
+        </div>
+
+        <h1 class="hero-headline anim-fade-up d2">
+          La tanda<br>
+          <em>de siempre,</em><br>
+          <span class="line-normal">sin el riesgo.</span>
+        </h1>
+
+        <p class="hero-tagline anim-fade-up d3">
+          "La tanda de siempre — sin el riesgo de que te dejen colgado."
+        </p>
+
+        <p class="hero-value-prop anim-fade-up d4">
+          AI-organized savings circles on Arbitrum. Save together,
+          in pesos, without the trust problem.
+        </p>
+
+        <div class="hero-ctas anim-fade-up d5">
+          <a href="#" class="btn-primary">Crear una Tanda</a>
+          <a href="#" class="btn-secondary">Cómo Funciona</a>
+        </div>
+
+        <div class="trust-strip anim-fade-in d6">
+          <span class="trust-item">Built on Arbitrum</span>
+          <span class="trust-item">Settles in MXNB</span>
+          <span class="trust-item">Non-custodial</span>
+        </div>
+      </div>
+
+      <div class="hero-right" style="padding-left: 80px; padding-right: 64px;">
+        <div class="features-label anim-fade-in d2">
+          Características principales
+        </div>
+
+        <ul class="feature-list">
+          <li class="feature-item anim-fade-up d3">
+            <span class="feature-num">I.</span>
+            <div>
+              <div class="feature-title">AI Reliability Scoring</div>
+              <p class="feature-body">
+                An on-chain AI underwriter reads each member's transaction history and assigns
+                a reliability score. Collateral is set to match — high trust earns lower stakes.
+              </p>
+            </div>
+          </li>
+          <li class="feature-item anim-fade-up d4">
+            <span class="feature-num">II.</span>
+            <div>
+              <div class="feature-title">Default-Proof by Design</div>
+              <p class="feature-body">
+                If a member defaults, their collateral is slashed and an insurance pool
+                tops up the shortfall. The recipient is always paid in full. Always.
+              </p>
+            </div>
+          </li>
+          <li class="feature-item anim-fade-up d5">
+            <span class="feature-num">III.</span>
+            <div>
+              <div class="feature-title">Gasless Onboarding</div>
+              <p class="feature-body">
+                Join with a passkey. No seed phrase, no gas fees, no crypto expertise required.
+                Built for the next wave of LATAM users.
+              </p>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── SECTION DIVIDER ──────────────────────────────────── -->
+  <div class="section-divider">
+    <div class="divider-inner">
+      <div class="section-title-block">
+        <div class="section-overline">Círculo activo · Vista en vivo</div>
+        <h2 class="section-title">
+          Tanda Oaxaca<br>
+          <span style="font-style: normal; font-weight: 300; font-size: 0.85em; color: var(--ink-soft);">Ronda 2 de 4 · 100 MXNB</span>
+        </h2>
+      </div>
+      <p class="section-desc">
+        Así se ve la inteligencia artificial trabajando en tiempo real —
+        calificando, monitoreando, y protegiendo a cada miembro del círculo.
+      </p>
+    </div>
+  </div>
+
+  <!-- ── DASHBOARD ─────────────────────────────────────────── -->
+  <section class="dashboard">
+    <div class="dashboard-inner">
+
+      <!-- Warning Banner -->
+      <div class="warning-banner anim-fade-up d1">
+        <span class="warning-icon">⚠</span>
+        <p class="warning-text">
+          <strong>Agente IA — Alerta de Riesgo:</strong>&ensp;El agente detectó riesgo de impago de
+          <strong>0xkito</strong> esta ronda — se solicitó refuerzo de colateral.
+          Score de confiabilidad crítico: <strong>28 / 100</strong>. Supervisión activa en curso.
+        </p>
+      </div>
+
+      <!-- Circle Header -->
+      <div class="circle-header">
+        <div>
+          <div class="circle-name">Tanda Oaxaca</div>
+          <div class="circle-meta">
+            <span class="circle-meta-item">Contribución <span>100 MXNB/ronda</span></span>
+            <span class="circle-meta-item">Integrantes <span>4 miembros</span></span>
+            <span class="circle-meta-item">Siguiente <span>María</span></span>
+          </div>
+          <div class="round-progress" style="margin-top: 20px;">
+            <div class="round-pip done"></div>
+            <div class="round-pip active"></div>
+            <div class="round-pip"></div>
+            <div class="round-pip"></div>
+            <span class="round-label">Ronda 2 de 4</span>
+          </div>
+        </div>
+        <div class="circle-stats">
+          <div class="pot-label">Pote actual</div>
+          <div class="pot-amount">400 MXNB</div>
+        </div>
+      </div>
+
+      <!-- Members Grid -->
+      <div class="members-grid">
+
+        <!-- María — High Trust -->
+        <div class="member-card trust-high anim-fade-up d2">
+          <div class="next-badge">↓ Próxima receptora</div>
+          <div class="member-slot">Turno <span class="slot-num">01</span></div>
+          <div class="member-name">María</div>
+
+          <div class="score-area">
+            <div class="score-label">Calificación IA</div>
+            <div>
+              <span class="score-num s-high">82</span>
+              <span class="score-max">/100</span>
+            </div>
+            <div class="score-bar-track">
+              <div class="score-bar-fill s-high" style="width: 82%;"></div>
+            </div>
+          </div>
+
+          <div class="member-detail">
+            <span class="detail-label">Colateral</span>
+            <span class="detail-val highlight">0.5× — 50 MXNB</span>
+          </div>
+          <div class="member-detail">
+            <span class="detail-label">Historial</span>
+            <span class="detail-val">On-time ✓</span>
+          </div>
+
+          <div class="ai-rationale">
+            <div class="ai-rationale-label">Agente IA</div>
+            <p class="ai-rationale-text">"6 rondas a tiempo, 1 círculo completado. Riesgo muy bajo."</p>
+          </div>
+        </div>
+
+        <!-- Diego — Mid Trust -->
+        <div class="member-card trust-mid anim-fade-up d3">
+          <div class="member-slot" style="margin-top: 32px;">Turno <span class="slot-num">02</span></div>
+          <div class="member-name">Diego</div>
+
+          <div class="score-area">
+            <div class="score-label">Calificación IA</div>
+            <div>
+              <span class="score-num s-mid">66</span>
+              <span class="score-max">/100</span>
+            </div>
+            <div class="score-bar-track">
+              <div class="score-bar-fill s-mid" style="width: 66%;"></div>
+            </div>
+          </div>
+
+          <div class="member-detail">
+            <span class="detail-label">Colateral</span>
+            <span class="detail-val">1× — 100 MXNB</span>
+          </div>
+          <div class="member-detail">
+            <span class="detail-label">Historial</span>
+            <span class="detail-val">2 rondas previas</span>
+          </div>
+
+          <div class="ai-rationale">
+            <div class="ai-rationale-label">Agente IA</div>
+            <p class="ai-rationale-text">"Actividad moderada. 2 círculos anteriores sin defaults."</p>
+          </div>
+        </div>
+
+        <!-- Lupe — Lower Trust -->
+        <div class="member-card trust-low anim-fade-up d4">
+          <div class="member-slot" style="margin-top: 32px;">Turno <span class="slot-num">03</span></div>
+          <div class="member-name">Lupe</div>
+
+          <div class="score-area">
+            <div class="score-label">Calificación IA</div>
+            <div>
+              <span class="score-num s-low">50</span>
+              <span class="score-max">/100</span>
+            </div>
+            <div class="score-bar-track">
+              <div class="score-bar-fill s-low" style="width: 50%;"></div>
+            </div>
+          </div>
+
+          <div class="member-detail">
+            <span class="detail-label">Colateral</span>
+            <span class="detail-val">2× — 200 MXNB</span>
+          </div>
+          <div class="member-detail">
+            <span class="detail-label">Historial</span>
+            <span class="detail-val">Billetera nueva</span>
+          </div>
+
+          <div class="ai-rationale">
+            <div class="ai-rationale-label">Agente IA</div>
+            <p class="ai-rationale-text">"Historial limitado, primer círculo. Colateral elevado por precaución."</p>
+          </div>
+        </div>
+
+        <!-- 0xkito — At Risk -->
+        <div class="member-card trust-risk flagged anim-fade-up d5">
+          <div class="member-slot" style="margin-top: 32px;">Turno <span class="slot-num">04</span></div>
+          <div class="member-name">0xkito</div>
+
+          <div class="score-area">
+            <div class="score-label">Calificación IA</div>
+            <div>
+              <span class="score-num s-risk">28</span>
+              <span class="score-max">/100</span>
+            </div>
+            <div class="score-bar-track">
+              <div class="score-bar-fill s-risk" style="width: 28%;"></div>
+            </div>
+          </div>
+
+          <div class="member-detail">
+            <span class="detail-label">Colateral</span>
+            <span class="detail-val alert">3× — 300 MXNB ⚑</span>
+          </div>
+          <div class="member-detail">
+            <span class="detail-label">Estado</span>
+            <span class="detail-val alert">Riesgo elevado</span>
+          </div>
+
+          <div class="ai-rationale">
+            <div class="ai-rationale-label">Agente IA — Alerta</div>
+            <p class="ai-rationale-text">"Wallet cold-start, sin historial verificable. Refuerzo de colateral solicitado esta ronda."</p>
+          </div>
+        </div>
+
+      </div><!-- /members-grid -->
+
+      <!-- Dashboard Footer -->
+      <div class="dashboard-footer anim-fade-up d6">
+
+        <div class="insurance-panel">
+          <div class="insurance-icon-block">
+            <span class="insurance-icon">⊕</span>
+          </div>
+          <div>
+            <div class="insurance-label">Fondo de Protección</div>
+            <div class="insurance-amount">1,240 MXNB</div>
+            <p class="insurance-desc">
+              Cubre el pago completo si un miembro incumple —
+              el receptor siempre cobra.
+            </p>
+          </div>
+        </div>
+
+        <div class="next-panel">
+          <div class="next-panel-details">
+            <div class="next-label">Próxima receptora · Ronda 2</div>
+            <div class="next-name">María</div>
+            <p class="next-desc">Score 82 · Colateral 0.5×</p>
+          </div>
+          <div class="next-amount-block">
+            <div class="next-amount">400 MXNB</div>
+            <div class="next-amount-sub">Pago garantizado</div>
+          </div>
+        </div>
+
+      </div><!-- /dashboard-footer -->
+
+    </div>
+  </section>
+
+  <!-- ── FOOTER ────────────────────────────────────────────── -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-logo">Tanda</div>
+      <div class="footer-copy">
+        © 2026 Tanda On-Chain · Arbitrum · MXNB
+      </div>
+      <p class="footer-tagline">
+        La tanda de siempre —<br>sin el riesgo de que te dejen colgado.
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    // Animate score bars on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      const bars = document.querySelectorAll('.score-bar-fill');
+      bars.forEach(bar => {
+        const target = bar.style.width;
+        bar.style.width = '0%';
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            bar.style.width = target;
+          });
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>
