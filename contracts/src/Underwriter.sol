@@ -11,7 +11,10 @@ import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 ///         nudge the score within +/- MAX_DELTA of the contract-computed base score.
 contract Underwriter is EIP712 {
     ReputationSBT public immutable reputation;
-    address public aiSigner;
+    /// @dev The AI agent's signing address, fixed at deploy. Immutable so the trust-minimization
+    ///      guarantee (decisions clamped to a band around an on-chain base score) cannot be
+    ///      silently re-pointed to a different signer; rotation requires a fresh deployment.
+    address public immutable aiSigner;
 
     uint256 public constant MAX_DELTA = 15;
 
@@ -22,8 +25,10 @@ contract Underwriter is EIP712 {
     error ScoreOutOfBand();
     error InvalidSigner();
     error SignatureExpired();
+    error ZeroAddress();
 
     constructor(address reputation_, address aiSigner_) EIP712("TandaUnderwriter", "1") {
+        if (reputation_ == address(0) || aiSigner_ == address(0)) revert ZeroAddress();
         reputation = ReputationSBT(reputation_);
         aiSigner = aiSigner_;
     }

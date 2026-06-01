@@ -44,6 +44,7 @@ contract TandaCircle is ReentrancyGuard {
     error AlreadyContributed();
     error RoundIncomplete();
     error NoCollateral();
+    error ZeroAddress();
 
     event Joined(address indexed member, uint256 index);
     event Started(uint256 timestamp);
@@ -65,6 +66,10 @@ contract TandaCircle is ReentrancyGuard {
         uint256 contributionAmount_,
         uint8 maxMembers_
     ) {
+        if (
+            organizer_ == address(0) || token_ == address(0) || reputation_ == address(0)
+                || underwriter_ == address(0)
+        ) revert ZeroAddress();
         organizer = organizer_;
         token = IERC20(token_);
         reputation = IReputationSBT(reputation_);

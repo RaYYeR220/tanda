@@ -16,12 +16,14 @@ contract CircleFactory {
     mapping(address => bool) public isCircle;
 
     error InvalidParams();
+    error ZeroAddress();
 
     event CircleCreated(
         address indexed circle, address indexed organizer, uint256 contributionAmount, uint8 maxMembers
     );
 
     constructor(address mxnb_, address reputation_, address underwriter_) {
+        if (mxnb_ == address(0) || reputation_ == address(0) || underwriter_ == address(0)) revert ZeroAddress();
         mxnb = mxnb_;
         reputation = ReputationSBT(reputation_);
         underwriter = Underwriter(underwriter_);
