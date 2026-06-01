@@ -59,11 +59,15 @@ export async function underwrite(
 
     const block = msg.content.find((b: any) => b.type === "tool_use");
     if (!block) throw new Error("no tool_use block in response");
-    const input = (block as any).input as { adjustedScore: number; rationale: string };
+    const input = (block as any).input as { adjustedScore: unknown; rationale: unknown };
+
+    if (!Number.isFinite(Number(input.adjustedScore))) {
+      throw new Error("malformed adjustedScore in tool output");
+    }
 
     return {
-      adjustedScore: clampToBand(Math.round(input.adjustedScore), base),
-      rationale: input.rationale,
+      adjustedScore: clampToBand(Math.round(Number(input.adjustedScore)), base),
+      rationale: typeof input.rationale === "string" ? input.rationale : `AI score within band of base ${base}.`,
     };
   } catch (err) {
     return {
