@@ -5,6 +5,7 @@ import {Test} from "forge-std/Test.sol";
 import {MockMXNB} from "../src/MockMXNB.sol";
 import {ReputationSBT} from "../src/ReputationSBT.sol";
 import {Underwriter} from "../src/Underwriter.sol";
+import {SignDecision} from "./util/SignDecision.sol";
 
 contract UnderwriterScoreTest is Test {
     ReputationSBT internal sbt;
@@ -58,5 +59,71 @@ contract UnderwriterScoreTest is Test {
         assertEq(uw.quote(59, amount), 200_000_000);
         assertEq(uw.quote(40, amount), 200_000_000);
         assertEq(uw.quote(39, amount), 300_000_000);
+    }
+}
+
+contract UnderwriterVerifyTest is Test {
+    ReputationSBT internal sbt;
+    Underwriter internal uw;
+    uint256 internal aiKey = 0xA1;
+    address internal aiSigner;
+    address internal circle = address(0xC1);
+    address internal member = address(0x111);
+
+    uint256 internal constant AMOUNT = 100_000_000;
+
+    function setUp() public {
+        aiSigner = vm.addr(aiKey);
+        sbt = new ReputationSBT(address(this));
+        uw = new Underwriter(address(sbt), aiSigner);
+    }
+
+    function _sign(uint256 key, uint256 adjustedScore, uint256 deadline) internal view returns (bytes memory) {
+        return SignDecision.sign(
+            vm, key, address(uw), circle, member, adjustedScore, keccak256("reason"), deadline
+        );
+    }
+
+    function test_validSignatureInBandReturnsCollateral() public {
+        uint256 deadline = block.timestamp + 1 hours;
+        bytes memory sig = _sign(aiKey, 62, deadline);
+        uint256 collateral = uw.verifyAndQuote(circle, member, 62, keccak256("reason"), deadline, AMOUNT, sig);
+        assertEq(collateral, AMOUNT);
+    }
+
+    function test_rejectsScoreAboveBand() public {
+        uint256 deadline = block.timestamp + 1 hours;
+        bytes memory sig = _sign(aiKey, 66, deadline);
+        vm.expectRevert(Underwriter.ScoreOutOfBand.selector);
+        uw.verifyAndQuote(circle, member, 66, keccak256("reason"), deadline, AMOUNT, sig);
+    }
+
+    function test_rejectsScoreBelowBand() public {
+        uint256 deadline = block.timestamp + 1 hours;
+        bytes memory sig = _sign(aiKey, 34, deadline);
+        vm.expectRevert(Underwriter.ScoreOutOfBand.selector);
+        uw.verifyAndQuote(circle, member, 34, keccak256("reason"), deadline, AMOUNT, sig);
+    }
+
+    function test_rejectsWrongSigner() public {
+        uint256 deadline = block.timestamp + 1 hours;
+        bytes memory sig = _sign(0xBEEF, 55, deadline);
+        vm.expectRevert(Underwriter.InvalidSigner.selector);
+        uw.verifyAndQuote(circle, member, 55, keccak256("reason"), deadline, AMOUNT, sig);
+    }
+
+    function test_rejectsExpired() public {
+        uint256 deadline = block.timestamp + 1 hours;
+        bytes memory sig = _sign(aiKey, 55, deadline);
+        vm.warp(deadline + 1);
+        vm.expectRevert(Underwriter.SignatureExpired.selector);
+        uw.verifyAndQuote(circle, member, 55, keccak256("reason"), deadline, AMOUNT, sig);
+    }
+
+    function test_rejectsTamperedScore() public {
+        uint256 deadline = block.timestamp + 1 hours;
+        bytes memory sig = _sign(aiKey, 55, deadline);
+        vm.expectRevert(Underwriter.InvalidSigner.selector);
+        uw.verifyAndQuote(circle, member, 60, keccak256("reason"), deadline, AMOUNT, sig);
     }
 }
