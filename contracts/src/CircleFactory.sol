@@ -39,7 +39,7 @@ contract CircleFactory {
         return allCircles.length;
     }
 
-    function createCircle(uint256 contributionAmount, uint8 maxMembers, uint256 roundDuration)
+    function createCircle(uint256 contributionAmount, uint8 maxMembers, uint256 roundDuration, uint256 bidDuration)
         external
         returns (address)
     {
@@ -52,7 +52,8 @@ contract CircleFactory {
             address(insurancePool),
             contributionAmount,
             maxMembers,
-            roundDuration
+            roundDuration,
+            bidDuration
         );
         address addr = address(circle);
         allCircles.push(addr);

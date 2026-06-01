@@ -25,6 +25,7 @@ contract IntegrationTest is Test {
     uint256 internal constant COLLATERAL_FRESH = 200_000_000;
     uint8 internal constant MAX = 3;
     uint256 internal constant ROUND = 1 days;
+    uint256 internal constant BIDDUR = 1 hours;
 
     function setUp() public {
         aiSigner = vm.addr(aiKey);
@@ -53,7 +54,7 @@ contract IntegrationTest is Test {
 
     function test_endToEndHappyLifecycle() public {
         vm.prank(organizer);
-        address circleAddr = factory.createCircle(AMOUNT, MAX, ROUND);
+        address circleAddr = factory.createCircle(AMOUNT, MAX, ROUND, BIDDUR);
         TandaCircle circle = TandaCircle(circleAddr);
 
         for (uint256 i = 0; i < members.length; i++) {
@@ -96,7 +97,7 @@ contract IntegrationTest is Test {
 
     function test_defaultScenario_recipientMadeWhole_circleContinues() public {
         vm.prank(organizer);
-        address circleAddr = factory.createCircle(AMOUNT, MAX, ROUND);
+        address circleAddr = factory.createCircle(AMOUNT, MAX, ROUND, BIDDUR);
         TandaCircle circle = TandaCircle(circleAddr);
 
         for (uint256 i = 0; i < members.length; i++) {

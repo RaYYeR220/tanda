@@ -29,6 +29,7 @@ contract TandaCircleTest is Test {
     uint256 internal constant COLLATERAL_FRESH = 200_000_000;
     uint8 internal constant MAX = 3;
     uint256 internal constant ROUND = 1 days;
+    uint256 internal constant BIDDUR = 1 hours;
 
     function setUp() public {
         aiSigner = vm.addr(aiKey);
@@ -37,7 +38,7 @@ contract TandaCircleTest is Test {
         uw = new Underwriter(address(sbt), aiSigner);
         pool = new InsurancePool(address(mxnb), address(this));
         circle = new TandaCircle(
-            organizer, address(mxnb), address(sbt), address(uw), address(pool), AMOUNT, MAX, ROUND
+            organizer, address(mxnb), address(sbt), address(uw), address(pool), AMOUNT, MAX, ROUND, BIDDUR
         );
         sbt.setCircleAuthorized(address(circle), true);
         pool.setCircleAuthorized(address(circle), true);
@@ -234,6 +235,7 @@ contract TandaCircleInsuranceTest is Test {
     uint256 internal constant AMOUNT = 100_000_000;
     uint8 internal constant MAX = 2;
     uint256 internal constant ROUND = 1 days;
+    uint256 internal constant BIDDUR = 1 hours;
 
     function setUp() public {
         aiSigner = vm.addr(aiKey);
@@ -242,7 +244,7 @@ contract TandaCircleInsuranceTest is Test {
         uw = new Underwriter(address(sbt), aiSigner);
         pool = new InsurancePool(address(mxnb), address(this));
         circle = new TandaCircle(
-            address(this), address(mxnb), address(sbt), address(uw), address(pool), AMOUNT, MAX, ROUND
+            address(this), address(mxnb), address(sbt), address(uw), address(pool), AMOUNT, MAX, ROUND, BIDDUR
         );
         sbt.setCircleAuthorized(address(circle), true);
         pool.setCircleAuthorized(address(circle), true);

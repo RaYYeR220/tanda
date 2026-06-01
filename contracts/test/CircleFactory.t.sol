@@ -19,6 +19,7 @@ contract CircleFactoryTest is Test {
     address internal aiSigner = address(0xA15);
 
     uint256 internal constant ROUND = 1 days;
+    uint256 internal constant BIDDUR = 1 hours;
 
     function setUp() public {
         mxnb = new MockMXNB();
@@ -32,7 +33,7 @@ contract CircleFactoryTest is Test {
 
     function test_createCircle_deploysAuthorizesTracksOnBothRegistries() public {
         vm.prank(organizer);
-        address circleAddr = factory.createCircle(100_000_000, 3, ROUND);
+        address circleAddr = factory.createCircle(100_000_000, 3, ROUND, BIDDUR);
 
         assertTrue(factory.isCircle(circleAddr));
         assertEq(factory.allCirclesLength(), 1);
@@ -51,25 +52,25 @@ contract CircleFactoryTest is Test {
 
     function test_createCircle_emitsEvent() public {
         vm.prank(organizer);
-        factory.createCircle(50_000_000, 5, ROUND);
+        factory.createCircle(50_000_000, 5, ROUND, BIDDUR);
         assertEq(factory.allCirclesLength(), 1);
     }
 
     function test_createCircle_rejectsZeroContribution() public {
         vm.prank(organizer);
         vm.expectRevert(CircleFactory.InvalidParams.selector);
-        factory.createCircle(0, 3, ROUND);
+        factory.createCircle(0, 3, ROUND, BIDDUR);
     }
 
     function test_createCircle_rejectsTooFewMembers() public {
         vm.prank(organizer);
         vm.expectRevert(CircleFactory.InvalidParams.selector);
-        factory.createCircle(100_000_000, 1, ROUND);
+        factory.createCircle(100_000_000, 1, ROUND, BIDDUR);
     }
 
     function test_createCircle_rejectsZeroRoundDuration() public {
         vm.prank(organizer);
         vm.expectRevert(CircleFactory.InvalidParams.selector);
-        factory.createCircle(100_000_000, 3, 0);
+        factory.createCircle(100_000_000, 3, 0, BIDDUR);
     }
 }

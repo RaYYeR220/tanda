@@ -23,6 +23,7 @@ contract TandaCircle is ReentrancyGuard {
 
     enum State {
         Forming,
+        Bidding,
         Active,
         Completed,
         Defaulted
@@ -36,12 +37,17 @@ contract TandaCircle is ReentrancyGuard {
     uint256 public immutable contributionAmount;
     uint8 public immutable maxMembers;
     uint256 public immutable roundDuration;
+    uint256 public immutable bidDuration;
 
     State public state;
     address[] public members;
     mapping(address => bool) public isMember;
     mapping(address => uint256) public collateral;
     mapping(address => bool) public hasDefaulted;
+    mapping(address => uint256) public memberScore; // AI-clamped score captured at join
+    mapping(address => uint256) public bidFee; // auction bid (0 if not bid)
+    uint256 public bidDeadline;
+    uint256[] public payoutOrder; // slot -> member index; identity for the no-auction path
 
     uint256 public currentRound;
     uint256 public roundDeadline;
@@ -60,9 +66,15 @@ contract TandaCircle is ReentrancyGuard {
     error RoundAlreadyComplete();
     error NoCollateral();
     error ZeroAddress();
+    error ZeroBid();
+    error AlreadyBid();
+    error BidNotClosed();
 
     event Joined(address indexed member, uint256 index, uint256 collateral, uint256 premium);
     event Started(uint256 timestamp, uint256 roundDeadline);
+    event BiddingOpened(uint256 bidDeadline);
+    event BidPlaced(address indexed member, uint256 fee);
+    event BiddingFinalized(uint256[] payoutOrder);
     event Contributed(address indexed member, uint256 indexed round);
     event PaidOut(address indexed recipient, uint256 indexed round, uint256 amount);
     event MemberDefaulted(
@@ -85,7 +97,8 @@ contract TandaCircle is ReentrancyGuard {
         address insurancePool_,
         uint256 contributionAmount_,
         uint8 maxMembers_,
-        uint256 roundDuration_
+        uint256 roundDuration_,
+        uint256 bidDuration_
     ) {
         if (
             organizer_ == address(0) || token_ == address(0) || reputation_ == address(0)
@@ -99,6 +112,7 @@ contract TandaCircle is ReentrancyGuard {
         contributionAmount = contributionAmount_;
         maxMembers = maxMembers_;
         roundDuration = roundDuration_;
+        bidDuration = bidDuration_;
         state = State.Forming;
     }
 
@@ -122,6 +136,7 @@ contract TandaCircle is ReentrancyGuard {
         isMember[msg.sender] = true;
         members.push(msg.sender);
         collateral[msg.sender] = required;
+        memberScore[msg.sender] = adjustedScore;
         emit Joined(msg.sender, members.length - 1, required, prem);
 
         uint256 total = required + prem;
@@ -137,9 +152,107 @@ contract TandaCircle is ReentrancyGuard {
     function start() external inState(State.Forming) {
         if (msg.sender != organizer) revert NotOrganizer();
         if (members.length != maxMembers) revert NotFull();
+        _initIdentityOrder();
         state = State.Active;
         roundDeadline = block.timestamp + roundDuration;
         emit Started(block.timestamp, roundDeadline);
+    }
+
+    function _initIdentityOrder() internal {
+        for (uint256 i = 0; i < members.length; i++) {
+            payoutOrder.push(i);
+        }
+    }
+
+    /// @notice Organizer opens the bidding phase (alternative to start()).
+    function openBidding() external inState(State.Forming) {
+        if (msg.sender != organizer) revert NotOrganizer();
+        if (members.length != maxMembers) revert NotFull();
+        state = State.Bidding;
+        bidDeadline = block.timestamp + bidDuration;
+        emit BiddingOpened(bidDeadline);
+    }
+
+    /// @notice Member bids a fee for an earlier payout slot. The fee funds the insurance pool
+    ///         (it never enters the pot or collateral). One bid per member; fee must be > 0.
+    function bid(uint256 fee) external inState(State.Bidding) nonReentrant {
+        if (!isMember[msg.sender]) revert NotMember();
+        if (fee == 0) revert ZeroBid();
+        if (bidFee[msg.sender] != 0) revert AlreadyBid();
+        bidFee[msg.sender] = fee;
+        token.safeTransferFrom(msg.sender, address(this), fee);
+        token.safeTransfer(address(insurancePool), fee);
+        insurancePool.notifyPremium(fee);
+        emit BidPlaced(msg.sender, fee);
+    }
+
+    /// @notice Organizer finalizes the auction: assign payout slots greedily by descending fee,
+    ///         constrained by each member's AI-allowed earliest slot, then go Active.
+    function finalizeBidding() external inState(State.Bidding) {
+        if (msg.sender != organizer) revert NotOrganizer();
+        uint256 n = members.length;
+
+        uint256[] memory order = new uint256[](n);
+        for (uint256 i = 0; i < n; i++) {
+            order[i] = i;
+        }
+        for (uint256 i = 0; i < n; i++) {
+            uint256 best = i;
+            for (uint256 j = i + 1; j < n; j++) {
+                uint256 fj = bidFee[members[order[j]]];
+                uint256 fb = bidFee[members[order[best]]];
+                if (fj > fb || (fj == fb && order[j] < order[best])) {
+                    best = j;
+                }
+            }
+            (order[i], order[best]) = (order[best], order[i]);
+        }
+
+        uint256 SENTINEL = type(uint256).max;
+        uint256[] memory slotToMember = new uint256[](n);
+        for (uint256 s = 0; s < n; s++) {
+            slotToMember[s] = SENTINEL;
+        }
+        for (uint256 k = 0; k < n; k++) {
+            uint256 mIdx = order[k];
+            uint256 floor = underwriter.earliestSlot(memberScore[members[mIdx]], n);
+            for (uint256 s = floor; s < n; s++) {
+                if (slotToMember[s] == SENTINEL) {
+                    slotToMember[s] = mIdx;
+                    break;
+                }
+            }
+        }
+        for (uint256 k = 0; k < n; k++) {
+            uint256 mIdx = order[k];
+            bool placed = false;
+            for (uint256 s = 0; s < n; s++) {
+                if (slotToMember[s] == mIdx) {
+                    placed = true;
+                    break;
+                }
+            }
+            if (placed) continue;
+            for (uint256 s = 0; s < n; s++) {
+                if (slotToMember[s] == SENTINEL) {
+                    slotToMember[s] = mIdx;
+                    break;
+                }
+            }
+        }
+
+        for (uint256 s = 0; s < n; s++) {
+            payoutOrder.push(slotToMember[s]);
+        }
+        state = State.Active;
+        roundDeadline = block.timestamp + roundDuration;
+        emit BiddingFinalized(payoutOrder);
+        emit Started(block.timestamp, roundDeadline);
+    }
+
+    /// @notice Helper: the member index scheduled to receive the pot in slot `s`.
+    function payoutOrderAt(uint256 s) external view returns (uint256) {
+        return payoutOrder[s];
     }
 
     function contribute() external inState(State.Active) nonReentrant {
@@ -195,7 +308,7 @@ contract TandaCircle is ReentrancyGuard {
     }
 
     function _settle(uint256 payAmount) internal {
-        address recipient = members[currentRound];
+        address recipient = members[payoutOrder[currentRound]];
         emit PaidOut(recipient, currentRound, payAmount);
 
         if (currentRound + 1 == members.length) {
