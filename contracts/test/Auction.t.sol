@@ -67,6 +67,12 @@ contract AuctionTest is Test {
         circle.bid(fee);
     }
 
+    // Finalize after the bid window closes (the path used when not everyone bid).
+    function _finalize() internal {
+        vm.warp(circle.bidDeadline() + 1);
+        circle.finalizeBidding();
+    }
+
     function _joinAll() internal {
         _join(hi, 50);
         _join(mid, 50);
@@ -110,8 +116,8 @@ contract AuctionTest is Test {
         _bid(risky, 50_000_000);
         _bid(mid, 10_000_000);
         _bid(hi, 1_000_000);
-
-        circle.finalizeBidding();
+        // d4 did not bid -> finalize only after the window closes
+        _finalize();
         assertEq(uint8(circle.state()), uint8(TandaCircle.State.Active));
 
         assertEq(circle.payoutOrderAt(0), _indexOf(mid));
@@ -124,7 +130,7 @@ contract AuctionTest is Test {
         circle.openBidding();
         _bid(risky, 50_000_000);
         _bid(mid, 10_000_000);
-        circle.finalizeBidding();
+        _finalize();
 
         bool[4] memory seen;
         for (uint256 s = 0; s < 4; s++) {
@@ -139,7 +145,7 @@ contract AuctionTest is Test {
         _joinAll();
         circle.openBidding();
         _bid(mid, 10_000_000);
-        circle.finalizeBidding();
+        _finalize();
 
         address slot0 = circle.members(circle.payoutOrderAt(0));
         uint256 before = mxnb.balanceOf(slot0);
@@ -180,6 +186,26 @@ contract AuctionTest is Test {
         vm.prank(mid);
         vm.expectRevert(TandaCircle.WrongState.selector);
         circle.bid(1_000_000);
+    }
+
+    function test_finalize_revertsBeforeDeadlineWhenNotAllBid() public {
+        _joinAll();
+        circle.openBidding();
+        _bid(mid, 10_000_000); // only one bidder, window still open
+        vm.expectRevert(TandaCircle.BidNotClosed.selector);
+        circle.finalizeBidding();
+    }
+
+    function test_finalize_allowedImmediatelyWhenEveryoneBid() public {
+        _joinAll();
+        circle.openBidding();
+        _bid(hi, 1_000_000);
+        _bid(mid, 2_000_000);
+        _bid(risky, 3_000_000);
+        _bid(d4, 4_000_000);
+        // everyone bid -> can finalize without waiting for the deadline
+        circle.finalizeBidding();
+        assertEq(uint8(circle.state()), uint8(TandaCircle.State.Active));
     }
 
     function test_startStillWorksAsNoAuctionShortcut() public {

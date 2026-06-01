@@ -192,6 +192,17 @@ contract TandaCircle is ReentrancyGuard {
         if (msg.sender != organizer) revert NotOrganizer();
         uint256 n = members.length;
 
+        // The organizer may only finalize once the bid window has closed, unless everyone
+        // has already bid. This stops the organizer from cutting off members mid-auction.
+        bool allBid = true;
+        for (uint256 i = 0; i < n; i++) {
+            if (bidFee[members[i]] == 0) {
+                allBid = false;
+                break;
+            }
+        }
+        if (!allBid && block.timestamp <= bidDeadline) revert BidNotClosed();
+
         uint256[] memory order = new uint256[](n);
         for (uint256 i = 0; i < n; i++) {
             order[i] = i;
