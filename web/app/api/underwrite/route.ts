@@ -60,13 +60,16 @@ async function readReputation(member: Address): Promise<Reputation> {
  *  Uses sequential reads (anvil does not deploy multicall3 by default). */
 async function readCircleFacts(circle: Address, member: Address) {
   const client = serverClient();
-  const read = <T>(functionName: string, args?: unknown[]) =>
-    client.readContract({ address: circle, abi: abis.TandaCircle, functionName, args }) as Promise<T>;
+  const tc = { address: circle, abi: abis.TandaCircle } as const;
 
-  const currentRound = await read<bigint>("currentRound");
-  const contributionAmount = await read<bigint>("contributionAmount");
-  const collateral = await read<bigint>("collateral", [member]);
-  const contributed = await read<boolean>("contributedInRound", [currentRound, member]);
+  const currentRound = (await client.readContract({ ...tc, functionName: "currentRound" })) as bigint;
+  const contributionAmount = (await client.readContract({ ...tc, functionName: "contributionAmount" })) as bigint;
+  const collateral = (await client.readContract({ ...tc, functionName: "collateral", args: [member] })) as bigint;
+  const contributed = (await client.readContract({
+    ...tc,
+    functionName: "contributedInRound",
+    args: [currentRound, member],
+  })) as boolean;
   return { currentRound, contributionAmount, collateral, contributed };
 }
 
