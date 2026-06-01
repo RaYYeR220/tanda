@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { Member } from "@/lib/useCircle";
 import { trustTier, formatMXNB, collateralMultiplier } from "@/lib/format";
 import { getMemberInfo } from "@/lib/memberMap";
@@ -8,6 +11,14 @@ interface MemberCardProps {
   contributionAmount: bigint;
   currentRound: number;
   animDelay?: string;
+  /** Address of the currently connected wallet */
+  connectedAddress?: `0x${string}`;
+  /** Called when user clicks Contribuir (approves then contributes) */
+  onContribute?: () => void;
+  /** Called when user clicks Reforzar with a chosen amount */
+  onTopUp?: (amount: bigint) => void;
+  isContributing?: boolean;
+  isToppingUp?: boolean;
 }
 
 const BAND_CLASS: Record<string, string> = {
@@ -36,6 +47,11 @@ export default function MemberCard({
   contributionAmount,
   currentRound,
   animDelay,
+  connectedAddress,
+  onContribute,
+  onTopUp,
+  isContributing = false,
+  isToppingUp = false,
 }: MemberCardProps) {
   const tier = trustTier(member.score);
   const { name, handle, rationale } = getMemberInfo(member.address);
@@ -45,6 +61,14 @@ export default function MemberCard({
   const isNextRecipient = member.slot === currentRound;
   const initial = name.slice(0, 1).toUpperCase();
   const avatarLetter = isFlagged ? "⚠" : initial;
+
+  const isMe =
+    !!connectedAddress &&
+    member.address.toLowerCase() === connectedAddress.toLowerCase();
+  const canContribute = isMe && !member.contributed && !!onContribute;
+  const canTopUp = isMe && (member.atRisk || member.hasDefaulted) && !!onTopUp;
+
+  const [topUpAmt, setTopUpAmt] = useState("100");
 
   return (
     <div
@@ -97,6 +121,53 @@ export default function MemberCard({
         <div className={`mc-rationale${tier === "flag" ? " trust-flag" : ""}`}>
           {rationale}
         </div>
+
+        {/* ── ACTION ZONE ── */}
+        {canContribute && (
+          <button
+            className="btn-primary"
+            style={{ marginTop: 12, width: "100%", fontSize: "0.80rem", padding: "10px 16px" }}
+            onClick={onContribute}
+            disabled={isContributing}
+          >
+            {isContributing ? "Procesando…" : `Contribuir ${formatMXNB(contributionAmount)} MXNB`}
+          </button>
+        )}
+
+        {canTopUp && (
+          <div style={{ marginTop: 12, display: "flex", gap: 6 }}>
+            <input
+              type="number"
+              min="1"
+              value={topUpAmt}
+              onChange={(e) => setTopUpAmt(e.target.value)}
+              style={{
+                flex: 1,
+                background: "rgba(255,255,255,0.07)",
+                border: "1px solid rgba(237,217,163,0.22)",
+                borderRadius: 4,
+                padding: "8px 10px",
+                color: "#FAF3E0",
+                fontSize: "0.80rem",
+                fontFamily: "var(--font-body, sans-serif)",
+              }}
+              placeholder="MXNB"
+            />
+            <button
+              className="btn-secondary"
+              style={{ fontSize: "0.75rem", padding: "8px 14px", whiteSpace: "nowrap" }}
+              onClick={() => {
+                const n = parseFloat(topUpAmt);
+                if (!isNaN(n) && n > 0 && onTopUp) {
+                  onTopUp(BigInt(Math.round(n * 1_000_000)));
+                }
+              }}
+              disabled={isToppingUp}
+            >
+              {isToppingUp ? "…" : "Reforzar"}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

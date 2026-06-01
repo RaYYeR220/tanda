@@ -1,26 +1,160 @@
 "use client";
 
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { useAccount } from "wagmi";
 import { useCircle } from "@/lib/useCircle";
 import { formatMXNB } from "@/lib/format";
 import { getMemberInfo } from "@/lib/memberMap";
+import { addresses } from "@/lib/contracts";
+import {
+  useApprove,
+  useContribute,
+  useTopUp,
+  useResolveRound,
+  useFlagAtRisk,
+} from "@/lib/useWriteTanda";
 import CircleHeader from "@/components/CircleHeader";
 import AiWarningBanner from "@/components/AiWarningBanner";
 import MemberCard from "@/components/MemberCard";
 import AuctionRow from "@/components/AuctionRow";
 import InsurancePoolCard from "@/components/InsurancePoolCard";
+import { TxToastProvider, useTxToast } from "@/components/TxToast";
 
 const ANIM_DELAYS = ["0.12s", "0.22s", "0.32s", "0.42s"];
 
-export default function CirclePage() {
-  const params = useParams();
-  const rawAddress = Array.isArray(params.address)
-    ? params.address[0]
-    : params.address ?? "0x";
-
-  const circleAddress = rawAddress as `0x${string}`;
+// Inner component that uses the toast context (must be inside TxToastProvider)
+function CircleDashboard({ circleAddress }: { circleAddress: `0x${string}` }) {
   const view = useCircle(circleAddress);
+  const { address: connectedAddress } = useAccount();
+  const toast = useTxToast();
+
+  // Track toast IDs across approve → action chains
+  const toastIdRef = useRef<string | null>(null);
+
+  // ── Refetch helper ───────────────────────────────────────
+  const refetch = useCallback(() => {
+    view.refetch().catch(console.error);
+  }, [view]);
+
+  // ── Contribute flow ──────────────────────────────────────
+  const contribute = useContribute(circleAddress, () => {
+    if (toastIdRef.current) {
+      toast.update(toastIdRef.current, { status: "success", action: "Contribución confirmada ✓" });
+    }
+    refetch();
+  });
+
+  const approveContribute = useApprove(
+    addresses.mxnb,
+    circleAddress,
+    useCallback(() => {
+      // approval confirmed → trigger contribute
+      if (toastIdRef.current) {
+        toast.update(toastIdRef.current, { status: "confirming", action: "Contribuyendo…" });
+      }
+      contribute.run();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [contribute.run, toast]),
+  );
+
+  // Watch approve hash to update toast
+  useEffect(() => {
+    if (approveContribute.hash && toastIdRef.current) {
+      toast.update(toastIdRef.current, { hash: approveContribute.hash });
+    }
+  }, [approveContribute.hash, toast]);
+
+  const handleContribute = useCallback(() => {
+    const id = toast.push({ action: "Aprobando MXNB…", status: "pending" });
+    toastIdRef.current = id;
+    approveContribute.run(view.contributionAmount);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [toast, approveContribute.run, view.contributionAmount]);
+
+  // ── Top-up flow ──────────────────────────────────────────
+  const [topUpAmount, setTopUpAmount] = useState<bigint>(0n);
+
+  const topUp = useTopUp(circleAddress, () => {
+    if (toastIdRef.current) {
+      toast.update(toastIdRef.current, { status: "success", action: "Colateral reforzado ✓" });
+    }
+    refetch();
+  });
+
+  const approveTopUp = useApprove(
+    addresses.mxnb,
+    circleAddress,
+    useCallback(() => {
+      if (toastIdRef.current) {
+        toast.update(toastIdRef.current, { status: "confirming", action: "Reforzando colateral…" });
+      }
+      topUp.run(topUpAmount);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [topUp.run, topUpAmount, toast]),
+  );
+
+  const handleTopUp = useCallback(
+    (amount: bigint) => {
+      setTopUpAmount(amount);
+      const id = toast.push({ action: "Aprobando MXNB para colateral…", status: "pending" });
+      toastIdRef.current = id;
+      approveTopUp.run(amount);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [toast, approveTopUp.run],
+  );
+
+  // ── Resolve round ────────────────────────────────────────
+  const resolveRound = useResolveRound(circleAddress, () => {
+    if (toastIdRef.current) {
+      toast.update(toastIdRef.current, { status: "success", action: "Ronda resuelta ✓" });
+    }
+    refetch();
+  });
+
+  // Watch resolveRound errors
+  useEffect(() => {
+    if (resolveRound.error && toastIdRef.current) {
+      toast.update(toastIdRef.current, {
+        status: "error",
+        error: resolveRound.error.includes("RoundNotExpired")
+          ? "La ronda aún no ha expirado"
+          : resolveRound.error.slice(0, 120),
+      });
+    }
+  }, [resolveRound.error, toast]);
+
+  const handleResolveRound = useCallback(() => {
+    const id = toast.push({ action: "Resolviendo ronda…", status: "pending" });
+    toastIdRef.current = id;
+    resolveRound.run();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [toast, resolveRound.run]);
+
+  // ── AI Flag ──────────────────────────────────────────────
+  const flagAtRisk = useFlagAtRisk(circleAddress, () => {
+    if (toastIdRef.current) {
+      toast.update(toastIdRef.current, { status: "success", action: "Miembro marcado en riesgo ✓" });
+    }
+    refetch();
+  });
+
+  const handleFlagAtRisk = useCallback(
+    async (member: `0x${string}`) => {
+      const id = toast.push({ action: "Consultando agente IA…", status: "pending" });
+      toastIdRef.current = id;
+      try {
+        await flagAtRisk.run(member);
+        toast.update(id, { status: "confirming", action: "Enviando flag on-chain…" });
+      } catch (e) {
+        toast.update(id, { status: "error", error: String(e) });
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [toast, flagAtRisk.run],
+  );
 
   const nextName = view.nextRecipient
     ? getMemberInfo(view.nextRecipient).name
@@ -83,6 +217,18 @@ export default function CirclePage() {
       </div>
     );
   }
+
+  const isContributing =
+    approveContribute.isPending ||
+    approveContribute.isConfirming ||
+    contribute.isPending ||
+    contribute.isConfirming;
+
+  const isToppingUp =
+    approveTopUp.isPending ||
+    approveTopUp.isConfirming ||
+    topUp.isPending ||
+    topUp.isConfirming;
 
   return (
     <div
@@ -194,7 +340,37 @@ export default function CirclePage() {
             <CircleHeader view={view} />
 
             {/* AI early-warning banner */}
-            <AiWarningBanner members={view.members} />
+            <AiWarningBanner
+              members={view.members}
+              circleAddress={circleAddress}
+              onFlagAtRisk={handleFlagAtRisk}
+              isFlagging={
+                flagAtRisk.isFetching ||
+                flagAtRisk.isPending ||
+                flagAtRisk.isConfirming
+              }
+            />
+
+            {/* Resolver ronda button */}
+            <div style={{ marginBottom: 24, display: "flex", alignItems: "center", gap: 12 }}>
+              <button
+                className="btn-secondary"
+                style={{ fontSize: "0.82rem", padding: "10px 24px" }}
+                onClick={handleResolveRound}
+                disabled={resolveRound.isPending || resolveRound.isConfirming}
+              >
+                {resolveRound.isPending || resolveRound.isConfirming
+                  ? "Procesando…"
+                  : "Resolver ronda"}
+              </button>
+              {resolveRound.error && (
+                <span style={{ fontSize: "0.75rem", color: "#FCA5A5" }}>
+                  {resolveRound.error.includes("RoundNotExpired")
+                    ? "La ronda aún no ha expirado"
+                    : resolveRound.error.slice(0, 80)}
+                </span>
+              )}
+            </div>
 
             {/* Members section label */}
             <div className="members-label" aria-label="AI-scored circle members">
@@ -210,6 +386,11 @@ export default function CirclePage() {
                   contributionAmount={view.contributionAmount}
                   currentRound={view.currentRound}
                   animDelay={ANIM_DELAYS[i] ?? "0.5s"}
+                  connectedAddress={connectedAddress}
+                  onContribute={handleContribute}
+                  onTopUp={handleTopUp}
+                  isContributing={isContributing}
+                  isToppingUp={isToppingUp}
                 />
               ))}
             </div>
@@ -249,5 +430,20 @@ export default function CirclePage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function CirclePage() {
+  const params = useParams();
+  const rawAddress = Array.isArray(params.address)
+    ? params.address[0]
+    : params.address ?? "0x";
+
+  const circleAddress = rawAddress as `0x${string}`;
+
+  return (
+    <TxToastProvider>
+      <CircleDashboard circleAddress={circleAddress} />
+    </TxToastProvider>
   );
 }

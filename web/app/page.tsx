@@ -65,8 +65,8 @@ export default function Home() {
             />
           </li>
           <li>
-            <a
-              href="#"
+            <Link
+              href="/circles/new"
               className="text-[0.82rem] font-bold tracking-[0.04em] rounded-[4px] px-5 py-2 no-underline transition-all duration-200"
               style={{
                 background: "#D97706",
@@ -74,7 +74,7 @@ export default function Home() {
               }}
             >
               Crear tanda →
-            </a>
+            </Link>
           </li>
         </ul>
       </nav>

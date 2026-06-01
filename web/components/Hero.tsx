@@ -1,3 +1,4 @@
+import Link from "next/link";
 import FeatureCard from "./FeatureCard";
 import TrustStrip from "./TrustStrip";
 
@@ -178,9 +179,9 @@ export default function Hero() {
             className="reveal flex flex-wrap gap-[14px] mb-11"
             style={{ animationDelay: "0.50s" }}
           >
-            <a href="#" className="btn-primary">
+            <Link href="/circles/new" className="btn-primary">
               🌼&nbsp; Crear una tanda
-            </a>
+            </Link>
             <a href="#como-funciona" className="btn-secondary">
               Cómo funciona →
             </a>

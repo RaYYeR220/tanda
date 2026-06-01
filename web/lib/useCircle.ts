@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback } from "react";
 import { useReadContracts } from "wagmi";
 import { addresses, abis } from "./contracts";
 
@@ -26,6 +27,7 @@ export type CircleView = {
   members: Member[];
   nextRecipient?: `0x${string}`;
   poolBalance: bigint;
+  refetch: () => Promise<void>;
 };
 
 const EMPTY_ADDR = "0x" as `0x${string}`;
@@ -252,6 +254,14 @@ export function useCircle(circleAddress: `0x${string}`): CircleView {
     phase3.error?.message ||
     undefined;
 
+  const refetch = useCallback(async () => {
+    await Promise.all([
+      phase1.refetch().catch(() => {}),
+      phase2.refetch().catch(() => {}),
+      phase3.refetch().catch(() => {}),
+    ]);
+  }, [phase1, phase2, phase3]);
+
   return {
     loading,
     error: errorMsg,
@@ -263,5 +273,6 @@ export function useCircle(circleAddress: `0x${string}`): CircleView {
     members,
     nextRecipient,
     poolBalance,
+    refetch,
   };
 }
