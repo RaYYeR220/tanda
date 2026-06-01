@@ -187,3 +187,50 @@ contract UnderwriterEarliestSlotTest is Test {
         assertEq(uw.earliestSlot(29, 4), 2);
     }
 }
+
+contract UnderwriterRiskFlagTest is Test {
+    ReputationSBT internal sbt;
+    Underwriter internal uw;
+    uint256 internal aiKey = 0xA1;
+    address internal aiSigner;
+    address internal circle = address(0xC1);
+    address internal member = address(0x111);
+
+    function setUp() public {
+        aiSigner = vm.addr(aiKey);
+        sbt = new ReputationSBT(address(this));
+        uw = new Underwriter(address(sbt), aiSigner);
+    }
+
+    function _sign(uint256 key, uint256 round, uint256 deadline) internal view returns (bytes memory) {
+        return SignDecision.signRiskFlag(vm, key, address(uw), circle, member, round, keccak256("risk"), deadline);
+    }
+
+    function test_validRiskFlagAccepted() public view {
+        uint256 deadline = block.timestamp + 1 hours;
+        bytes memory sig = _sign(aiKey, 2, deadline);
+        assertTrue(uw.verifyRiskFlag(circle, member, 2, keccak256("risk"), deadline, sig));
+    }
+
+    function test_rejectsWrongSigner() public {
+        uint256 deadline = block.timestamp + 1 hours;
+        bytes memory sig = _sign(0xBEEF, 2, deadline);
+        vm.expectRevert(Underwriter.InvalidSigner.selector);
+        uw.verifyRiskFlag(circle, member, 2, keccak256("risk"), deadline, sig);
+    }
+
+    function test_rejectsExpired() public {
+        uint256 deadline = block.timestamp + 1 hours;
+        bytes memory sig = _sign(aiKey, 2, deadline);
+        vm.warp(deadline + 1);
+        vm.expectRevert(Underwriter.SignatureExpired.selector);
+        uw.verifyRiskFlag(circle, member, 2, keccak256("risk"), deadline, sig);
+    }
+
+    function test_rejectsTamperedRound() public {
+        uint256 deadline = block.timestamp + 1 hours;
+        bytes memory sig = _sign(aiKey, 2, deadline);
+        vm.expectRevert(Underwriter.InvalidSigner.selector);
+        uw.verifyRiskFlag(circle, member, 3, keccak256("risk"), deadline, sig);
+    }
+}

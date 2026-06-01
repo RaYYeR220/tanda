@@ -22,6 +22,10 @@ contract Underwriter is EIP712 {
         "Decision(address circle,address member,uint256 adjustedScore,bytes32 rationaleHash,uint256 deadline)"
     );
 
+    bytes32 private constant RISK_FLAG_TYPEHASH = keccak256(
+        "RiskFlag(address circle,address member,uint256 round,bytes32 rationaleHash,uint256 deadline)"
+    );
+
     error ScoreOutOfBand();
     error InvalidSigner();
     error SignatureExpired();
@@ -99,5 +103,24 @@ contract Underwriter is EIP712 {
         if (adjustedScore < lo || adjustedScore > hi) revert ScoreOutOfBand();
 
         return quote(adjustedScore, contributionAmount);
+    }
+
+    /// @notice Verify an AI-signed early-warning risk flag for a member in a given round.
+    /// @dev Same signer/deadline checks as verifyAndQuote, no band (a flag is a boolean assertion).
+    function verifyRiskFlag(
+        address circle,
+        address member,
+        uint256 round,
+        bytes32 rationaleHash,
+        uint256 deadline,
+        bytes calldata signature
+    ) external view returns (bool) {
+        if (block.timestamp > deadline) revert SignatureExpired();
+        bytes32 structHash =
+            keccak256(abi.encode(RISK_FLAG_TYPEHASH, circle, member, round, rationaleHash, deadline));
+        bytes32 digest = _hashTypedDataV4(structHash);
+        address signer = ECDSA.recover(digest, signature);
+        if (signer != aiSigner) revert InvalidSigner();
+        return true;
     }
 }
