@@ -137,4 +137,58 @@ contract IntegrationTest is Test {
         assertEq(circle.currentRound(), 2);
         assertEq(uint8(circle.state()), uint8(TandaCircle.State.Active));
     }
+
+    /// @notice The auction money-shot: a risky member out-bids everyone for slot 0, but the AI
+    ///         risk band keeps them out of the early slots. n=3, risky score 25 -> floor n/2 = 1.
+    /// @dev Uses a local stack so this contract can seed the risky member's on-chain reputation
+    ///      (a prior default) BEFORE handing SBT admin to the factory.
+    function test_auctionScenario_riskyOutbidButBandWins() public {
+        ReputationSBT lsbt = new ReputationSBT(address(this));
+        Underwriter luw = new Underwriter(address(lsbt), aiSigner);
+        InsurancePool lpool = new InsurancePool(address(mxnb), address(this));
+        CircleFactory lfactory = new CircleFactory(address(mxnb), address(lsbt), address(luw), address(lpool));
+
+        // seed members[0] with a default (base score 50 - 25 = 25, <30 band) while still admin
+        lsbt.setCircleAuthorized(address(this), true);
+        lsbt.recordDefault(members[0]);
+
+        lsbt.transferAdmin(address(lfactory));
+        lpool.transferAdmin(address(lfactory));
+        mxnb.mint(address(lpool), 1_000_000_000);
+
+        vm.prank(organizer);
+        address circleAddr = lfactory.createCircle(AMOUNT, MAX, ROUND, BIDDUR);
+        TandaCircle circle = TandaCircle(circleAddr);
+
+        uint256[3] memory scores = [uint256(25), 50, 50]; // members[0] risky
+        for (uint256 i = 0; i < members.length; i++) {
+            mxnb.mint(members[i], AMOUNT * 20);
+            vm.prank(members[i]);
+            mxnb.approve(circleAddr, type(uint256).max);
+
+            uint256 deadline = block.timestamp + 1 hours;
+            bytes memory sig = SignDecision.sign(
+                vm, aiKey, address(luw), circleAddr, members[i], scores[i], keccak256("ok"), deadline
+            );
+            vm.prank(members[i]);
+            circle.join(scores[i], keccak256("ok"), deadline, sig);
+        }
+
+        vm.prank(organizer);
+        circle.openBidding();
+
+        // risky bids the most...
+        vm.prank(members[0]);
+        circle.bid(50_000_000);
+        vm.prank(members[1]);
+        circle.bid(5_000_000);
+
+        vm.warp(circle.bidDeadline() + 1);
+        vm.prank(organizer);
+        circle.finalizeBidding();
+
+        // ...but the AI band (floor n/2 = 1 for n=3) bars them from slot 0
+        assertTrue(circle.payoutOrderAt(0) != 0);
+        assertEq(uint8(circle.state()), uint8(TandaCircle.State.Active));
+    }
 }
