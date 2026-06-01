@@ -4,20 +4,24 @@ pragma solidity ^0.8.24;
 import {Test} from "forge-std/Test.sol";
 import {MockMXNB} from "../src/MockMXNB.sol";
 import {ReputationSBT} from "../src/ReputationSBT.sol";
+import {Underwriter} from "../src/Underwriter.sol";
 import {CircleFactory} from "../src/CircleFactory.sol";
 import {TandaCircle} from "../src/TandaCircle.sol";
 
 contract CircleFactoryTest is Test {
     MockMXNB internal mxnb;
     ReputationSBT internal sbt;
+    Underwriter internal uw;
     CircleFactory internal factory;
     address internal organizer = address(0x0123);
+    address internal aiSigner = address(0xA15);
 
     function setUp() public {
         mxnb = new MockMXNB();
-        sbt = new ReputationSBT(address(this));        // deployer is admin
-        factory = new CircleFactory(address(mxnb), address(sbt));
-        sbt.transferAdmin(address(factory));           // hand admin to factory
+        sbt = new ReputationSBT(address(this));
+        uw = new Underwriter(address(sbt), aiSigner);
+        factory = new CircleFactory(address(mxnb), address(sbt), address(uw));
+        sbt.transferAdmin(address(factory));
     }
 
     function test_createCircle_deploysAuthorizesTracks() public {
@@ -33,10 +37,10 @@ contract CircleFactoryTest is Test {
         assertEq(c.contributionAmount(), 100_000_000);
         assertEq(c.maxMembers(), 3);
         assertEq(address(c.token()), address(mxnb));
+        assertEq(address(c.underwriter()), address(uw));
     }
 
     function test_createCircle_emitsEvent() public {
-        vm.recordLogs();
         vm.prank(organizer);
         factory.createCircle(50_000_000, 5);
         assertEq(factory.allCirclesLength(), 1);
