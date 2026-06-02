@@ -11,7 +11,6 @@
 
 import { keccak256, toBytes, type Hex, type Address } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import Anthropic from "@anthropic-ai/sdk";
 
 // ─── Types (mirrors agent/src/types.ts) ──────────────────────────────────────
 
@@ -59,34 +58,14 @@ export function clampToBand(adjusted: number, base: number): number {
   return Math.min(hi, Math.max(lo, adjusted));
 }
 
-// ─── AI scoring (Claude) — mirrors agent/src/underwrite.ts ───────────────────
-// When ANTHROPIC_API_KEY is set, Claude adjusts the deterministic base score WITHIN the
+// ─── AI scoring (Gemini via OpenRouter) ──────────────────────────────────────
+// When OPENROUTER_API_KEY is set, an LLM adjusts the deterministic base score WITHIN the
 // trust-minimization band and writes a rationale citing the on-chain signals. The on-chain
 // Underwriter independently re-derives the base and rejects anything outside [base ± MAX_DELTA],
 // so the LLM can nuance but never fabricate. Falls back to the deterministic base on any failure.
 
-const DECISION_TOOL = {
-  name: "submit_decision",
-  description: "Submit the final underwriting decision for this member.",
-  input_schema: {
-    type: "object" as const,
-    properties: {
-      adjustedScore: {
-        type: "integer",
-        minimum: 0,
-        maximum: 100,
-        description: "Final reliability score, 0-100. Stay within +/-15 of the provided base score.",
-      },
-      rationale: {
-        type: "string",
-        description: "One or two sentences citing the on-chain signals behind the score.",
-      },
-    },
-    required: ["adjustedScore", "rationale"],
-  },
-};
-
-const AI_MODEL = "claude-opus-4-8";
+const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
+const DEFAULT_MODEL = "google/gemini-3-flash-preview";
 
 export interface AiDecision {
   adjustedScore: number;
@@ -94,47 +73,79 @@ export interface AiDecision {
   usedAI: boolean;
 }
 
-/** Ask Claude to adjust within the band; deterministic fallback if no key or on error. */
+/** Best-effort JSON extraction (handles models that wrap output in prose / markdown fences). */
+function parseJsonLoose(s: string): { adjustedScore?: unknown; rationale?: unknown } | null {
+  try {
+    return JSON.parse(s);
+  } catch {
+    /* fall through */
+  }
+  const m = s.match(/\{[\s\S]*\}/);
+  if (m) {
+    try {
+      return JSON.parse(m[0]);
+    } catch {
+      /* ignore */
+    }
+  }
+  return null;
+}
+
+/** Ask the LLM (OpenRouter) to adjust within the band; deterministic fallback on no key / error. */
 export async function assessScore(rep: Reputation, meta?: WalletMeta): Promise<AiDecision> {
   const base = baseScore(rep);
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) {
     return { adjustedScore: base, rationale: "Deterministic score from on-chain reputation.", usedAI: false };
   }
 
   try {
-    const client = new Anthropic({ apiKey });
-    const msg = await client.messages.create({
-      model: AI_MODEL,
-      max_tokens: 512,
-      tools: [DECISION_TOOL],
-      tool_choice: { type: "tool", name: "submit_decision" },
-      messages: [
-        {
-          role: "user",
-          content:
-            `You are underwriting a member of an on-chain savings circle (tanda).\n` +
-            `Deterministic base score (from on-chain reputation): ${base}/100.\n` +
-            `On-chain reputation: ${JSON.stringify(rep)}.\n` +
-            (meta
-              ? `Wallet metadata: ageDays=${meta.ageDays}, txCount=${meta.txCount}, ethBalanceWei=${meta.mxnbBalance}.\n`
-              : ``) +
-            `Adjust the score within +/-15 of the base to reflect cold-start nuance ` +
-            `(a brand-new but active wallet is less risky than a dormant one). ` +
-            `Cite the signals you used. Submit via submit_decision.`,
-        },
-      ],
+    const model = process.env.OPENROUTER_MODEL || DEFAULT_MODEL;
+    const res = await fetch(OPENROUTER_URL, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://github.com/RaYYeR220/tanda",
+        "X-Title": "Tanda",
+      },
+      body: JSON.stringify({
+        model,
+        max_tokens: 400,
+        response_format: { type: "json_object" },
+        messages: [
+          {
+            role: "system",
+            content:
+              `You are the AI underwriter for an on-chain Mexican savings circle (tanda). ` +
+              `Reply with ONLY a JSON object: {"adjustedScore": <integer 0-100>, "rationale": "<1-2 sentences>"}. ` +
+              `adjustedScore MUST stay within +/-15 of the provided base score.`,
+          },
+          {
+            role: "user",
+            content:
+              `Deterministic base score (from on-chain reputation): ${base}/100.\n` +
+              `On-chain reputation: ${JSON.stringify(rep)}.\n` +
+              (meta
+                ? `Wallet metadata: ageDays=${meta.ageDays}, txCount=${meta.txCount}, ethBalanceWei=${meta.mxnbBalance}.\n`
+                : ``) +
+              `Adjust within +/-15 of the base for cold-start nuance ` +
+              `(a brand-new but active wallet is less risky than a dormant one), and cite the signals you used.`,
+          },
+        ],
+      }),
     });
 
-    const block = msg.content.find((b) => b.type === "tool_use");
-    if (!block || block.type !== "tool_use") throw new Error("no tool_use block");
-    const input = block.input as { adjustedScore: unknown; rationale: unknown };
-    if (!Number.isFinite(Number(input.adjustedScore))) throw new Error("malformed adjustedScore");
+    if (!res.ok) throw new Error(`OpenRouter HTTP ${res.status}`);
+    const data = await res.json();
+    const content = data?.choices?.[0]?.message?.content;
+    const parsed = typeof content === "string" ? parseJsonLoose(content) : null;
+    if (!parsed || !Number.isFinite(Number(parsed.adjustedScore))) throw new Error("malformed LLM output");
 
     return {
-      adjustedScore: clampToBand(Math.round(Number(input.adjustedScore)), base),
+      adjustedScore: clampToBand(Math.round(Number(parsed.adjustedScore)), base),
       rationale:
-        typeof input.rationale === "string" ? input.rationale : `AI score within band of base ${base}.`,
+        typeof parsed.rationale === "string" ? parsed.rationale : `AI score within band of base ${base}.`,
       usedAI: true,
     };
   } catch {
