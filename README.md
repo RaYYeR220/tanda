@@ -21,10 +21,12 @@ underwriting, no collateral, no recourse.
 - **AI underwriter** reads each member's *on-chain* reputation (rounds paid on time, late,
   defaults, circles completed) and assigns a credit score. The score sets the member's
   **collateral multiplier** and how early a payout slot they may bid for.
-- **Trust-minimized AI.** The AI never has unchecked power. Every decision is **EIP-712
-  signed** off-chain, and the `Underwriter` contract independently recomputes a deterministic
-  `baseScore` from the soulbound reputation token and **rejects any signed score outside a
-  ±15 band** around it. The AI can nuance, never fabricate.
+- **Trust-minimized AI.** The AI never has unchecked power. Scoring is a **live LLM**
+  (Gemini via OpenRouter — see `web/lib/underwriter.ts`) that reads the member's on-chain
+  reputation + wallet signals and nuances the score, with a deterministic fallback if no key.
+  Every decision is **EIP-712 signed** off-chain, and the `Underwriter` contract independently
+  recomputes a deterministic `baseScore` from the soulbound reputation token and **rejects any
+  signed score outside a ±15 band** around it. The AI can nuance, never fabricate.
 - **Escrow + slash.** Contributions and collateral live in the `TandaCircle` contract. Miss a
   round and your collateral is slashed to make the recipient whole.
 - **Insurance pool.** A shared pool absorbs shortfalls beyond a single member's collateral, so
@@ -52,6 +54,7 @@ The full "Tanda Oaxaca" demo circle is deployed and seeded on **Arbitrum Sepolia
 |---|---|
 | Demo circle (Tanda Oaxaca) | [`0x4E96CA33C8fFd5Eb6f99d5D081e97FAF1E8a559B`](https://sepolia.arbiscan.io/address/0x4E96CA33C8fFd5Eb6f99d5D081e97FAF1E8a559B) |
 | Auction circle (live bids) | [`0x5654b0104A4a7083FDd8ee59895CCeC6BF1f9CFF`](https://sepolia.arbiscan.io/address/0x5654b0104A4a7083FDd8ee59895CCeC6BF1f9CFF) |
+| Completed circle (full lifecycle) | [`0x611018E5967dEf104C295f32F162e446b8C6d3bD`](https://sepolia.arbiscan.io/address/0x611018E5967dEf104C295f32F162e446b8C6d3bD) |
 | CircleFactory | [`0xFD53CE3B35660D8B8Dfa514DDB3853172A42C1E8`](https://sepolia.arbiscan.io/address/0xFD53CE3B35660D8B8Dfa514DDB3853172A42C1E8) |
 | Underwriter | [`0x67f70c123B446fE87C51Eb78A1e64Ba3e1B2042D`](https://sepolia.arbiscan.io/address/0x67f70c123B446fE87C51Eb78A1e64Ba3e1B2042D) |
 | ReputationSBT | [`0xC747777779e9f16d01e39be6C056BdD9F88C4055`](https://sepolia.arbiscan.io/address/0xC747777779e9f16d01e39be6C056BdD9F88C4055) |
@@ -169,8 +172,10 @@ Setup:
    and `NEXT_PUBLIC_GASLESS_CIRCLE` (the address from step 2).
 
 On that circle's dashboard (while it's still Forming) the **"Únete con passkey (sin gas)"** button
-runs the sponsored join. Verified live: three passkey smart accounts joined a Forming circle paying
-0 ETH, each AI-scored as a cold-start member (50 → 2× collateral).
+runs the sponsored join. The new smart account is scored **live by the AI** (Gemini, when
+`OPENROUTER_API_KEY` is set) and its rationale is shown in the success panel — e.g. a brand-new
+dormant wallet is scored 35 ("zero age, balance or tx history, high sybil risk", −15 band floor).
+Verified live: passkey smart accounts joined a Forming circle paying 0 ETH.
 
 ---
 
@@ -204,3 +209,5 @@ Every number on screen is a live on-chain read — verifiable on
 - ✅ Deployed + seeded live on Arbitrum Sepolia
 - ✅ Gasless passkey onboarding (ERC-4337) — verified live: passkey-owned smart accounts
   join via Pimlico-sponsored userops (mint + approve + join batched, 0 ETH, no wallet)
+- ✅ Live AI underwriter — Gemini (via OpenRouter) scores joins on-chain-bounded, verified live
+- ✅ Full lifecycle — a circle seeded through all rounds to Completed (collateral, payouts, done)

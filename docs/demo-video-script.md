@@ -19,6 +19,8 @@ Mexican market). Swap to a Spanish VO via ElevenLabs Multilingual if preferred.
   - Main circle: `http://localhost:3010/circles/0x4E96CA33C8fFd5Eb6f99d5D081e97FAF1E8a559B`
   - Auction: `http://localhost:3010/circles/0x5654b0104A4a7083FDd8ee59895CCeC6BF1f9CFF`
   - Gasless (forming): `http://localhost:3010/circles/0xDD01119D792d9E3c6520Fe29F37F4492b05B0875`
+    (for a clean "first member joins" shot, seed a fresh empty one — command at the bottom)
+  - Completed (full lifecycle, optional close B-roll): `http://localhost:3010/circles/0x611018E5967dEf104C295f32F162e446b8C6d3bD`
 - **Recorder:** OBS / Win+G / ShareX — browser window only, 1080p+, 30–60 fps. Move the cursor slowly.
 - **Two live actions need prep:**
   - *Resolver ronda* (default-caught): connect MetaMask with a little Sepolia ETH. ONE-SHOT — re-seed via `SeedDemoSepolia` for another take.
@@ -36,7 +38,7 @@ Mexican market). Swap to a Spanish VO via ElevenLabs Multilingual if preferred.
 | S2 | 0:18–0:40 | Main circle: full dashboard → zoom on the 4 member cards (82/66/50/28, collateral 0.5×→3×) → cursor on footer "Arbitrum Sepolia · 421614" | Ken Burns zoom on cards + footer |
 | S3 | 0:40–1:12 | Same circle: zoom on red AI banner (0xkito flagged) → click "Resolver ronda" → wait for confirm → dashboard updates (kito defaulted, pool/recipient) | Film click + result; cut/speed the tx wait |
 | S4 | 1:12–1:36 | Auction circle: zoom on "TANDA DE PUJA (EN VIVO)" → hold on 0xkito row (80 MXNB, score 28, slot #3) + red "IA bloqueó" banner | Zoom on the bid table; linger on kito + banner |
-| S5 | 1:36–2:00 | Gasless forming circle: cursor on "🔑 Únete con passkey" → click → Windows Hello prompt → "Te uniste sin gas" success panel | Film click + Hello + result; speed up the ~20s userop |
+| S5 | 1:36–2:00 | Gasless forming circle: cursor on "🔑 Únete con passkey" → click → Windows Hello prompt → "Te uniste sin gas" success panel (zoom on the **live AI rationale** 🤖 + score) | Film click + Hello + result; speed up the ~20s userop. The rationale is generated live by Gemini |
 | End | 2:00–2:15 | Back to dashboard → end card: `github.com/RaYYeR220/tanda` + "ETH Mexico 2026 · MXNB · Arbitrum" | End card in the editor |
 
 ---
@@ -55,8 +57,8 @@ Before a payment is even missed, the AI flags zero-x-kito as a default risk — 
 **[S4 — ~22s]**
 Who gets paid first? Members bid for earlier turns — but the AI sets a risk band. Watch: zero-x-kito bids the most, eighty pesos, for an early slot. Blocked. A score of twenty-eight can't buy its way to the front — it lands last in line. The AI protects everyone else's money.
 
-**[S5 — ~20s]**
-And anyone can join with just a passkey. No wallet, no ETH, no gas. One sponsored transaction mints, approves, and joins — secured by a fingerprint. Account abstraction puts a first-time user one tap away from a real on-chain savings circle.
+**[S5 — ~22s]**
+And anyone can join with just a passkey. No wallet, no ETH, no gas — and the AI scores them on the spot, reading their on-chain footprint live. One sponsored transaction mints, approves, and joins, secured by a fingerprint. Account abstraction puts a first-time user one tap away from a real on-chain savings circle.
 
 **[S6 — ~13s]**
 Tanda — the savings circle Mexicans already trust, now without the risk. AI underwriting, on-chain escrow, an insurance backstop. All in MXNB, on Arbitrum.
