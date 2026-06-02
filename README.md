@@ -149,6 +149,30 @@ holds or receives ETH, so it needs no gas and stays identical across anvil and S
 
 ---
 
+## Gasless passkey onboarding (ERC-4337)
+
+A new member can join with only a **device passkey** — no browser wallet, no ETH, no
+pre-funded MXNB. One Pimlico-sponsored UserOperation batches `mint → approve → join`,
+authorized by a WebAuthn passkey that owns a Coinbase Smart Account (pure `viem/account-abstraction`,
+no permissionless.js). It's a progressive enhancement — the EOA/RainbowKit flow is untouched.
+
+Setup:
+1. Pimlico (`dashboard.pimlico.io`): an API key + a sponsorship policy covering Arbitrum Sepolia.
+2. Create a Forming circle to onboard into:
+   ```powershell
+   $env:PRIVATE_KEY="0x..."; $env:FACTORY="0xFD53CE3B35660D8B8Dfa514DDB3853172A42C1E8"
+   forge script script/CreateFormingCircleSepolia.s.sol:CreateFormingCircleSepolia `
+     --rpc-url $env:ARBITRUM_SEPOLIA_RPC_URL --broadcast
+   ```
+3. In `web/.env.local`: `NEXT_PUBLIC_BUNDLER_URL` (Pimlico v2 URL), `NEXT_PUBLIC_PIMLICO_SPONSORSHIP_POLICY`,
+   and `NEXT_PUBLIC_GASLESS_CIRCLE` (the address from step 2).
+
+On that circle's dashboard (while it's still Forming) the **"Únete con passkey (sin gas)"** button
+runs the sponsored join. Verified live: three passkey smart accounts joined a Forming circle paying
+0 ETH, each AI-scored as a cold-start member (50 → 2× collateral).
+
+---
+
 ## Demo script (the 1–3 min video)
 
 1. **Open the dashboard** — Tanda Oaxaca, round 2 of 4, live from Arbitrum Sepolia (footer
@@ -162,6 +186,10 @@ holds or receives ETH, so it needs no gas and stays identical across anvil and S
    is short on testnet), click **Resolver ronda**: 0xkito's collateral is slashed and the
    **insurance pool** keeps the recipient (Diego) whole. Show the pool balance before/after.
 
+5. **Gasless onboarding** (bonus) — on a Forming circle, tap **"Únete con passkey (sin gas)"**,
+   authenticate with Face ID / Windows Hello, and a brand-new smart account joins the tanda in
+   one Pimlico-sponsored transaction: no wallet, no ETH, no MXNB up front.
+
 Every number on screen is a live on-chain read — verifiable on
 [Arbiscan](https://sepolia.arbiscan.io/address/0x4E96CA33C8fFd5Eb6f99d5D081e97FAF1E8a559B).
 
@@ -172,4 +200,5 @@ Every number on screen is a live on-chain read — verifiable on
 - ✅ Contracts + AI agent — complete, reviewed, tested (77 forge / 20 vitest)
 - ✅ Web app — folk-modern landing + live dashboard + write flows
 - ✅ Deployed + seeded live on Arbitrum Sepolia
-- 🔜 Gasless passkey onboarding (ERC-4337) — progressive enhancement over the EOA flow
+- ✅ Gasless passkey onboarding (ERC-4337) — verified live: passkey-owned smart accounts
+  join via Pimlico-sponsored userops (mint + approve + join batched, 0 ETH, no wallet)
