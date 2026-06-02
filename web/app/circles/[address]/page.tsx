@@ -9,6 +9,7 @@ import { formatMXNB } from "@/lib/format";
 import { getMemberInfo } from "@/lib/memberMap";
 import { addresses } from "@/lib/contracts";
 import { activeChain } from "@/lib/chain";
+import PasskeyJoinButton from "@/components/PasskeyJoinButton";
 import {
   useApprove,
   useContribute,
@@ -351,6 +352,19 @@ function CircleDashboard({ circleAddress }: { circleAddress: `0x${string}` }) {
                 flagAtRisk.isConfirming
               }
             />
+
+            {/* Gasless passkey onboarding — shown while the circle is still Forming */}
+            {view.state === 0 && (
+              <div style={{ marginBottom: 24 }}>
+                <div
+                  className="text-[0.65rem] font-bold tracking-[0.16em] uppercase mb-2"
+                  style={{ color: "rgba(237,217,163,0.5)" }}
+                >
+                  Tanda en formación — onboarding sin gas
+                </div>
+                <PasskeyJoinButton circle={circleAddress} onJoined={view.refetch} />
+              </div>
+            )}
 
             {/* Resolver ronda button */}
             <div style={{ marginBottom: 24, display: "flex", alignItems: "center", gap: 12 }}>
