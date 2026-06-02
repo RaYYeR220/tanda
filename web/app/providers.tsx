@@ -9,7 +9,7 @@ import {
   lightTheme,
 } from "@rainbow-me/rainbowkit";
 import { http } from "viem";
-import { activeChain } from "@/lib/chain";
+import { activeChain, rpcUrl } from "@/lib/chain";
 import "@rainbow-me/rainbowkit/styles.css";
 
 const projectId =
@@ -20,9 +20,7 @@ const config = getDefaultConfig({
   projectId,
   chains: [activeChain],
   transports: {
-    [activeChain.id]: http(
-      activeChain.rpcUrls.default.http[0]
-    ),
+    [activeChain.id]: http(rpcUrl),
   },
   ssr: true,
 });

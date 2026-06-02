@@ -26,6 +26,29 @@ export const MEMBER_MAP: Record<
     rationale:
       "billetera nueva sin historial, default previo detectado · colateral máximo",
   },
+
+  // ── Arbitrum Sepolia members (keccak-derived seed addresses) ───────────────
+  "0xf0e7d67a871b8b181c408bedee82cffc0cb2db53": {
+    name: "María",
+    handle: "@maria.eth",
+    rationale: "6 rondas a tiempo, 1 círculo completado · historial sólido",
+  },
+  "0x4b197d3c8eed5dfadf5113273277b27b61538d93": {
+    name: "Diego",
+    handle: "@diegomx",
+    rationale: "3 círculos completados, 1 demora menor · perfil moderado",
+  },
+  "0xc0cc6bc960f9975e05e76823951844d1c732240f": {
+    name: "Lupe",
+    handle: "@guadalupe_v",
+    rationale: "billetera nueva, cold-start · historial limitado",
+  },
+  "0x29ba4bbd669c2c6338b2d33c8e33e6b5ddc5aad9": {
+    name: "0xkito",
+    handle: "@0xkito",
+    rationale:
+      "billetera nueva sin historial, default previo detectado · colateral máximo",
+  },
 };
 
 import { shortAddr } from "./format";

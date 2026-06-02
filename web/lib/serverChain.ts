@@ -1,5 +1,5 @@
 import { createPublicClient, http, type PublicClient } from "viem";
-import { activeChain } from "./chain";
+import { activeChain, rpcUrl } from "./chain";
 
 /**
  * Server-side viem client used by the /api/underwrite route to read the TRUSTED on-chain
@@ -8,6 +8,6 @@ import { activeChain } from "./chain";
 export function serverClient(): PublicClient {
   return createPublicClient({
     chain: activeChain,
-    transport: http(activeChain.rpcUrls.default.http[0]),
+    transport: http(rpcUrl),
   });
 }

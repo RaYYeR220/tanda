@@ -11,3 +11,10 @@ export const anvil = defineChain({
 /** Flip the whole app between local anvil and Arbitrum Sepolia with one env var. */
 export const activeChain =
   process.env.NEXT_PUBLIC_CHAIN === "arbitrumSepolia" ? arbitrumSepolia : anvil;
+
+/**
+ * RPC endpoint for reads/writes. Prefers a dedicated endpoint (Alchemy/Infura) via
+ * NEXT_PUBLIC_RPC_URL for reliability under demo load, else the chain's public RPC.
+ */
+export const rpcUrl =
+  process.env.NEXT_PUBLIC_RPC_URL || activeChain.rpcUrls.default.http[0];

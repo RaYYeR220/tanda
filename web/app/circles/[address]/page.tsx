@@ -8,6 +8,7 @@ import { useCircle } from "@/lib/useCircle";
 import { formatMXNB } from "@/lib/format";
 import { getMemberInfo } from "@/lib/memberMap";
 import { addresses } from "@/lib/contracts";
+import { activeChain } from "@/lib/chain";
 import {
   useApprove,
   useContribute,
@@ -423,7 +424,7 @@ function CircleDashboard({ circleAddress }: { circleAddress: `0x${string}` }) {
             className="w-[5px] h-[5px] rounded-full"
             style={{ background: "#0F9090" }}
           />
-          Anvil · Chain ID 31337 · MXNB · Non-custodial
+          {activeChain.name} · Chain ID {activeChain.id} · MXNB · Non-custodial
           <span className="ml-auto font-mono" style={{ color: "rgba(237,217,163,0.18)" }}>
             {circleAddress}
           </span>
