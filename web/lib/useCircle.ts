@@ -15,6 +15,10 @@ export type Member = {
   hasDefaulted: boolean;
   /** payout slot assigned to this member */
   slot: number;
+  /** auction bid in MXNB-wei (0 if no bidding happened / didn't bid) */
+  bidFee: bigint;
+  /** AI-allowed earliest payout slot for this member's score (the risk band floor) */
+  earliestSlot: number;
 };
 
 export type CircleView = {
@@ -28,8 +32,17 @@ export type CircleView = {
   members: Member[];
   nextRecipient?: `0x${string}`;
   poolBalance: bigint;
+  /** true once any member has placed an auction bid (the circle ran a bidding phase) */
+  biddingOccurred: boolean;
   refetch: () => Promise<void>;
 };
+
+/** Mirror of Underwriter.earliestSlot(score, n): the AI risk-band floor on payout slot. */
+function earliestSlotFloor(score: number, n: number): number {
+  if (score >= 50) return 0;
+  if (score >= 30) return Math.floor(n / 4);
+  return Math.floor(n / 2);
+}
 
 const EMPTY_ADDR = "0x" as `0x${string}`;
 
@@ -146,6 +159,12 @@ export function useCircle(circleAddress: `0x${string}`): CircleView {
           functionName: "hasDefaulted" as const,
           args: [addr] as const,
         },
+        {
+          address: circleAddress,
+          abi: abis.TandaCircle,
+          functionName: "bidFee" as const,
+          args: [addr] as const,
+        },
       ])
     : [];
 
@@ -182,7 +201,7 @@ export function useCircle(circleAddress: `0x${string}`): CircleView {
   });
 
   // ── Parse phase 3 results ────────────────────────────────────────
-  const perMemberSlotCount = 5;
+  const perMemberSlotCount = 6;
   const payoutOrderOffset = memberCount * perMemberSlotCount;
   const poolBalanceOffset = payoutOrderOffset + memberCount;
 
@@ -220,6 +239,10 @@ export function useCircle(circleAddress: `0x${string}`): CircleView {
       phase3.data?.[base + 4]?.status === "success"
         ? Boolean(phase3.data[base + 4].result)
         : false;
+    const bidFee =
+      phase3.data?.[base + 5]?.status === "success"
+        ? (phase3.data[base + 5].result as bigint)
+        : 0n;
     const slot = memberSlotMap.get(i) ?? i;
 
     return {
@@ -231,8 +254,12 @@ export function useCircle(circleAddress: `0x${string}`): CircleView {
       atRisk,
       hasDefaulted,
       slot,
+      bidFee,
+      earliestSlot: earliestSlotFloor(score, memberCount || 1),
     };
   });
+
+  const biddingOccurred = members.some((m) => m.bidFee > 0n);
 
   // Next recipient: member at payoutOrder[currentRound]
   const nextRecipientIndex = payoutOrder[currentRound];
@@ -277,6 +304,7 @@ export function useCircle(circleAddress: `0x${string}`): CircleView {
     members,
     nextRecipient,
     poolBalance,
+    biddingOccurred,
     refetch,
   };
 }

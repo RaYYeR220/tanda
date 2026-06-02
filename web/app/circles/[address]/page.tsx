@@ -411,7 +411,7 @@ function CircleDashboard({ circleAddress }: { circleAddress: `0x${string}` }) {
             </div>
 
             {/* Auction row */}
-            <AuctionRow />
+            <AuctionRow members={view.members} biddingOccurred={view.biddingOccurred} />
 
             {/* Dashboard footer */}
             <div className="cd-footer">
