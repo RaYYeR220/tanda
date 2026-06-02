@@ -18,6 +18,7 @@
  */
 
 import {
+  createClient,
   createPublicClient,
   http,
   maxUint256,
@@ -90,15 +91,32 @@ export async function getSmartAccount(owner: WebAuthnAccount) {
   });
 }
 
+type PimlicoGasTier = { maxFeePerGas: Hex; maxPriorityFeePerGas: Hex };
+type PimlicoGasPrice = { slow: PimlicoGasTier; standard: PimlicoGasTier; fast: PimlicoGasTier };
+
 /** A bundler client wired to Pimlico for both submission and paymaster sponsorship. */
 function bundlerClient(account: Awaited<ReturnType<typeof getSmartAccount>>) {
+  const url = bundlerUrl();
   const policyId = process.env.NEXT_PUBLIC_PIMLICO_SPONSORSHIP_POLICY;
+  // Pimlico rejects a userop whose priority fee is below the network minimum, so the fees
+  // must come from Pimlico's own `pimlico_getUserOperationGasPrice` (viem defaults to 0 on L2s).
+  const pimlico = createClient({ transport: http(url) });
   return createBundlerClient({
     account,
     client: publicClient(),
-    transport: http(bundlerUrl()),
+    transport: http(url),
     paymaster: true,
     paymasterContext: policyId ? { sponsorshipPolicyId: policyId } : undefined,
+    userOperation: {
+      estimateFeesPerGas: async () => {
+        const request = pimlico.request as (args: { method: string; params?: unknown[] }) => Promise<unknown>;
+        const gp = (await request({ method: "pimlico_getUserOperationGasPrice" })) as PimlicoGasPrice;
+        return {
+          maxFeePerGas: BigInt(gp.standard.maxFeePerGas),
+          maxPriorityFeePerGas: BigInt(gp.standard.maxPriorityFeePerGas),
+        };
+      },
+    },
   });
 }
 

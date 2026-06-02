@@ -2,6 +2,7 @@
 
 import { useCallback } from "react";
 import { useReadContracts } from "wagmi";
+import { keepPreviousData } from "@tanstack/react-query";
 import { addresses, abis } from "./contracts";
 
 export type Member = {
@@ -63,6 +64,7 @@ export function useCircle(circleAddress: `0x${string}`): CircleView {
       enabled: !!isValid,
       refetchInterval: 4000,
       staleTime: 2000,
+      placeholderData: keepPreviousData,
     },
   });
 
@@ -97,6 +99,7 @@ export function useCircle(circleAddress: `0x${string}`): CircleView {
       enabled: !!isValid && memberCount > 0,
       refetchInterval: 4000,
       staleTime: 2000,
+      placeholderData: keepPreviousData,
     },
   });
 
@@ -174,6 +177,7 @@ export function useCircle(circleAddress: `0x${string}`): CircleView {
       enabled: allAddrsLoaded,
       refetchInterval: 4000,
       staleTime: 2000,
+      placeholderData: keepPreviousData,
     },
   });
 
