@@ -11,6 +11,7 @@
 
 import { keccak256, toBytes, type Hex, type Address } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
+import Anthropic from "@anthropic-ai/sdk";
 
 // ─── Types (mirrors agent/src/types.ts) ──────────────────────────────────────
 
@@ -56,6 +57,93 @@ export function clampToBand(adjusted: number, base: number): number {
   const lo = Math.max(0, base - MAX_DELTA);
   const hi = Math.min(100, base + MAX_DELTA);
   return Math.min(hi, Math.max(lo, adjusted));
+}
+
+// ─── AI scoring (Claude) — mirrors agent/src/underwrite.ts ───────────────────
+// When ANTHROPIC_API_KEY is set, Claude adjusts the deterministic base score WITHIN the
+// trust-minimization band and writes a rationale citing the on-chain signals. The on-chain
+// Underwriter independently re-derives the base and rejects anything outside [base ± MAX_DELTA],
+// so the LLM can nuance but never fabricate. Falls back to the deterministic base on any failure.
+
+const DECISION_TOOL = {
+  name: "submit_decision",
+  description: "Submit the final underwriting decision for this member.",
+  input_schema: {
+    type: "object" as const,
+    properties: {
+      adjustedScore: {
+        type: "integer",
+        minimum: 0,
+        maximum: 100,
+        description: "Final reliability score, 0-100. Stay within +/-15 of the provided base score.",
+      },
+      rationale: {
+        type: "string",
+        description: "One or two sentences citing the on-chain signals behind the score.",
+      },
+    },
+    required: ["adjustedScore", "rationale"],
+  },
+};
+
+const AI_MODEL = "claude-opus-4-8";
+
+export interface AiDecision {
+  adjustedScore: number;
+  rationale: string;
+  usedAI: boolean;
+}
+
+/** Ask Claude to adjust within the band; deterministic fallback if no key or on error. */
+export async function assessScore(rep: Reputation, meta?: WalletMeta): Promise<AiDecision> {
+  const base = baseScore(rep);
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) {
+    return { adjustedScore: base, rationale: "Deterministic score from on-chain reputation.", usedAI: false };
+  }
+
+  try {
+    const client = new Anthropic({ apiKey });
+    const msg = await client.messages.create({
+      model: AI_MODEL,
+      max_tokens: 512,
+      tools: [DECISION_TOOL],
+      tool_choice: { type: "tool", name: "submit_decision" },
+      messages: [
+        {
+          role: "user",
+          content:
+            `You are underwriting a member of an on-chain savings circle (tanda).\n` +
+            `Deterministic base score (from on-chain reputation): ${base}/100.\n` +
+            `On-chain reputation: ${JSON.stringify(rep)}.\n` +
+            (meta
+              ? `Wallet metadata: ageDays=${meta.ageDays}, txCount=${meta.txCount}, ethBalanceWei=${meta.mxnbBalance}.\n`
+              : ``) +
+            `Adjust the score within +/-15 of the base to reflect cold-start nuance ` +
+            `(a brand-new but active wallet is less risky than a dormant one). ` +
+            `Cite the signals you used. Submit via submit_decision.`,
+        },
+      ],
+    });
+
+    const block = msg.content.find((b) => b.type === "tool_use");
+    if (!block || block.type !== "tool_use") throw new Error("no tool_use block");
+    const input = block.input as { adjustedScore: unknown; rationale: unknown };
+    if (!Number.isFinite(Number(input.adjustedScore))) throw new Error("malformed adjustedScore");
+
+    return {
+      adjustedScore: clampToBand(Math.round(Number(input.adjustedScore)), base),
+      rationale:
+        typeof input.rationale === "string" ? input.rationale : `AI score within band of base ${base}.`,
+      usedAI: true,
+    };
+  } catch {
+    return {
+      adjustedScore: base,
+      rationale: `Deterministic fallback (LLM unavailable): base score ${base} from on-chain reputation.`,
+      usedAI: false,
+    };
+  }
 }
 
 // ─── Risk assessment (mirrors agent/src/monitor.ts) ──────────────────────────
@@ -148,8 +236,9 @@ export interface SignedDecisionResult {
 }
 
 /**
- * Deterministic (no AI) signed underwriting decision.
- * Used by the /api/underwrite route; the Claude path lives in the agent package.
+ * Signed underwriting decision. Uses Claude to nuance the score within the band when
+ * ANTHROPIC_API_KEY is set (see assessScore); deterministic base otherwise. Either way the
+ * on-chain Underwriter clamps the signed score to [base ± MAX_DELTA].
  */
 export async function buildSignedDecision(params: {
   privateKey: Hex;
@@ -158,13 +247,16 @@ export async function buildSignedDecision(params: {
   circle: Address;
   member: Address;
   reputation: Reputation;
+  walletMeta?: WalletMeta;
   deadline: bigint;
 }): Promise<SignedDecisionResult> {
-  const { privateKey, chainId, underwriterContract, circle, member, reputation, deadline } = params;
+  const { privateKey, chainId, underwriterContract, circle, member, reputation, walletMeta, deadline } =
+    params;
 
   const account = privateKeyToAccount(privateKey);
-  const adjustedScore = baseScore(reputation);
-  const rationale = "Deterministic score from on-chain reputation.";
+  const decision = await assessScore(reputation, walletMeta);
+  const adjustedScore = decision.adjustedScore;
+  const rationale = decision.rationale;
   const rationaleHash = keccak256(toBytes(rationale));
 
   const signature = await account.signTypedData({

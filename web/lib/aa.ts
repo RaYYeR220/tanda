@@ -123,6 +123,7 @@ function bundlerClient(account: Awaited<ReturnType<typeof getSmartAccount>>) {
 /** Signed underwriting decision shape returned by /api/underwrite (kind: "decision"). */
 export type SignedDecision = {
   adjustedScore: number;
+  rationale: string;
   rationaleHash: Hex;
   deadline: string;
   signature: Hex;
@@ -148,6 +149,7 @@ export type GaslessJoinResult = {
   userOpHash: Hex;
   txHash: Hex;
   adjustedScore: number;
+  rationale: string;
 };
 
 /**
@@ -206,5 +208,6 @@ export async function joinCircleGasless(opts: {
     userOpHash,
     txHash: receipt.receipt.transactionHash,
     adjustedScore: decision.adjustedScore,
+    rationale: decision.rationale,
   };
 }

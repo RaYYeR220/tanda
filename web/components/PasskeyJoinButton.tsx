@@ -64,6 +64,11 @@ export default function PasskeyJoinButton({
           Cuenta inteligente <span className="font-mono">{shortAddr(result.smartAccount)}</span> ·
           score IA <strong>{result.adjustedScore}</strong> · 0 ETH de gas pagado.
         </div>
+        {result.rationale && (
+          <div className="mt-1 italic" style={{ color: "rgba(237,217,163,0.65)" }}>
+            🤖 {result.rationale}
+          </div>
+        )}
         {explorer && (
           <a
             href={`${explorer}/tx/${result.txHash}`}

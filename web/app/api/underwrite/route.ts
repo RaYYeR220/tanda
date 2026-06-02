@@ -26,7 +26,12 @@
 import { NextResponse } from "next/server";
 import type { Hex, Address } from "viem";
 import { isAddress } from "viem";
-import { buildSignedDecision, buildSignedRiskFlag, type Reputation } from "../../../lib/underwriter";
+import {
+  buildSignedDecision,
+  buildSignedRiskFlag,
+  type Reputation,
+  type WalletMeta,
+} from "../../../lib/underwriter";
 import { activeChain } from "../../../lib/chain";
 import { addresses, abis } from "../../../lib/contracts";
 import { serverClient } from "../../../lib/serverChain";
@@ -54,6 +59,16 @@ async function readReputation(member: Address): Promise<Reputation> {
     defaults: Number(r[3]),
     circlesCompleted: Number(r[4]),
   };
+}
+
+/** Read on-chain wallet metadata the AI uses for cold-start nuance (tx count, native balance). */
+async function readWalletMeta(member: Address): Promise<WalletMeta> {
+  const client = serverClient();
+  const [txCount, balance] = await Promise.all([
+    client.getTransactionCount({ address: member }),
+    client.getBalance({ address: member }),
+  ]);
+  return { ageDays: 0, txCount: Number(txCount), mxnbBalance: balance };
 }
 
 /** Read circle-scoped facts (current round, the member's collateral + whether they contributed).
@@ -103,8 +118,8 @@ export async function POST(req: Request) {
 
   try {
     if (kind === "decision") {
-      // Reputation read from chain — NOT from the request body.
-      const reputation = await readReputation(member);
+      // Reputation + wallet metadata read from chain — NOT from the request body.
+      const [reputation, walletMeta] = await Promise.all([readReputation(member), readWalletMeta(member)]);
       const result = await buildSignedDecision({
         privateKey: signerKey,
         chainId: activeChain.id,
@@ -112,6 +127,7 @@ export async function POST(req: Request) {
         circle,
         member,
         reputation,
+        walletMeta,
         deadline: toBigInt(deadline),
       });
       return NextResponse.json({

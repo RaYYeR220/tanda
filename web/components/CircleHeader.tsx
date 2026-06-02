@@ -27,6 +27,7 @@ export default function CircleHeader({ view }: CircleHeaderProps) {
   } = view;
 
   const stateLabel = STATE_LABELS[state] ?? "ACTIVA";
+  const isCompleted = state === 3;
   const displayRound = currentRound + 1; // 1-indexed for display
 
   const nextName = nextRecipient
@@ -35,7 +36,7 @@ export default function CircleHeader({ view }: CircleHeaderProps) {
 
   // Build round pips
   const pips = Array.from({ length: roundsTotal }, (_, i) => {
-    if (i < currentRound) return "done";
+    if (isCompleted || i < currentRound) return "done";
     if (i === currentRound) return "active";
     return "pending";
   });
@@ -62,8 +63,10 @@ export default function CircleHeader({ view }: CircleHeaderProps) {
             <span className="cmeta-value">{members.length}</span>
           </div>
           <div className="cmeta">
-            <span className="cmeta-label">Próxima receptora</span>
-            <span className="cmeta-value teal">{nextName} ✓</span>
+            <span className="cmeta-label">{isCompleted ? "Rondas pagadas" : "Próxima receptora"}</span>
+            <span className="cmeta-value teal">
+              {isCompleted ? `${roundsTotal}/${roundsTotal} ✓` : `${nextName} ✓`}
+            </span>
           </div>
           <div className="cmeta">
             <span className="cmeta-label">Fondo protección</span>
@@ -75,7 +78,9 @@ export default function CircleHeader({ view }: CircleHeaderProps) {
       {/* Right: round pips + pot */}
       <div className="round-block">
         <span className="round-label-sm">
-          Ronda {displayRound} de {roundsTotal}
+          {isCompleted
+            ? `Completada · ${roundsTotal}/${roundsTotal}`
+            : `Ronda ${displayRound} de ${roundsTotal}`}
         </span>
         <div
           className="round-pips"
