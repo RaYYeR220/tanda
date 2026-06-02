@@ -51,6 +51,7 @@ The full "Tanda Oaxaca" demo circle is deployed and seeded on **Arbitrum Sepolia
 | Contract | Address |
 |---|---|
 | Demo circle (Tanda Oaxaca) | [`0x4E96CA33C8fFd5Eb6f99d5D081e97FAF1E8a559B`](https://sepolia.arbiscan.io/address/0x4E96CA33C8fFd5Eb6f99d5D081e97FAF1E8a559B) |
+| Auction circle (live bids) | [`0x5654b0104A4a7083FDd8ee59895CCeC6BF1f9CFF`](https://sepolia.arbiscan.io/address/0x5654b0104A4a7083FDd8ee59895CCeC6BF1f9CFF) |
 | CircleFactory | [`0xFD53CE3B35660D8B8Dfa514DDB3853172A42C1E8`](https://sepolia.arbiscan.io/address/0xFD53CE3B35660D8B8Dfa514DDB3853172A42C1E8) |
 | Underwriter | [`0x67f70c123B446fE87C51Eb78A1e64Ba3e1B2042D`](https://sepolia.arbiscan.io/address/0x67f70c123B446fE87C51Eb78A1e64Ba3e1B2042D) |
 | ReputationSBT | [`0xC747777779e9f16d01e39be6C056BdD9F88C4055`](https://sepolia.arbiscan.io/address/0xC747777779e9f16d01e39be6C056BdD9F88C4055) |
@@ -180,8 +181,9 @@ runs the sponsored join. Verified live: three passkey smart accounts joined a Fo
    multiplier (0.5× → 3×).
 2. **AI early-warning** — point at the red banner: the agent has signed a `RiskFlag` for
    **0xkito**, who hasn't contributed this round. Their card is **FLAGGED**.
-3. **Auction band** — the slot-auction row shows 0xkito's bid for an earlier slot **rejected
-   on-chain** because their score is below the AI-permitted band.
+3. **Auction band** (on the dedicated auction circle below) — the slot-auction row shows **live
+   on-chain bids**: 0xkito bid 80 MXNB (the highest) but a score-28 wallet is floored out of the
+   early slots by the AI band, landing in slot #3 while María (82) took slot #1 for less.
 4. **Default caught** — once round 2's deadline passes (~10 min after seeding; round duration
    is short on testnet), click **Resolver ronda**: 0xkito's collateral is slashed and the
    **insurance pool** keeps the recipient (Diego) whole. Show the pool balance before/after.
